@@ -58,3 +58,19 @@ class Story {
   bool get isExpired => DateTime.now().isAfter(expiresAt);
   bool hasBeenViewedBy(String userId) => viewedBy.contains(userId);
 }
+
+class FriendStoryGroup {
+  final String userId;
+  final String username;
+  final String avatarUrl;
+  final bool hasUnviewed;
+  final List<Story> stories;
+
+  FriendStoryGroup({
+    required this.userId,
+    required this.username,
+    required this.avatarUrl,
+    required this.hasUnviewed,
+    required this.stories,
+  });
+}

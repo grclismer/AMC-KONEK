@@ -35,3 +35,15 @@
 2026-03-22 10:27:00.169: [INFO] OnDoneLoading sync enabled: 1
 2026-03-22 10:27:11.368: [INFO] Sync initialization duration: 1562ms
 2026-03-22 10:54:08.655: [INFO] VisibilityChanged: 0
+2026-03-22 10:56:27.044: [INFO] OnDoneLoading sync enabled: 0
+2026-03-22 10:56:32.103: [INFO] Primary account changed.
+2026-03-22 10:56:32.103: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-03-22 10:56:39.545: [INFO] Sync initialization duration: 12497ms
+2026-03-22 18:33:46.015: [INFO] OnDoneLoading sync enabled: 1
+2026-03-22 18:34:00.454: [INFO] Sync initialization duration: 4656ms
+2026-03-22 18:50:27.428: [INFO] VisibilityChanged: 0
+2026-03-22 18:53:06.213: [INFO] OnDoneLoading sync enabled: 0
+2026-03-22 18:53:16.685: [INFO] Primary account changed.
+2026-03-22 18:53:16.685: [INFO] OnPrimaryAccountChanged PrimaryAccountChangeEvent::Type::kSet
+2026-03-22 18:53:34.048: [INFO] Sync initialization duration: 27828ms
+2026-03-22 19:00:14.269: [INFO] VisibilityChanged: 0

@@ -8,6 +8,7 @@ import '../models/story_model.dart';
 import '../theme/app_theme.dart';
 import '../screens/story_viewer_screen.dart';
 import '../services/storage_service.dart';
+import '../widgets/user_photo_widget.dart';
 
 class StoriesBar extends StatefulWidget {
   const StoriesBar({super.key});
@@ -46,6 +47,7 @@ class _StoriesBarState extends State<StoriesBar> {
       builder: (context, userSnapshot) {
         final userData = userSnapshot.data?.data() as Map<String, dynamic>? ?? {};
         final photoURL = userData['photoURL'];
+        final friendIds = List<String>.from(userData['friends'] ?? []);
         
         return StreamBuilder<List<Story>>(
           stream: StoryService.instance.getUserStoriesStream(user.uid),
@@ -61,11 +63,18 @@ class _StoriesBarState extends State<StoriesBar> {
                 left: 12,
                 right: 12,
               ),
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  _buildYourStory(user, hasStories, stories, photoURL),
-                ],
+              child: StreamBuilder<List<FriendStoryGroup>>(
+                stream: StoryService.instance.getFriendsStoriesStream(friendIds, user.uid),
+                builder: (context, friendsSnapshot) {
+                  final friendGroups = friendsSnapshot.data ?? [];
+                  return ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      _buildYourStory(user, hasStories, stories, photoURL),
+                      ...friendGroups.map((group) => _buildFriendStory(group)),
+                    ],
+                  );
+                },
               ),
             );
           },
@@ -159,6 +168,52 @@ class _StoriesBarState extends State<StoriesBar> {
         builder: (_) => StoryViewerScreen(
           stories: stories,
           initialIndex: 0,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFriendStory(FriendStoryGroup group) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => StoryViewerScreen(
+            stories: group.stories,
+            initialIndex: 0,
+          ),
+        ),
+      ),
+      child: Container(
+        width: 80,
+        margin: const EdgeInsets.only(right: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(2.5),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: group.hasUnviewed ? AppTheme.primaryGradient : null,
+                border: group.hasUnviewed
+                    ? null
+                    : Border.all(color: Colors.grey[700]!, width: 2),
+              ),
+              child: UserPhotoWidget(userId: group.userId, radius: 30),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              group.username,
+              style: const TextStyle(
+                fontSize: 11,
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       ),
     );

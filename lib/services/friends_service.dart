@@ -3,6 +3,7 @@ import '../models/user_model.dart';
 import '../models/friend_request_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
+import 'notification_service.dart';
 
 class FriendsService {
   static final FriendsService instance = FriendsService._internal();
@@ -53,6 +54,17 @@ class FriendsService {
         'pendingRequests': FieldValue.arrayUnion([currentUser.uid]),
       });
     });
+
+    if (currentUser.uid != toUserId) {
+      await NotificationService.sendNotification(
+        recipientId: toUserId,
+        senderId: currentUser.uid,
+        senderName: userData['displayName'] ?? currentUser.displayName ?? 'User',
+        senderAvatar: userData['photoURL'] ?? currentUser.photoURL ?? '',
+        type: 'follow',
+        message: 'sent you a Kakonek request',
+      );
+    }
   }
   
   // Accept friend request

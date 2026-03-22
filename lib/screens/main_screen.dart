@@ -22,11 +22,24 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   final AuthService _authService = AuthService();
+  late final List<Widget> _pages;
+  final GlobalKey<ReelsPageState> _reelsKey = GlobalKey<ReelsPageState>();
 
   @override
   void initState() {
     super.initState();
     _checkProfileCompletion();
+    _pages = [
+      const HomePage(),
+      ReelsPage(key: _reelsKey),
+      const MessagesScreen(),
+      const ProfileMenuScreen(),
+    ];
+
+    // Ensure Reels are silenced on app start since Home is the initial tab
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _reelsKey.currentState?.setTabActive(false);
+    });
   }
 
   void _checkProfileCompletion() {
@@ -45,14 +58,6 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  // Pages are no longer static or const to ensure they rebuild fresh on auth change
-  List<Widget> _getPages() => [
-    const HomePage(),
-    const ReelsPage(),
-    const MessagesScreen(),
-    const ProfileMenuScreen(),
-  ];
-
   void _showCreatePostModal() {
     showModalBottomSheet(
       context: context,
@@ -63,6 +68,10 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _onItemTapped(int index) {
+    if (index != _selectedIndex) {
+      print('🔊 MainScreen: Tab switching, toggling Reels active state: ${index == 1}');
+      _reelsKey.currentState?.setTabActive(index == 1);
+    }
     setState(() {
       _selectedIndex = index;
     });
@@ -72,7 +81,10 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      body: _getPages()[_selectedIndex],
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _pages,
+      ),
       bottomNavigationBar: ClipRRect(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         child: BackdropFilter(

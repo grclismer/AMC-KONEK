@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import '../theme/app_theme.dart';
+import '../widgets/user_photo_widget.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -8,51 +13,39 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  final List<Map<String, dynamic>> _notifications = [
-    {
-      'name': 'Kap Onin',
-      'action': 'liked your post',
-      'time': '2m ago',
-      'isUnread': true,
-      'avatar': 'https://assets.epuzzle.info/puzzle/158/484/original.jpg',
-    },
-    {
-      'name': 'Doc. Ron',
-      'action': 'commented: "Triple B!"',
-      'time': '15m ago',
-      'isUnread': true,
-      'avatar': 'https://i.audiomack.com/markerenzreyes8/ba5a0a2d03.webp?width=1000&height=1000',
-    },
-    {
-      'name': 'Arman Salon',
-      'action': 'started following you',
-      'time': '1h ago',
-      'isUnread': false,
-      'avatar': 'https://m.media-amazon.com/images/M/MV5BMTRkMzcyNDYtYWQzMC00MTU5LTkyYmMtMzA2ODg0YjMzY2Q5XkEyXkFqcGc@._V1_QL75_UY281_CR155,0,190,281_.jpg',
-    },
-    {
-      'name': 'Maria Santos',
-      'action': 'tagged you in a post',
-      'time': '3h ago',
-      'isUnread': false,
-      'avatar': 'https://randomuser.me/api/portraits/women/44.jpg',
-    },
-  ];
+  final _currentUserId = FirebaseAuth.instance.currentUser?.uid;
 
-  void _markAllRead() {
-    setState(() {
-      for (var n in _notifications) {
-        n['isUnread'] = false;
-      }
-    });
+  Future<void> _markAllRead() async {
+    if (_currentUserId == null) return;
+    
+    final batch = FirebaseFirestore.instance.batch();
+    final snapshot = await FirebaseFirestore.instance
+        .collection('notifications')
+        .where('recipientId', isEqualTo: _currentUserId)
+        .where('isRead', isEqualTo: false)
+        .get();
+        
+    for (var doc in snapshot.docs) {
+      batch.update(doc.reference, {'isRead': true});
+    }
+    
+    await batch.commit();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_currentUserId == null) {
+      return const Scaffold(
+        backgroundColor: AppTheme.backgroundDark,
+        body: Center(child: Text("Please log in", style: TextStyle(color: Colors.white))),
+      );
+    }
+
     return Scaffold(
+      backgroundColor: AppTheme.backgroundDark,
       appBar: AppBar(
         title: const Text('Notifications', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.amber,
+        backgroundColor: AppTheme.surfaceDark,
         foregroundColor: Colors.white,
         actions: [
           TextButton(
@@ -61,40 +54,71 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
         ],
       ),
-      body: ListView.separated(
-        itemCount: _notifications.length,
-        separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey[200]),
-        itemBuilder: (context, index) {
-          final n = _notifications[index];
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(n['avatar']),
-            ),
-            title: RichText(
-              text: TextSpan(
-                style: const TextStyle(color: Colors.black, fontSize: 14),
-                children: [
-                  TextSpan(text: n['name'], style: const TextStyle(fontWeight: FontWeight.bold)),
-                  const TextSpan(text: ' '),
-                  TextSpan(text: nAction(n)),
-                ],
-              ),
-            ),
-            subtitle: Text(n['time'], style: TextStyle(color: Colors.grey[500], fontSize: 12)),
-            trailing: n['isUnread']
-                ? Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.orange, shape: BoxShape.circle))
-                : null,
-            onTap: () {
-              setState(() {
-                n['isUnread'] = false;
-              });
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('notifications')
+            .where('recipientId', isEqualTo: _currentUserId)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator(color: AppTheme.primaryPurple));
+          }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text('No notifications yet', style: TextStyle(color: AppTheme.textSecondary)));
+          }
+
+          final docs = snapshot.data!.docs.toList();
+          
+          // Sort in memory globally bypassing composite index constraints
+          docs.sort((a, b) {
+            final aTime = (a.data() as Map<String, dynamic>)['timestamp'] as Timestamp?;
+            final bTime = (b.data() as Map<String, dynamic>)['timestamp'] as Timestamp?;
+            final aDate = aTime?.toDate() ?? DateTime.now();
+            final bDate = bTime?.toDate() ?? DateTime.now();
+            return bDate.compareTo(aDate);
+          });
+
+          return ListView.separated(
+            itemCount: docs.length,
+            separatorBuilder: (context, index) => const Divider(height: 1, color: Colors.white10),
+            itemBuilder: (context, index) {
+              final doc = docs[index];
+              final n = doc.data() as Map<String, dynamic>;
+              
+              final bool isRead = n['isRead'] ?? false;
+              final timestamp = (n['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now();
+              final senderId = n['senderId'] ?? '';
+              final senderName = n['senderName'] ?? 'User';
+              final message = n['message'] ?? '';
+
+              return ListTile(
+                leading: UserPhotoWidget(userId: senderId, radius: 20),
+                title: RichText(
+                  text: TextSpan(
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    children: [
+                      TextSpan(text: senderName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      const TextSpan(text: ' '),
+                      TextSpan(text: message),
+                    ],
+                  ),
+                ),
+                subtitle: Text(
+                  timeago.format(timestamp), 
+                  style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)
+                ),
+                trailing: !isRead
+                    ? Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.orange, shape: BoxShape.circle))
+                    : null,
+                onTap: () {
+                  if (!isRead) doc.reference.update({'isRead': true});
+                },
+                tileColor: !isRead ? Colors.orange.withOpacity(0.05) : null,
+              );
             },
-            tileColor: n['isUnread'] ? Colors.orange.withValues(alpha: 0.05) : null,
           );
         },
       ),
     );
   }
-
-  String nAction(Map<String, dynamic> n) => n['action'];
 }

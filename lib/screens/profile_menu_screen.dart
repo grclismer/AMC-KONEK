@@ -6,7 +6,6 @@ import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/animations.dart';
 import 'profile_screen.dart';
-import 'saved_posts_screen.dart';
 import 'kakonek_center_screen.dart';
 import 'settings_screen.dart';
 import 'report_problem_screen.dart';
@@ -171,11 +170,6 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
             icon: Icons.person_outline,
             title: 'My Profile',
             onTap: () => Navigator.push(context, SlidePageRoute(page: const ProfileScreen())),
-          ),
-          _buildMenuItem(
-            icon: Icons.bookmark_outline,
-            title: 'Saved Posts',
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SavedPostsScreen())),
           ),
           _buildMenuItem(
             icon: Icons.group_outlined,

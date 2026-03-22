@@ -1,6 +1,11 @@
 import 'dart:convert';
+import 'dart:io' as io;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import '../services/post_service.dart';
 import '../services/reel_service.dart';
@@ -40,7 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: isOwnProfile ? 5 : 3, vsync: this);
   }
 
   @override
@@ -170,9 +175,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                             valueFromData: (reels) =>
                                 reels.length.toString(),
                           ),
-                          _buildStatColumn(
-                            'Kakonek',
-                            userData['friendCount']?.toString() ?? '0',
+                          GestureDetector(
+                            onTap: () => _showKakonekList(context),
+                            child: _buildStatColumn(
+                              'Kakonek',
+                              userData['friendCount']?.toString() ?? '0',
+                            ),
                           ),
                         ],
                       ),
@@ -244,10 +252,12 @@ class _ProfileScreenState extends State<ProfileScreen>
               indicatorWeight: 2.5,
               labelColor: Colors.white,
               unselectedLabelColor: AppTheme.textSecondary,
-              tabs: const [
-                Tab(icon: Icon(Icons.grid_on_outlined)),
-                Tab(icon: Icon(Icons.video_library_outlined)),
-                Tab(icon: Icon(Icons.repeat_rounded)),
+              tabs: [
+                const Tab(icon: Icon(Icons.grid_on_outlined)),
+                const Tab(icon: Icon(Icons.video_library_outlined)),
+                const Tab(icon: Icon(Icons.repeat_rounded)),
+                if (isOwnProfile) const Tab(icon: Icon(Icons.bookmark_border_rounded)),
+                if (isOwnProfile) const Tab(icon: Icon(Icons.lock_outline_rounded)),
               ],
             ),
           ),
@@ -259,6 +269,8 @@ class _ProfileScreenState extends State<ProfileScreen>
           _PostsGridTab(userId: targetUid, postService: _postService),
           _ReelsGridTab(userId: targetUid),
           _RepostsGridTab(userId: targetUid, postService: _postService),
+          if (isOwnProfile) _SavedTab(userId: targetUid),
+          if (isOwnProfile) _PrivatePostsTab(userId: targetUid, postService: _postService),
         ],
       ),
     );
@@ -363,6 +375,85 @@ class _ProfileScreenState extends State<ProfileScreen>
             .showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     }
+  }
+
+  void _showKakonekList(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        maxChildSize: 0.9,
+        minChildSize: 0.3,
+        builder: (context, scrollController) => Container(
+          decoration: const BoxDecoration(
+            color: AppTheme.surfaceDark,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)),
+              ),
+              const Padding(
+                padding: EdgeInsets.all(16),
+                child: Text('Kakonek', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              const Divider(color: Colors.white10),
+              Expanded(
+                child: StreamBuilder<DocumentSnapshot>(
+                  stream: FirebaseFirestore.instance.collection('users').doc(targetUid).snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator(color: AppTheme.primaryPurple));
+                    }
+                    if (!snapshot.hasData || !snapshot.data!.exists) {
+                      return const Center(child: Text('No Kakonek yet', style: TextStyle(color: AppTheme.textSecondary)));
+                    }
+                    final data = snapshot.data!.data() as Map<String, dynamic>;
+                    final friends = List<String>.from(data['friends'] ?? []);
+                    if (friends.isEmpty) {
+                      return const Center(child: Text('No Kakonek yet', style: TextStyle(color: AppTheme.textSecondary)));
+                    }
+                    return ListView.builder(
+                      controller: scrollController,
+                      itemCount: friends.length,
+                      itemBuilder: (context, index) {
+                        final friendId = friends[index];
+                        return FutureBuilder<DocumentSnapshot>(
+                          future: FirebaseFirestore.instance.collection('users').doc(friendId).get(),
+                          builder: (context, friendSnap) {
+                            if (!friendSnap.hasData || !friendSnap.data!.exists) {
+                              return const SizedBox.shrink();
+                            }
+                            final friendData = friendSnap.data!.data() as Map<String, dynamic>;
+                            final displayName = friendData['displayName'] ?? 'User';
+                            final username = friendData['username'] ?? '';
+                            return ListTile(
+                              leading: UserPhotoWidget(userId: friendId, radius: 20),
+                              title: Text(displayName, style: const TextStyle(color: Colors.white)),
+                              subtitle: Text('@$username', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.push(this.context, MaterialPageRoute(builder: (_) => ProfileScreen(userId: friendId)));
+                              },
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void _showProfilePictureFullscreen(BuildContext context) {
@@ -902,17 +993,99 @@ class _ReelsGridTab extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => DraggableScrollableSheet(
-        initialChildSize: 0.7,
-        maxChildSize: 0.95,
-        minChildSize: 0.4,
-        builder: (_, controller) => Container(
-          decoration: BoxDecoration(
-            color: AppTheme.surfaceDark,
-            borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          padding: const EdgeInsets.all(20),
+      builder: (_) => _ReelDetailSheet(reel: reel),
+    );
+  }
+}
+
+class _ReelDetailSheet extends StatefulWidget {
+  final Reel reel;
+  const _ReelDetailSheet({required this.reel});
+
+  @override
+  State<_ReelDetailSheet> createState() => _ReelDetailSheetState();
+}
+
+class _ReelDetailSheetState extends State<_ReelDetailSheet> {
+  VideoPlayerController? _controller;
+  bool _isLiked = false;
+  int _likesCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
+    _isLiked = widget.reel.isLikedBy(currentUserId);
+    _likesCount = widget.reel.likes;
+    _initVideo();
+  }
+
+  Future<void> _initVideo() async {
+    final url = widget.reel.videoUrl;
+    if (url.isEmpty) return;
+    try {
+      if (url.startsWith('http')) {
+        _controller = VideoPlayerController.networkUrl(Uri.parse(url));
+      } else if (url.startsWith('data:video')) {
+        if (kIsWeb) {
+          _controller = VideoPlayerController.networkUrl(Uri.parse(url));
+        } else {
+          final bytes = base64Decode(url.split(',').last);
+          final tempDir = await getTemporaryDirectory();
+          final tempFile = io.File('${tempDir.path}/temp_reel_detail_${widget.reel.id}.mp4');
+          await tempFile.writeAsBytes(bytes);
+          _controller = VideoPlayerController.file(tempFile);
+        }
+      } else {
+        return;
+      }
+      await _controller!.initialize();
+      _controller!.setLooping(true);
+      if (mounted) {
+        setState(() {});
+        _controller!.play();
+      }
+    } catch (e) {
+      debugPrint('Error init detail video: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.pause();
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  void _toggleLike() {
+    setState(() {
+      _isLiked = !_isLiked;
+      _likesCount += _isLiked ? 1 : -1;
+    });
+    ReelService.instance.toggleLike(widget.reel.id).catchError((_) {
+      if (mounted) {
+        setState(() {
+          _isLiked = !_isLiked;
+          _likesCount += _isLiked ? 1 : -1;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.92,
+      maxChildSize: 0.95,
+      minChildSize: 0.4,
+      builder: (_, scrollController) => Container(
+        decoration: const BoxDecoration(
+          color: AppTheme.surfaceDark,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.all(20),
+        child: SingleChildScrollView(
+          controller: scrollController,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -922,43 +1095,60 @@ class _ReelsGridTab extends StatelessWidget {
                   width: 40,
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                      color: Colors.white24,
-                      borderRadius: BorderRadius.circular(2)),
+                  decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)),
                 ),
               ),
-              // Play icon
-              Container(
-                width: double.infinity,
-                height: 180,
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(12),
+              if (_controller != null && _controller!.value.isInitialized)
+                AspectRatio(
+                  aspectRatio: 9 / 16,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: VideoPlayer(_controller!),
+                  ),
+                )
+              else
+                AspectRatio(
+                  aspectRatio: 9 / 16,
+                  child: Container(
+                    decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(12)),
+                    child: const Center(child: CircularProgressIndicator(color: AppTheme.primaryPurple)),
+                  ),
                 ),
-                child: const Center(
-                  child: Icon(Icons.play_circle_outline,
-                      size: 60, color: Colors.white54),
-                ),
-              ),
               const SizedBox(height: 16),
-              Text(reel.displayName,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15)),
+              Text(widget.reel.displayName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(height: 4),
-              Text(reel.caption,
-                  style: const TextStyle(
-                      color: Colors.white70, fontSize: 14)),
+              Text(widget.reel.caption, style: const TextStyle(color: Colors.white70, fontSize: 14)),
               const SizedBox(height: 12),
-              Row(children: [
-                _ReelStat(Icons.favorite_border, '${reel.likes}'),
-                const SizedBox(width: 16),
-                _ReelStat(
-                    Icons.remove_red_eye_outlined, '${reel.views}'),
-                const SizedBox(width: 16),
-                _ReelStat(Icons.chat_bubble_outline, '${reel.comments}'),
-              ]),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: _toggleLike,
+                    child: Row(
+                      children: [
+                        Icon(_isLiked ? Icons.favorite : Icons.favorite_border, color: _isLiked ? Colors.red : AppTheme.textSecondary, size: 20),
+                        const SizedBox(width: 4),
+                        Text('$_likesCount', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Row(
+                    children: [
+                      const Icon(Icons.chat_bubble_outline, color: AppTheme.textSecondary, size: 20),
+                      const SizedBox(width: 4),
+                      Text('${widget.reel.comments}', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
+                    ],
+                  ),
+                  const SizedBox(width: 16),
+                  Row(
+                    children: [
+                      const Icon(Icons.remove_red_eye_outlined, color: AppTheme.textSecondary, size: 20),
+                      const SizedBox(width: 4),
+                      Text('${widget.reel.views}', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
+                    ],
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -1123,9 +1313,9 @@ class _RepostsGridTab extends StatelessWidget {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) => DraggableScrollableSheet(
-        initialChildSize: 0.92,
+        initialChildSize: 0.75,
         maxChildSize: 0.95,
-        minChildSize: 0.5,
+        minChildSize: 0.4,
         builder: (_, controller) => Container(
           decoration: const BoxDecoration(
             color: AppTheme.backgroundDark,
@@ -1157,3 +1347,343 @@ class _RepostsGridTab extends StatelessWidget {
     );
   }
 }
+
+// ─── Saved Grid Tab (User's Saved Content) ──────────────────────────────────
+
+class _SavedTab extends StatelessWidget {
+  final String userId;
+  const _SavedTab({required this.userId});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('saved')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(
+            child: CircularProgressIndicator(color: AppTheme.primaryPurple),
+          );
+        }
+
+        final savedDocs = snapshot.data!.docs;
+
+        if (savedDocs.isEmpty) {
+          return const Center(
+            child: Text(
+              'No saved content yet',
+              style: TextStyle(color: AppTheme.textSecondary),
+            ),
+          );
+        }
+
+        // Sort in memory by savedAt descending
+        final sortedDocs = savedDocs.toList()
+          ..sort((a, b) {
+            final aData = a.data() as Map<String, dynamic>;
+            final bData = b.data() as Map<String, dynamic>;
+            final aTime = (aData['savedAt'] as Timestamp?)?.toDate() ?? DateTime.now();
+            final bTime = (bData['savedAt'] as Timestamp?)?.toDate() ?? DateTime.now();
+            return bTime.compareTo(aTime);
+          });
+
+        return GridView.builder(
+          padding: const EdgeInsets.all(2),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            crossAxisSpacing: 2,
+            mainAxisSpacing: 2,
+          ),
+          itemCount: sortedDocs.length,
+          itemBuilder: (context, index) {
+            final saved = sortedDocs[index].data() as Map<String, dynamic>;
+            final type = saved['type'] as String?;
+            final itemId = type == 'reel' ? saved['reelId'] : saved['postId'];
+            final collection = type == 'reel' ? 'reels' : 'posts';
+
+            if (itemId == null) return Container(color: AppTheme.surfaceDark);
+
+            return FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance
+                  .collection(collection)
+                  .doc(itemId)
+                  .get(),
+              builder: (context, itemSnap) {
+                if (!itemSnap.hasData || !itemSnap.data!.exists) {
+                  return Container(
+                    color: AppTheme.surfaceDark,
+                    child: const Center(
+                      child: Icon(Icons.bookmark_border_rounded, color: Colors.white54),
+                    ),
+                  );
+                }
+
+                Widget childWidget;
+                if (type == 'reel') {
+                  childWidget = Container(
+                    color: AppTheme.surfaceDark,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: const [
+                        Center(child: Icon(Icons.play_circle_outline, color: Colors.white54, size: 30)),
+                        Positioned(
+                          bottom: 4, right: 4,
+                          child: Icon(Icons.video_library, color: Colors.white, size: 14),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  final post = Post.fromFirestore(itemSnap.data!);
+                  if (post.type == PostType.image && post.content.isNotEmpty) {
+                    childWidget = Image.network(post.content, fit: BoxFit.cover);
+                  } else {
+                    childWidget = Container(
+                      color: AppTheme.surfaceDark,
+                      child: Center(
+                        child: Icon(
+                          post.type == PostType.text ? Icons.text_snippet : Icons.article,
+                          color: Colors.white54,
+                        ),
+                      ),
+                    );
+                  }
+                }
+
+                return GestureDetector(
+                  onTap: () {
+                    if (type == 'post') {
+                      final post = Post.fromFirestore(itemSnap.data!);
+                      _showSavedPostDetail(context, post);
+                    } else if (type == 'reel') {
+                      final reel = Reel.fromFirestore(itemSnap.data!);
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) => _ReelDetailSheet(reel: reel),
+                      );
+                    }
+                  },
+                  onLongPress: () {
+                    showModalBottomSheet(
+                      context: context,
+                      backgroundColor: AppTheme.surfaceDark,
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+                      builder: (bottomSheetContext) => Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 4,
+                            margin: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)),
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.bookmark_remove_rounded, color: Colors.red),
+                            title: const Text('Remove from saved', style: TextStyle(color: Colors.red)),
+                            onTap: () async {
+                              Navigator.pop(bottomSheetContext);
+                              await FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(userId)
+                                  .collection('saved')
+                                  .doc(sortedDocs[index].id)
+                                  .delete();
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Removed from saved')),
+                                );
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                    );
+                  },
+                  child: childWidget,
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showSavedPostDetail(BuildContext context, Post post) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.75,
+        maxChildSize: 0.95,
+        minChildSize: 0.4,
+        builder: (_, controller) => Container(
+          decoration: const BoxDecoration(
+            color: AppTheme.backgroundDark,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(top: 12, bottom: 8),
+                  decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)),
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: controller,
+                  child: PostWidget(post: post),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Private Posts Tab ────────────────────────────────────────────────────────
+
+class _PrivatePostsTab extends StatefulWidget {
+  final String userId;
+  final PostService postService;
+  const _PrivatePostsTab({required this.userId, required this.postService});
+
+  @override
+  State<_PrivatePostsTab> createState() => _PrivatePostsTabState();
+}
+
+class _PrivatePostsTabState extends State<_PrivatePostsTab> {
+  void _showPostDetailInProfile(Post post, List<Post> posts, int index) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.92,
+        maxChildSize: 0.95,
+        minChildSize: 0.5,
+        builder: (_, controller) => Container(
+          decoration: const BoxDecoration(
+            color: AppTheme.backgroundDark,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(top: 12, bottom: 8),
+                  decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(2)),
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: controller,
+                  child: PostWidget(post: post),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<Post>>(
+      stream: widget.postService.getPrivatePostsStream(widget.userId),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(
+            child: CircularProgressIndicator(color: AppTheme.primaryPurple),
+          );
+        }
+
+        final privatePosts = snapshot.data!;
+
+        if (privatePosts.isEmpty) {
+          return const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.lock_outline_rounded, color: Colors.white24, size: 60),
+                SizedBox(height: 16),
+                Text(
+                  'No private posts',
+                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 16),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return GridView.builder(
+          padding: const EdgeInsets.all(2),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            crossAxisSpacing: 2,
+            mainAxisSpacing: 2,
+          ),
+          itemCount: privatePosts.length,
+          itemBuilder: (context, index) {
+            final post = privatePosts[index];
+            return GestureDetector(
+              onTap: () => _showPostDetailInProfile(post, privatePosts, index),
+              child: _buildGridItem(post),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildGridItem(Post post) {
+    if (post.type == PostType.image && post.content.isNotEmpty) {
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.network(post.content, fit: BoxFit.cover),
+          const Positioned(
+            top: 4, right: 4,
+            child: Icon(Icons.lock, color: Colors.white, size: 14),
+          ),
+        ],
+      );
+    }
+    return Container(
+      color: AppTheme.surfaceDark,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Center(
+            child: Icon(
+              post.type == PostType.text ? Icons.text_snippet : Icons.article,
+              color: Colors.white54,
+            ),
+          ),
+          const Positioned(
+            top: 4, right: 4,
+            child: Icon(Icons.lock, color: Colors.white, size: 14),
+          ),
+        ],
+      ),
+    );
+  }
+}
+

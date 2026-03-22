@@ -19,7 +19,8 @@ enum _CreateType { text, photo, video, mood }
 // ─── Main Modal Widget ────────────────────────────────────────────────────────
 
 class CreatePostModal extends StatefulWidget {
-  const CreatePostModal({super.key});
+  final String? initialType;
+  const CreatePostModal({super.key, this.initialType});
 
   @override
   State<CreatePostModal> createState() => _CreatePostModalState();
@@ -32,12 +33,21 @@ class _CreatePostModalState extends State<CreatePostModal> {
 
   bool _isPosting = false;
   bool _isPublic = false; // Default: Friends Only (Kakonek)
+  bool _reelIsPublic = true;
 
   _CreateType _createType = _CreateType.text;
   XFile? _selectedImageFile;
   XFile? _selectedVideoFile;
   String? _selectedVideoName;
   String? _selectedMood;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initialType == 'reel') {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _pickVideo());
+    }
+  }
 
   @override
   void dispose() {
@@ -281,6 +291,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
           videoUrl: videoUrl,
           caption: text.isEmpty ? '📹 New Reel' : text,
           hashtags: _extractHashtags(text),
+          isPublic: _reelIsPublic,
         );
 
         if (mounted) {
@@ -331,9 +342,74 @@ class _CreatePostModalState extends State<CreatePostModal> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to post: $e')),
-        );
+        final errorStr = e.toString();
+
+        if (errorStr.contains('IMAGE_TOO_LARGE')) {
+          // Parse size: e.g. "Exception: IMAGE_TOO_LARGE:1234KB"
+          final parts = errorStr.split(':');
+          final size = parts.length >= 3 ? '${parts[2]}' : 'Unknown';
+
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              backgroundColor: AppTheme.surfaceDark,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: Row(
+                children: [
+                  const Icon(Icons.info_outline, color: Colors.orange),
+                  const SizedBox(width: 10),
+                  const Text('Image Too Large', style: TextStyle(color: Colors.white)),
+                ],
+              ),
+              content: Text(
+                'Your image ($size) exceeds the 700KB limit.\n\n'
+                'Because Konek stores images directly in the database, files must be small. '
+                'Please choose a smaller image or reduce the quality before uploading.',
+                style: const TextStyle(color: AppTheme.textSecondary),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK', style: TextStyle(color: AppTheme.primaryPurple)),
+                ),
+              ],
+            ),
+          );
+        } else if (errorStr.contains('FILE_TOO_LARGE')) {
+          // Parse size: e.g. "Exception: FILE_TOO_LARGE:1234KB"
+          final parts = errorStr.split(':');
+          final size = parts.isNotEmpty ? parts.last : 'Unknown';
+
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              backgroundColor: AppTheme.surfaceDark,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: Row(
+                children: [
+                  const Icon(Icons.info_outline, color: AppTheme.primaryPurple),
+                  const SizedBox(width: 10),
+                  const Text('Video Too Large', style: TextStyle(color: Colors.white)),
+                ],
+              ),
+              content: Text(
+                'Your video is $size but the maximum allowed size is 700KB.\n\n'
+                'This limit exists because Konek stores videos directly in the database without a paid storage service. Please trim your video to under 30 seconds and try again.',
+                style: const TextStyle(color: AppTheme.textSecondary),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK', style: TextStyle(color: AppTheme.primaryPurple)),
+                ),
+              ],
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to post: $e')),
+          );
+        }
       }
     } finally {
       if (mounted) setState(() => _isPosting = false);
@@ -454,7 +530,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
                         const SizedBox(height: 4),
                         GestureDetector(
                           onTap: _createType == _CreateType.video
-                              ? null // Reels are always public
+                              ? () => setState(() => _reelIsPublic = !_reelIsPublic)
                               : _togglePrivacy,
                           child: Container(
                             padding: const EdgeInsets.symmetric(
@@ -470,7 +546,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
                               children: [
                                 Icon(
                                   _createType == _CreateType.video
-                                      ? Icons.public
+                                      ? (_reelIsPublic ? Icons.public : Icons.group_outlined)
                                       : (_isPublic
                                             ? Icons.public
                                             : Icons.group_outlined),
@@ -480,7 +556,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
                                 const SizedBox(width: 4),
                                 Text(
                                   _createType == _CreateType.video
-                                      ? 'Public Reel'
+                                      ? (_reelIsPublic ? 'Para sa Imo (Public)' : 'Kakonek (Friends)')
                                       : (_isPublic
                                             ? 'Public'
                                             : 'Kakonek (Friends)'),
@@ -489,12 +565,11 @@ class _CreatePostModalState extends State<CreatePostModal> {
                                     color: AppTheme.textSecondary,
                                   ),
                                 ),
-                                if (_createType != _CreateType.video)
-                                  const Icon(
-                                    Icons.arrow_drop_down,
-                                    size: 14,
-                                    color: AppTheme.textSecondary,
-                                  ),
+                                const Icon(
+                                  Icons.arrow_drop_down,
+                                  size: 14,
+                                  color: AppTheme.textSecondary,
+                                ),
                               ],
                             ),
                           ),

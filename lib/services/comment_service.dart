@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/comment_model.dart';
 import '../models/post_model.dart';
+import 'notification_service.dart';
 
 class CommentService {
   CommentService._privateConstructor();
@@ -130,6 +131,24 @@ class CommentService {
           transaction.update(parentSnapshot.reference, {'replyCount': currentReplies + 1});
         }
       });
+      
+      // Send notification
+      final postSnapshot = await _firestore.collection(Post.getCollectionName()).doc(comment.postId).get();
+      final postData = postSnapshot.data();
+      if (postData != null) {
+        final postOwnerId = postData['userId'];
+        if (postOwnerId != null && postOwnerId != comment.userId) {
+          await NotificationService.sendNotification(
+            recipientId: postOwnerId,
+            senderId: comment.userId,
+            senderName: verifiedUsername,
+            senderAvatar: comment.avatarUrl,
+            type: 'comment',
+            message: 'commented on your post',
+            postId: comment.postId,
+          );
+        }
+      }
       
       developer.log('Comment created successfully with ID: ${docRef.id}');
     } catch (e, stackTrace) {

@@ -74,17 +74,32 @@ class PostService {
   }
 
   /// Returns a real-time stream of all public posts for the "Discover" feed.
-  Stream<List<Post>> getDiscoverPostsStream() {
-    return _firestore.collection(_collection)
-        .limit(100)
+  /// Excludes posts from the current user and their Kakonek (mutual friends).
+  Stream<List<Post>> getDiscoverPostsStream() async* {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) { yield []; return; }
+
+    yield* _firestore
+        .collection('users')
+        .doc(currentUser.uid)
         .snapshots()
-        .map((snapshot) {
-          final posts = snapshot.docs.map((doc) => Post.fromFirestore(doc)).toList();
-          // Filter by isPublic and ignore expired moods
-          final publicPosts = posts.where((p) => p.isPublic && !p.isExpired).toList();
-          publicPosts.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-          return publicPosts.take(50).toList();
-        });
+        .asyncExpand((userDoc) {
+      final userData = userDoc.data() ?? {};
+      final friendIds = List<String>.from(userData['friends'] ?? []);
+      final excludeIds = {...friendIds, currentUser.uid};
+
+      return _firestore.collection(_collection).limit(100).snapshots().map((snapshot) {
+        final posts = snapshot.docs.map((doc) => Post.fromFirestore(doc)).toList();
+        final filtered = posts.where((p) =>
+          p.isPublic &&
+          !p.isExpired &&
+          !p.isRepost &&
+          !excludeIds.contains(p.userId)
+        ).toList();
+        filtered.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+        return filtered.take(50).toList();
+      });
+    });
   }
 
   /// Get user's original posts ONLY (no reposts)
@@ -110,6 +125,22 @@ class PostService {
           posts.sort((a, b) => b.timestamp.compareTo(a.timestamp));
           
           developer.log('Returning ${posts.length} original posts after local filter/sort');
+          return posts;
+        });
+  }
+
+  /// Returns a live stream of private posts (isPublic == false) for a user.
+  Stream<List<Post>> getPrivatePostsStream(String userId) {
+    return _firestore
+        .collection(_collection)
+        .where('userId', isEqualTo: userId)
+        .snapshots()
+        .map((snapshot) {
+          final posts = snapshot.docs
+              .map((doc) => Post.fromFirestore(doc))
+              .where((post) => post.isPublic == false && !post.isRepost && !post.isExpired)
+              .toList();
+          posts.sort((a, b) => b.timestamp.compareTo(a.timestamp));
           return posts;
         });
   }

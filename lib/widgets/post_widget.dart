@@ -4,6 +4,7 @@ import 'tiktok_player_placeholder.dart';
 import '../models/post_model.dart';
 import '../services/post_service.dart';
 import '../services/auth_service.dart';
+import '../services/notification_service.dart';
 import '../models/comment_model.dart';
 import '../services/comment_service.dart';
 import '../screens/comments_screen.dart';
@@ -12,6 +13,8 @@ import '../theme/animations.dart';
 import '../screens/profile_screen.dart';
 import 'dart:developer' as developer;
 import '../widgets/user_photo_widget.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class PostWidget extends StatefulWidget {
   final Post post;
@@ -27,6 +30,8 @@ class _PostWidgetState extends State<PostWidget> {
   late int _likeCount;
   late bool _isReposted = false;
   late int _repostCount;
+  bool _isHidden = false;
+  bool _isSaved = false;
   final String? _currentUserId = AuthService().currentUser?.uid;
 
   @override
@@ -36,6 +41,17 @@ class _PostWidgetState extends State<PostWidget> {
     _repostCount = widget.post.repostCount;
     _isLiked = _currentUserId != null && widget.post.likedBy.contains(_currentUserId);
     _checkRepostStatus();
+    if (_currentUserId != null) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(_currentUserId)
+          .collection('saved')
+          .doc(widget.post.id)
+          .get()
+          .then((doc) {
+        if (mounted) setState(() => _isSaved = doc.exists);
+      });
+    }
   }
 
   Future<void> _checkRepostStatus() async {
@@ -45,6 +61,23 @@ class _PostWidgetState extends State<PostWidget> {
       setState(() {
         _isReposted = isReposted;
       });
+    }
+  }
+
+  Future<void> _handleSave() async {
+    if (_currentUserId == null) return;
+    final ref = FirebaseFirestore.instance
+        .collection('users')
+        .doc(_currentUserId)
+        .collection('saved')
+        .doc(widget.post.id);
+    setState(() => _isSaved = !_isSaved);
+    if (_isSaved) {
+      await ref.set({'type': 'post', 'postId': widget.post.id, 'savedAt': FieldValue.serverTimestamp()});
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Post saved!')));
+    } else {
+      await ref.delete();
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Post unsaved')));
     }
   }
 
@@ -76,6 +109,20 @@ class _PostWidgetState extends State<PostWidget> {
     try {
       if (_isLiked) {
         await PostService.instance.likePost(widget.post.id, _currentUserId);
+        
+        // Notify post owner
+        final currentUser = FirebaseAuth.instance.currentUser;
+        if (currentUser != null && _currentUserId != widget.post.userId) {
+          await NotificationService.sendNotification(
+            recipientId: widget.post.userId,
+            senderId: currentUser.uid,
+            senderName: currentUser.displayName ?? 'User',
+            senderAvatar: currentUser.photoURL ?? '',
+            type: 'like',
+            message: 'liked your post',
+            postId: widget.post.id,
+          );
+        }
       } else {
         await PostService.instance.unlikePost(widget.post.id, _currentUserId);
       }
@@ -247,7 +294,11 @@ class _PostWidgetState extends State<PostWidget> {
             ListTile(
               leading: const Icon(Icons.info_outline),
               title: const Text('About this account'),
-              onTap: () => Navigator.pop(context),
+              onTap: () {
+                Navigator.pop(context);
+                final uId = widget.post.isRepost ? widget.post.originalUserId! : widget.post.userId;
+                Navigator.push(context, MaterialPageRoute(builder: (_) => ProfileScreen(userId: uId)));
+              },
             ),
             if (_currentUserId == widget.post.userId)
               ListTile(
@@ -260,15 +311,16 @@ class _PostWidgetState extends State<PostWidget> {
               )
             else
               ListTile(
-                leading: const Icon(Icons.report_problem_outlined, color: Colors.red),
-                title: const Text('Report Post', style: TextStyle(color: Colors.red)),
-                onTap: () => Navigator.pop(context),
+                leading: const Icon(Icons.hide_source_outlined, color: Colors.orange),
+                title: const Text('Hide Post', style: TextStyle(color: Colors.orange)),
+                onTap: () {
+                  Navigator.pop(context);
+                  setState(() => _isHidden = true);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Post hidden. You won\'t see this post again.')),
+                  );
+                },
               ),
-            ListTile(
-              leading: const Icon(Icons.link),
-              title: const Text('Copy Link'),
-              onTap: () => Navigator.pop(context),
-            ),
             const SizedBox(height: 12),
           ],
         ),
@@ -278,6 +330,7 @@ class _PostWidgetState extends State<PostWidget> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isHidden) return const SizedBox.shrink();
     developer.log('=== BUILDING POST ===');
     developer.log('Post ID: ${widget.post.id}');
     developer.log('Type: ${widget.post.type}');
@@ -319,14 +372,22 @@ class _PostWidgetState extends State<PostWidget> {
                     color: AppTheme.textSecondary,
                   ),
                   const SizedBox(width: 6),
-                  Text(
-                    widget.post.userId == _currentUserId
-                        ? 'You reposted'
-                        : '${widget.post.username} reposted',
-                    style: const TextStyle(
-                      color: AppTheme.textSecondary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
+                  UserPhotoWidget(userId: widget.post.userId, radius: 9),
+                  const SizedBox(width: 6),
+                  GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      SlidePageRoute(page: ProfileScreen(userId: widget.post.userId)),
+                    ),
+                    child: Text(
+                      widget.post.userId == _currentUserId
+                          ? 'You reposted'
+                          : '@${widget.post.username} reposted',
+                      style: const TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],
@@ -513,18 +574,14 @@ class _PostWidgetState extends State<PostWidget> {
                   color: _isReposted ? Colors.green : null,
                   onTap: _handleRepost,
                 ),
-                BounceClick(
-                  onTap: () {},
-                  child: _actionButton(
-                    icon: Icons.share_rounded,
-                    label: "Share",
-                    onTap: () {},
-                  ),
-                ),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.bookmark_border_rounded, color: AppTheme.textSecondary, size: 24),
-                  onPressed: () {},
+                  icon: Icon(
+                    _isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                    color: _isSaved ? AppTheme.primaryPurple : AppTheme.textSecondary,
+                    size: 24,
+                  ),
+                  onPressed: _handleSave,
                 ),
               ],
             ),

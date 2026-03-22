@@ -380,6 +380,12 @@
       "languageVersion": "3.6"
     },
     {
+      "name": "intl",
+      "rootUri": "file:///C:/Users/Lismer%20Palce/AppData/Local/Pub/Cache/hosted/pub.dev/intl-0.20.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
       "name": "leak_tracker",
       "rootUri": "file:///C:/Users/Lismer%20Palce/AppData/Local/Pub/Cache/hosted/pub.dev/leak_tracker-11.0.2",
       "packageUri": "lib/",
@@ -564,6 +570,12 @@
       "rootUri": "file:///C:/Users/Lismer%20Palce/AppData/Local/Pub/Cache/hosted/pub.dev/test_api-0.7.6",
       "packageUri": "lib/",
       "languageVersion": "3.5"
+    },
+    {
+      "name": "timeago",
+      "rootUri": "file:///C:/Users/Lismer%20Palce/AppData/Local/Pub/Cache/hosted/pub.dev/timeago-3.7.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     },
     {
       "name": "transparent_image",

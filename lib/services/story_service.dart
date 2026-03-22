@@ -110,4 +110,54 @@ class StoryService {
       'viewedBy': FieldValue.arrayUnion([viewerId]),
     });
   }
+
+  /// Streams one FriendStoryGroup per friend who has active stories.
+  /// Uses whereIn on up to 10 friend IDs (Firestore limit).
+  Stream<List<FriendStoryGroup>> getFriendsStoriesStream(
+      List<String> friendIds, String currentUserId) {
+    if (friendIds.isEmpty) return Stream.value([]);
+
+    // Firestore whereIn max is 30; take first 10 to stay safe
+    final ids = friendIds.take(10).toList();
+
+    return _firestore
+        .collection('stories')
+        .where('userId', whereIn: ids)
+        .snapshots()
+        .map((snapshot) {
+      // Filter non-expired
+      final active = snapshot.docs
+          .map((doc) => Story.fromFirestore(doc))
+          .where((s) => !s.isExpired)
+          .toList();
+
+      // Group by userId
+      final Map<String, List<Story>> grouped = {};
+      for (final s in active) {
+        grouped.putIfAbsent(s.userId, () => []).add(s);
+      }
+
+      // Build groups — one bubble per friend
+      final groups = grouped.entries.map((entry) {
+        final userStories = entry.value
+          ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+        final hasUnviewed =
+            userStories.any((s) => !s.viewedBy.contains(currentUserId));
+        final first = userStories.first;
+        return FriendStoryGroup(
+          userId: entry.key,
+          username: first.username,
+          avatarUrl: first.avatarUrl,
+          hasUnviewed: hasUnviewed,
+          stories: userStories,
+        );
+      }).toList();
+
+      // Most-recently-updated friends first
+      groups.sort((a, b) =>
+          b.stories.last.timestamp.compareTo(a.stories.last.timestamp));
+
+      return groups;
+    });
+  }
 }
