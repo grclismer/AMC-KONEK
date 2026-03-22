@@ -12,6 +12,7 @@ import '../theme/animations.dart';
 import 'settings_screen.dart';
 import '../widgets/user_photo_widget.dart';
 import '../widgets/post_widget.dart';
+import 'dart:developer' as developer;
 
 // ─── Profile Screen ───────────────────────────────────────────────────────────
 
@@ -137,12 +138,15 @@ class _ProfileScreenState extends State<ProfileScreen>
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // Avatar
-                    UserPhotoWidget(
-                      userId: targetUid,
-                      radius: 42,
-                      showBorder: true,
-                      borderGradient: AppTheme.primaryGradient,
-                      borderWidth: 3,
+                    GestureDetector(
+                      onTap: () => _showProfilePictureFullscreen(context),
+                      child: UserPhotoWidget(
+                        userId: targetUid,
+                        radius: 42,
+                        showBorder: true,
+                        borderGradient: AppTheme.primaryGradient,
+                        borderWidth: 3,
+                      ),
                     ),
                     const SizedBox(width: 24),
                     // Stats — live counts from streams
@@ -243,7 +247,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               tabs: const [
                 Tab(icon: Icon(Icons.grid_on_outlined)),
                 Tab(icon: Icon(Icons.video_library_outlined)),
-                Tab(icon: Icon(Icons.person_pin_outlined)),
+                Tab(icon: Icon(Icons.repeat_rounded)),
               ],
             ),
           ),
@@ -254,7 +258,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         children: [
           _PostsGridTab(userId: targetUid, postService: _postService),
           _ReelsGridTab(userId: targetUid),
-          _TaggedTab(),
+          _RepostsGridTab(userId: targetUid, postService: _postService),
         ],
       ),
     );
@@ -360,6 +364,122 @@ class _ProfileScreenState extends State<ProfileScreen>
       }
     }
   }
+
+  void _showProfilePictureFullscreen(BuildContext context) {
+    // Get user's photo URL
+    final userStream = _authService.getUserStream(targetUid);
+    
+    showDialog(
+      context: context,
+      barrierColor: Colors.black87,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: EdgeInsets.zero,
+        child: Stack(
+          children: [
+            // Tap anywhere to close
+            GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                color: Colors.transparent,
+                width: double.infinity,
+                height: double.infinity,
+              ),
+            ),
+            
+            // Profile picture
+            Center(
+              child: StreamBuilder<DocumentSnapshot>(
+                stream: userStream,
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const CircularProgressIndicator(
+                      color: AppTheme.primaryPurple,
+                    );
+                  }
+                  
+                  final userData = snapshot.data?.data() as Map<String, dynamic>?;
+                  final photoURL = userData?['photoURL'] ?? '';
+                  
+                  if (photoURL.isEmpty) {
+                    return Container(
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[800],
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.person,
+                        size: 100,
+                        color: Colors.grey,
+                      ),
+                    );
+                  }
+                  
+                  // Get image provider
+                  ImageProvider? imageProvider;
+                  if (photoURL.startsWith('data:image')) {
+                    try {
+                      final base64String = photoURL.split(',').last;
+                      imageProvider = MemoryImage(base64Decode(base64String));
+                    } catch (e) {
+                      developer.log('Error decoding Base64: $e');
+                    }
+                  } else if (photoURL.startsWith('http')) {
+                    imageProvider = NetworkImage(photoURL);
+                  }
+                  
+                  if (imageProvider == null) {
+                    return Container(
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[800],
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.person,
+                        size: 100,
+                        color: Colors.grey,
+                      ),
+                    );
+                  }
+                  
+                  return InteractiveViewer(
+                    minScale: 0.5,
+                    maxScale: 4.0,
+                    child: ClipOval(
+                      child: Image(
+                        image: imageProvider,
+                        width: 300,
+                        height: 300,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            
+            // Close button
+            Positioned(
+              top: 40,
+              right: 20,
+              child: IconButton(
+                icon: const Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: 32,
+                ),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 // ─── Live Stat Column (counts from real stream) ───────────────────────────────
@@ -440,9 +560,20 @@ class _PostsGridTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    developer.log('=== BUILDING POSTS TAB ===');
+    developer.log('User ID: $userId');
+
     return StreamBuilder<List<Post>>(
-      stream: postService.getPostsByUserStream(userId),
+      stream: postService.getUserPostsStream(userId),
       builder: (context, snapshot) {
+        developer.log('Stream state: ${snapshot.connectionState}');
+        developer.log('Has data: ${snapshot.hasData}');
+        
+        if (snapshot.hasError) {
+          developer.log('POSTS TAB ERROR: ${snapshot.error}');
+          return Center(child: Text('Error loading posts: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+        }
+
         if (snapshot.connectionState == ConnectionState.waiting &&
             !snapshot.hasData) {
           return const Center(
@@ -451,6 +582,7 @@ class _PostsGridTab extends StatelessWidget {
         }
 
         final posts = snapshot.data ?? [];
+        developer.log('Total posts received in tab: ${posts.length}');
 
         if (posts.isEmpty) {
           return Center(
@@ -478,8 +610,13 @@ class _PostsGridTab extends StatelessWidget {
           itemCount: posts.length,
           itemBuilder: (context, index) {
             final post = posts[index];
+            developer.log('Building grid item $index for post: ${post.id}, Type: ${post.type.name}');
             return GestureDetector(
-              onTap: () => _showPostDetail(context, post),
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                developer.log('GRID_ON_TAP: Post ${post.id}');
+                _showPostDetail(context, post);
+              },
               child: _PostGridCell(post: post),
             );
           },
@@ -534,7 +671,8 @@ class _PostsGridTab extends StatelessWidget {
 
 class _PostGridCell extends StatelessWidget {
   final Post post;
-  const _PostGridCell({required this.post});
+  final bool isRepost;
+  const _PostGridCell({required this.post, this.isRepost = false});
 
   ImageProvider? _getImage(String url) {
     if (url.isEmpty) return null;
@@ -558,14 +696,75 @@ class _PostGridCell extends StatelessWidget {
         imageProvider != null
             ? Image(image: imageProvider, fit: BoxFit.cover)
             : Container(color: AppTheme.surfaceDark),
-        // Image indicator icon (top-right)
-        Positioned(
-          top: 6,
-          right: 6,
-          child: Icon(Icons.image,
-              size: 14, color: Colors.white.withOpacity(0.8)),
-        ),
+        if (isRepost)
+          Positioned(
+            bottom: 4,
+            right: 4,
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: Colors.black45,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: const Icon(Icons.repeat_rounded,
+                  size: 11, color: Colors.green),
+            ),
+          )
+        else
+          Positioned(
+            top: 6,
+            right: 6,
+            child: Icon(Icons.image,
+                size: 14, color: Colors.white.withOpacity(0.8)),
+          ),
       ]);
+    }
+
+    // ── Mood post — show emoji and amber tint ───────────────────────────────
+    if (post.type == PostType.mood) {
+      return Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.amber.withOpacity(0.3),
+              AppTheme.surfaceDark,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Stack(
+          children: [
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    post.moodEmoji ?? '😊',
+                    style: const TextStyle(fontSize: 28),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    post.moodLabel ?? 'Happy',
+                    style: const TextStyle(
+                      color: Colors.amber,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+            if (isRepost)
+              const Positioned(
+                bottom: 4,
+                right: 4,
+                child: Icon(Icons.repeat_rounded, size: 14, color: Colors.green),
+              ),
+          ],
+        ),
+      );
     }
 
     // ── Text post — show card preview ────────────────────────────────────────
@@ -581,33 +780,61 @@ class _PostGridCell extends StatelessWidget {
         ),
       ),
       padding: const EdgeInsets.all(8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Stack(
         children: [
-          // Text snippet
-          Text(
-            post.content,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-              height: 1.4,
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.article_outlined,
+                  color: AppTheme.textSecondary,
+                  size: 24,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  post.content,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                  ),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
-            maxLines: 4,
-            overflow: TextOverflow.ellipsis,
           ),
-          const Spacer(),
-          // Like count at bottom
-          Row(children: [
-            const Icon(Icons.favorite_border,
-                size: 10, color: AppTheme.textSecondary),
-            const SizedBox(width: 3),
-            Text(
-              '${post.likes}',
-              style: const TextStyle(
-                  color: AppTheme.textSecondary, fontSize: 10),
+          if (isRepost)
+            const Positioned(
+              bottom: 0,
+              right: 0,
+              child: Icon(Icons.repeat_rounded, size: 14, color: Colors.green),
+            )
+          else
+            Positioned(
+              bottom: 0,
+              left: 0,
+              child: Row(children: [
+                const Icon(Icons.favorite_border,
+                    size: 10, color: AppTheme.textSecondary),
+                const SizedBox(width: 3),
+                Text(
+                  '${post.likes}',
+                  style: const TextStyle(
+                      color: AppTheme.textSecondary, fontSize: 10),
+                ),
+                if (post.repostCount > 0) ...[
+                  const SizedBox(width: 8),
+                  const Icon(Icons.repeat_rounded, size: 10, color: Colors.green),
+                  const SizedBox(width: 3),
+                  Text(
+                    '${post.repostCount}',
+                    style: const TextStyle(color: AppTheme.textSecondary, fontSize: 10),
+                  ),
+                ],
+              ]),
             ),
-          ]),
         ],
       ),
     );
@@ -815,25 +1042,117 @@ class _ReelGridCell extends StatelessWidget {
   }
 }
 
-// ─── Tab 3: Tagged ────────────────────────────────────────────────────────────
+// ─── Tab 3: Reposts Grid ──────────────────────────────────────────────────────
 
-class _TaggedTab extends StatelessWidget {
+class _RepostsGridTab extends StatelessWidget {
+  final String userId;
+  final PostService postService;
+
+  const _RepostsGridTab({required this.userId, required this.postService});
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.person_pin_outlined,
-              size: 56, color: Colors.grey[700]),
-          const SizedBox(height: 12),
-          const Text(
-            'Tagged posts\ncoming soon',
-            textAlign: TextAlign.center,
-            style:
-                TextStyle(color: AppTheme.textSecondary, fontSize: 15),
+    developer.log('=== BUILDING REPOSTS TAB ===');
+    developer.log('User ID: $userId');
+
+    return StreamBuilder<List<Post>>(
+      stream: postService.getUserRepostsStream(userId),
+      builder: (context, snapshot) {
+        developer.log('Reposts Stream state: ${snapshot.connectionState}');
+        developer.log('Has data: ${snapshot.hasData}');
+
+        if (snapshot.hasError) {
+          developer.log('REPOSTS TAB ERROR: ${snapshot.error}');
+          return Center(child: Text('Error loading reposts: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting &&
+            !snapshot.hasData) {
+          return const Center(
+              child: CircularProgressIndicator(
+                  color: AppTheme.primaryPurple));
+        }
+
+        final reposts = snapshot.data ?? [];
+        developer.log('Total reposts received: ${reposts.length}');
+
+        if (reposts.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.repeat_rounded,
+                    size: 56, color: Colors.grey[700]),
+                const SizedBox(height: 12),
+                const Text('No reposts yet',
+                    style: TextStyle(
+                        color: AppTheme.textSecondary, fontSize: 15)),
+              ],
+            ),
+          );
+        }
+
+        return GridView.builder(
+          padding: const EdgeInsets.all(1),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            crossAxisSpacing: 1.5,
+            mainAxisSpacing: 1.5,
           ),
-        ],
+          itemCount: reposts.length,
+          itemBuilder: (context, index) {
+            final post = reposts[index];
+            developer.log('Building grid item $index for REPOST: ${post.id}, Type: ${post.type.name}');
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                developer.log('GRID_REPOST_ON_TAP: Post ${post.id}');
+                _showPostDetailInProfile(context, post);
+              },
+              child: _PostGridCell(post: post, isRepost: true),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showPostDetailInProfile(BuildContext context, Post post) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.92,
+        maxChildSize: 0.95,
+        minChildSize: 0.5,
+        builder: (_, controller) => Container(
+          decoration: const BoxDecoration(
+            color: AppTheme.backgroundDark,
+            borderRadius:
+                BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(top: 12, bottom: 8),
+                  decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(2)),
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: controller,
+                  child: PostWidget(post: post),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

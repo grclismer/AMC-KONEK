@@ -10,6 +10,7 @@ class Story {
   final DateTime timestamp;
   final DateTime expiresAt;  // 24 hours from creation
   final List<String> viewedBy;
+  final String? caption;
   
   Story({
     required this.id,
@@ -21,6 +22,7 @@ class Story {
     required this.timestamp,
     required this.expiresAt,
     required this.viewedBy,
+    this.caption,
   });
   
   factory Story.fromFirestore(DocumentSnapshot doc) {
@@ -35,6 +37,7 @@ class Story {
       timestamp: (data['timestamp'] as Timestamp).toDate(),
       expiresAt: (data['expiresAt'] as Timestamp).toDate(),
       viewedBy: List<String>.from(data['viewedBy'] ?? []),
+      caption: data['caption'],
     );
   }
   
@@ -48,6 +51,7 @@ class Story {
       'timestamp': Timestamp.fromDate(timestamp),
       'expiresAt': Timestamp.fromDate(expiresAt),
       'viewedBy': viewedBy,
+      'caption': caption,
     };
   }
   

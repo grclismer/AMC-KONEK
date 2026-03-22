@@ -257,22 +257,74 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
         child: Stack(
           children: [
             // Content
+            // Content
             Positioned.fill(
-              child: Center(
-                child: _currentMediaImage != null
-                  ? Image(
-                      image: _currentMediaImage!,
-                      fit: BoxFit.contain,
-                      width: double.infinity,
-                      height: double.infinity,
-                      gaplessPlayback: true,
-                    )
-                  : const Icon(
-                      Icons.error,
-                      color: Colors.white,
-                      size: 64,
+              child: (currentStory.mediaType == 'text' || currentStory.mediaType == 'mood')
+                ? Container(
+                    padding: const EdgeInsets.all(40),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppTheme.primaryPurple,
+                          AppTheme.primaryPink.withOpacity(0.8),
+                          AppTheme.surfaceDark,
+                        ],
+                      ),
                     ),
-              ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            currentStory.mediaUrl,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: currentStory.mediaType == 'mood' ? 42 : 28,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          if (currentStory.caption != null && currentStory.caption!.isNotEmpty) ...[
+                            const SizedBox(height: 24),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: Text(
+                                currentStory.caption!,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  )
+                : Center(
+                    child: _currentMediaImage != null
+                      ? Image(
+                          image: _currentMediaImage!,
+                          fit: BoxFit.contain,
+                          width: double.infinity,
+                          height: double.infinity,
+                          gaplessPlayback: true,
+                        )
+                      : const Icon(
+                          Icons.error,
+                          color: Colors.white,
+                          size: 64,
+                        ),
+                  ),
             ),
             
             // Progress

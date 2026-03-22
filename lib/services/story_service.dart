@@ -16,6 +16,7 @@ class StoryService {
     required String avatarUrl,
     required String mediaUrl,
     required String mediaType,
+    String? caption,
   }) async {
     final now = DateTime.now();
     final expiresAt = now.add(const Duration(hours: 24));
@@ -30,6 +31,7 @@ class StoryService {
       timestamp: now,
       expiresAt: expiresAt,
       viewedBy: [],
+      caption: caption,
     );
     
     await _firestore.collection('stories').add(story.toFirestore());

@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import '../models/reel_model.dart';
+import 'dart:io';
 
 /// Service for all Reel-related Firestore operations.
 class ReelService {
@@ -9,10 +11,41 @@ class ReelService {
   ReelService._internal();
 
   final _firestore = FirebaseFirestore.instance;
+  final _storage = FirebaseStorage.instance;
 
   // ─── Create ───────────────────────────────────────────────────────────────
 
-  /// Uploads a new reel. [videoUrl] can be a Base64 data-URI or a storage URL.
+  /// High-level upload method that handles Storage + Firestore
+  Future<void> uploadReel({
+    required String videoPath,
+    required String caption,
+  }) async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) throw Exception('Not logged in');
+
+    final file = File(videoPath);
+    if (!await file.exists()) throw Exception('Source file not found');
+
+    // 1. Upload to Storage
+    final String fileName = 'reel_${DateTime.now().millisecondsSinceEpoch}.mp4';
+    final ref = _storage.ref().child('reels').child(fileName);
+    
+    final uploadTask = await ref.putFile(
+      file, 
+      SettableMetadata(contentType: 'video/mp4'),
+    );
+    
+    final String downloadUrl = await uploadTask.ref.getDownloadURL();
+
+    // 2. Create Firestore Doc
+    await createReel(
+      videoUrl: downloadUrl,
+      caption: caption,
+    );
+  }
+
+  /// Uploads a new reel doc to Firestore. 
+  /// [videoUrl] can be a Storage URL or Base64 (legacy support).
   Future<void> createReel({
     required String videoUrl,
     required String caption,
@@ -62,20 +95,21 @@ class ReelService {
   // ─── Read ─────────────────────────────────────────────────────────────────
 
   /// Stream of all public reels for the Reels feed page, newest first.
-  /// Requires a Firestore composite index: isPublic ASC + timestamp DESC.
+  /// Modified to use in-memory sorting to avoid Firestore index requirements.
   Stream<List<Reel>> getReelsStream() {
     return _firestore
         .collection('reels')
         .where('isPublic', isEqualTo: true)
-        .orderBy('timestamp', descending: true)
         .limit(50)
         .snapshots(includeMetadataChanges: false)
-        .map((snap) => snap.docs.map((doc) => Reel.fromFirestore(doc)).toList())
+        .map((snap) {
+          final reels = snap.docs.map((doc) => Reel.fromFirestore(doc)).toList();
+          // Sort in-memory to avoid index error
+          reels.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          return reels;
+        })
         .handleError((error) {
-      // Likely a missing Firestore composite index.
-      // Create it at: Firebase Console → Firestore → Indexes
-      // Fields: isPublic (ASC), timestamp (DESC), Collection: reels
-      print('ReelService.getReelsStream error (check Firestore index): $error');
+      print('ReelService.getReelsStream error: $error');
     });
   }
 

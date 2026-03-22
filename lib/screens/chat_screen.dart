@@ -7,6 +7,7 @@ import '../models/chat_model.dart';
 import '../services/chat_service.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
+import '../services/storage_service.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
@@ -121,14 +122,16 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       );
       
-      // Convert to Base64
-      final bytes = await image.readAsBytes();
-      final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
-      
-      // Send image message
+      // Upload to Firebase Storage
+      final imageUrl = await StorageService.instance.uploadImage(
+        image.path,
+        folder: 'messages',
+      );
+
+      // Send image message with Storage URL
       await ChatService.instance.sendImageMessage(
         chatId: widget.chatId,
-        base64Image: base64Image,
+        imageUrl: imageUrl,
       );
       
       if (mounted) {

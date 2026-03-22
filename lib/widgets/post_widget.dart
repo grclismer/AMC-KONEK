@@ -10,7 +10,6 @@ import '../screens/comments_screen.dart';
 import '../theme/app_theme.dart';
 import '../theme/animations.dart';
 import '../screens/profile_screen.dart';
-import 'dart:convert';
 import 'dart:developer' as developer;
 import '../widgets/user_photo_widget.dart';
 
@@ -26,20 +25,37 @@ class PostWidget extends StatefulWidget {
 class _PostWidgetState extends State<PostWidget> {
   late bool _isLiked;
   late int _likeCount;
+  late bool _isReposted = false;
+  late int _repostCount;
   final String? _currentUserId = AuthService().currentUser?.uid;
 
   @override
   void initState() {
     super.initState();
     _likeCount = widget.post.likes;
+    _repostCount = widget.post.repostCount;
     _isLiked = _currentUserId != null && widget.post.likedBy.contains(_currentUserId);
+    _checkRepostStatus();
+  }
+
+  Future<void> _checkRepostStatus() async {
+    if (_currentUserId == null) return;
+    final isReposted = await PostService.instance.hasReposted(widget.post.id);
+    if (mounted) {
+      setState(() {
+        _isReposted = isReposted;
+      });
+    }
   }
 
   @override
   void didUpdateWidget(covariant PostWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.post.likes != oldWidget.post.likes || widget.post.likedBy != oldWidget.post.likedBy) {
+    if (widget.post.likes != oldWidget.post.likes || 
+        widget.post.likedBy != oldWidget.post.likedBy ||
+        widget.post.repostCount != oldWidget.post.repostCount) {
       _likeCount = widget.post.likes;
+      _repostCount = widget.post.repostCount;
       _isLiked = _currentUserId != null && widget.post.likedBy.contains(_currentUserId);
     }
   }
@@ -73,6 +89,50 @@ class _PostWidgetState extends State<PostWidget> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to update like status. Please try again.')),
+        );
+      }
+    }
+  }
+
+  Future<void> _handleRepost() async {
+    if (_currentUserId == null) return;
+
+    final bool previousIsReposted = _isReposted;
+    final int previousCount = _repostCount;
+
+    // Optimistic UI
+    setState(() {
+      _isReposted = !_isReposted;
+      _repostCount += _isReposted ? 1 : -1;
+    });
+
+    try {
+      if (_isReposted) {
+        await PostService.instance.repostPost(widget.post);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Reposted! 🎉 check your profile'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } else {
+        await PostService.instance.undoRepost(widget.post);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Repost removed')),
+          );
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _isReposted = previousIsReposted;
+        _repostCount = previousCount;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
         );
       }
     }
@@ -218,6 +278,12 @@ class _PostWidgetState extends State<PostWidget> {
 
   @override
   Widget build(BuildContext context) {
+    developer.log('=== BUILDING POST ===');
+    developer.log('Post ID: ${widget.post.id}');
+    developer.log('Type: ${widget.post.type}');
+    developer.log('User: ${widget.post.username}');
+    developer.log('Content exists: ${widget.post.content.isNotEmpty}');
+    developer.log('====================');
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -241,13 +307,44 @@ class _PostWidgetState extends State<PostWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ─── Repost Indicator ──────────────────────────────────────────────
+          if (widget.post.isRepost)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.repeat_rounded,
+                    size: 14,
+                    color: AppTheme.textSecondary,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    widget.post.userId == _currentUserId
+                        ? 'You reposted'
+                        : '${widget.post.username} reposted',
+                    style: const TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
           // Header
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
                 GestureDetector(
-                  onTap: () => Navigator.push(context, SlidePageRoute(page: ProfileScreen(userId: widget.post.userId))),
+                  onTap: () {
+                    final targetId = widget.post.isRepost 
+                        ? widget.post.originalUserId! 
+                        : widget.post.userId;
+                    Navigator.push(context, SlidePageRoute(page: ProfileScreen(userId: targetId)));
+                  },
                   child: Container(
                     padding: const EdgeInsets.all(2),
                     decoration: const BoxDecoration(
@@ -255,7 +352,9 @@ class _PostWidgetState extends State<PostWidget> {
                       gradient: AppTheme.primaryGradient,
                     ),
                     child: UserPhotoWidget(
-                      userId: widget.post.userId,
+                      userId: widget.post.isRepost 
+                          ? widget.post.originalUserId! 
+                          : widget.post.userId,
                       radius: 18,
                     ),
                   ),
@@ -263,12 +362,19 @@ class _PostWidgetState extends State<PostWidget> {
                 const SizedBox(width: 10),
                 Expanded(
                   child: GestureDetector(
-                    onTap: () => Navigator.push(context, SlidePageRoute(page: ProfileScreen(userId: widget.post.userId))),
+                    onTap: () {
+                      final targetId = widget.post.isRepost 
+                          ? widget.post.originalUserId! 
+                          : widget.post.userId;
+                      Navigator.push(context, SlidePageRoute(page: ProfileScreen(userId: targetId)));
+                    },
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.post.username.isNotEmpty ? widget.post.username : "Unknown User",
+                          widget.post.isRepost 
+                              ? (widget.post.originalUsername ?? "Original User")
+                              : (widget.post.username.isNotEmpty ? widget.post.username : "Unknown User"),
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
                         ),
                         Text(
@@ -297,15 +403,85 @@ class _PostWidgetState extends State<PostWidget> {
               ),
             ),
 
-          // Content
-          if (widget.post.type == PostType.text)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Text(
-                widget.post.content, 
-                style: const TextStyle(fontSize: 15, color: AppTheme.textPrimary, height: 1.4),
+          // Mood Indicator Section
+          if (widget.post.type == PostType.mood)
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.amber.withOpacity(0.15),
+                    Colors.orange.withOpacity(0.05),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: Colors.amber.withOpacity(0.3),
+                  width: 1.5,
+                ),
               ),
-            )
+              child: Row(
+                children: [
+                  Text(
+                    widget.post.moodEmoji ?? '😊',
+                    style: const TextStyle(fontSize: 40),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Feeling ${widget.post.moodLabel ?? 'Happy'}',
+                          style: const TextStyle(
+                            color: Colors.amber,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.schedule,
+                              size: 14,
+                              color: Colors.amber.shade700,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              widget.post.timeRemaining,
+                              style: TextStyle(
+                                color: Colors.amber.shade700,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          // Content
+          if (widget.post.type == PostType.text || widget.post.type == PostType.mood)
+            if (widget.post.content.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Text(
+                  widget.post.content, 
+                  style: const TextStyle(
+                    fontSize: 15, 
+                    color: AppTheme.textPrimary,
+                    height: 1.4,
+                  ),
+                ),
+              )
           else
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -330,6 +506,12 @@ class _PostWidgetState extends State<PostWidget> {
                   icon: Icons.chat_bubble_outline_rounded,
                   label: widget.post.comments.toString(),
                   onTap: _navigateToComments,
+                ),
+                _actionButton(
+                  icon: Icons.repeat_rounded,
+                  label: _repostCount.toString(),
+                  color: _isReposted ? Colors.green : null,
+                  onTap: _handleRepost,
                 ),
                 BounceClick(
                   onTap: () {},

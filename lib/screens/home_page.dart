@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import '../widgets/stories_bar.dart';
 import '../widgets/post_widget.dart';
@@ -272,10 +273,29 @@ class _HomePageState extends State<HomePage> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: posts.length,
-                    itemBuilder: (context, index) => FadeInStaggered(
-                      index: index,
-                      child: PostWidget(post: posts[index]),
-                    ),
+                    itemBuilder: (context, index) {
+                      try {
+                        return FadeInStaggered(
+                          index: index,
+                          child: PostWidget(post: posts[index]),
+                        );
+                      } catch (e, stackTrace) {
+                        developer.log('Error rendering post at index $index', error: e, stackTrace: stackTrace);
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.red.withOpacity(0.2)),
+                          ),
+                          child: const Text(
+                            'Something went wrong displaying this post',
+                            style: TextStyle(color: Colors.redAccent, fontSize: 13),
+                          ),
+                        );
+                      }
+                    },
                   );
                 },
               ),

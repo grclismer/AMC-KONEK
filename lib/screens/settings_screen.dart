@@ -10,6 +10,7 @@ import '../theme/effects.dart';
 import '../theme/animations.dart';
 import 'package:image_picker/image_picker.dart';
 import '../widgets/user_photo_widget.dart';
+import '../services/storage_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -331,11 +332,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _pickImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 50, maxWidth: 400, maxHeight: 400);
-    if (image != null) {
-      final bytes = await image.readAsBytes();
-      final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
-      await _authService.saveUserData({'photoURL': base64Image});
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image == null) return;
+
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(
+        child: CircularProgressIndicator(color: AppTheme.primaryPurple),
+      ),
+    );
+
+    try {
+      final photoURL =
+          await StorageService.instance.uploadProfilePicture(image.path);
+      await _authService.saveUserData({'photoURL': photoURL});
+      if (mounted) {
+        Navigator.pop(context); // Close loading
+        GlassmorphicEffects.showGlassSnackBar(context,
+            message: 'Profile picture updated!');
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // Close loading
+        GlassmorphicEffects.showGlassSnackBar(context,
+            message: 'Failed to upload: $e', isError: true);
+      }
     }
   }
 

@@ -1,25 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Enum representing the different types of posts supported in the app.
-enum PostType { text, image, video, tiktok }
+enum PostType { text, image, video, tiktok, mood }
 
-/// Helper extension to safely get string name from enum
+/// Helper extension for PostType
 extension PostTypeExtension on PostType {
   String get name => toString().split('.').last;
-}
-
-PostType _postTypeFromString(String type) {
-  switch (type.toLowerCase()) {
-    case 'image':
-      return PostType.image;
-    case 'video':
-      return PostType.video;
-    case 'tiktok':
-      return PostType.tiktok;
-    case 'text':
-    default:
-      return PostType.text;
-  }
 }
 
 /// A model class representing a social media post in the Konek app.
@@ -34,8 +20,22 @@ class Post {
   final DateTime timestamp;
   final int likes;
   final int comments;
+  final int repostCount; // ── New field ─────────────────────────────────────
   final List<String> likedBy;
   final bool isPublic;
+
+  // ─── Mood & Expiration ────────────────────────────────────────────────────
+  final DateTime? expiresAt;
+  final String? moodEmoji;
+  final String? moodLabel;
+
+  // ─── Repost Fields ────────────────────────────────────────────────────────
+  final bool isRepost;
+  final String? originalPostId;
+  final String? originalUserId;
+  final String? originalUsername;
+  final String? repostedBy; // Person who is reposting (their username)
+  final DateTime? repostedAt;
 
   Post({
     required this.id,
@@ -48,31 +48,51 @@ class Post {
     required this.timestamp,
     this.likes = 0,
     this.comments = 0,
+    this.repostCount = 0,
     this.likedBy = const [],
     this.isPublic = true,
+    this.expiresAt,
+    this.moodEmoji,
+    this.moodLabel,
+    this.isRepost = false,
+    this.originalPostId,
+    this.originalUserId,
+    this.originalUsername,
+    this.repostedBy,
+    this.repostedAt,
   });
 
-  /// Factory method to create a [Post] instance from a Firestore [DocumentSnapshot].
   factory Post.fromFirestore(DocumentSnapshot doc) {
-    Map<String, dynamic> data = doc.data() as Map<String, dynamic>? ?? {};
-
+    final data = doc.data() as Map<String, dynamic>? ?? {};
     return Post(
       id: doc.id,
       userId: data['userId'] ?? '',
       username: data['username'] ?? '',
       avatarUrl: data['avatarUrl'] ?? '',
-      type: _postTypeFromString(data['type'] ?? 'text'),
+      type: PostType.values.firstWhere(
+        (e) => e.name == (data['type'] ?? 'text'),
+        orElse: () => PostType.text,
+      ),
       content: data['content'] ?? '',
       caption: data['caption'],
       timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
       likes: data['likes'] ?? 0,
       comments: data['comments'] ?? 0,
+      repostCount: data['repostCount'] ?? 0,
       likedBy: List<String>.from(data['likedBy'] ?? []),
       isPublic: data['isPublic'] ?? true,
+      expiresAt: (data['expiresAt'] as Timestamp?)?.toDate(),
+      moodEmoji: data['moodEmoji'],
+      moodLabel: data['moodLabel'],
+      isRepost: data['isRepost'] ?? false,
+      originalPostId: data['originalPostId'],
+      originalUserId: data['originalUserId'],
+      originalUsername: data['originalUsername'],
+      repostedBy: data['repostedBy'],
+      repostedAt: (data['repostedAt'] as Timestamp?)?.toDate(),
     );
   }
 
-  /// Converts a [Post] instance into a map suitable for Firestore storage.
   Map<String, dynamic> toFirestore() {
     return {
       'userId': userId,
@@ -84,13 +104,41 @@ class Post {
       'timestamp': Timestamp.fromDate(timestamp),
       'likes': likes,
       'comments': comments,
+      'repostCount': repostCount,
       'likedBy': likedBy,
       'isPublic': isPublic,
+      'expiresAt': expiresAt != null ? Timestamp.fromDate(expiresAt!) : null,
+      'moodEmoji': moodEmoji,
+      'moodLabel': moodLabel,
+      'isRepost': isRepost,
+      'originalPostId': originalPostId,
+      'originalUserId': originalUserId,
+      'originalUsername': originalUsername,
+      'repostedBy': repostedBy,
+      'repostedAt': repostedAt != null ? Timestamp.fromDate(repostedAt!) : null,
     };
   }
 
-  /// Returns the Firestore collection name where posts are stored.
-  static String getCollectionName() {
-    return 'posts';
+  // Check if post has expired
+  bool get isExpired {
+    if (expiresAt == null) return false;
+    return DateTime.now().isAfter(expiresAt!);
   }
+
+  // Get time remaining for mood posts
+  String get timeRemaining {
+    if (expiresAt == null) return '';
+    final remaining = expiresAt!.difference(DateTime.now());
+    if (remaining.isNegative) return 'Expired';
+
+    if (remaining.inHours > 0) {
+      return '${remaining.inHours}h remaining';
+    } else if (remaining.inMinutes > 0) {
+      return '${remaining.inMinutes}m remaining';
+    } else {
+      return '${remaining.inSeconds}s remaining';
+    }
+  }
+
+  static String getCollectionName() => 'posts';
 }

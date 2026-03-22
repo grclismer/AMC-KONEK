@@ -132,7 +132,7 @@ class FriendsService {
   // Get pending requests stream
   Stream<List<FriendRequest>> getPendingRequestsStream() {
     final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) return Stream.value([]);
+    if (currentUser == null) return Stream.fromIterable([[]]);
     
     // Removing orderBy to ensure it works even without composite indexes
     return _firestore
@@ -304,13 +304,13 @@ class FriendsService {
   // Helper method for real-time friend check
   Stream<bool> isFriendStream(String otherUserId) {
     final currentUser = FirebaseAuth.instance.currentUser;
-    if (currentUser == null) return Stream.value(false);
+    if (currentUser == null) return Stream.fromIterable([false]);
 
     return _firestore.collection('users').doc(currentUser.uid).snapshots().map((snapshot) {
       if (!snapshot.exists) return false;
       final friends = List<String>.from(snapshot.data()?['friends'] ?? []);
       return friends.contains(otherUserId);
-    });
+    }).asBroadcastStream();
   }
 }
 

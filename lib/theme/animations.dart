@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui';
+import 'dart:convert';
 import 'app_theme.dart';
 
 /// Centralized location for premium animations and micro-interactions.
@@ -220,7 +221,7 @@ class _ShimmerBoxState extends State<ShimmerBox> with SingleTickerProviderStateM
   }
 }
 
-/// Image widget with Fade-in and Blur effect.
+/// Image widget with Fade-in and Blur effect, supporting both Network and Base64 images.
 class AnimatedBlurImage extends StatelessWidget {
   final String imageUrl;
   final double? width;
@@ -237,13 +238,36 @@ class AnimatedBlurImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.network(
-      imageUrl,
+    bool isBase64 = imageUrl.startsWith('data:image');
+    ImageProvider? imageProvider;
+
+    if (isBase64) {
+      try {
+        final base64String = imageUrl.split(',').last;
+        imageProvider = MemoryImage(base64Decode(base64String));
+      } catch (e) {
+        print('Error decoding Base64 image in AnimatedBlurImage: $e');
+      }
+    } else if (imageUrl.startsWith('http')) {
+      imageProvider = NetworkImage(imageUrl);
+    }
+
+    if (imageProvider == null) {
+      return Container(
+        width: width,
+        height: height,
+        color: AppTheme.surfaceLighter,
+        child: const Icon(Icons.error_outline, color: AppTheme.textSecondary),
+      );
+    }
+
+    return Image(
+      image: imageProvider,
       width: width,
       height: height,
       fit: fit,
       frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-        if (wasSynchronouslyLoaded) return child;
+        if (wasSynchronouslyLoaded || isBase64) return child;
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 500),
           child: frame == null

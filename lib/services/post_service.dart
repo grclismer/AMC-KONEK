@@ -29,8 +29,10 @@ class PostService {
       final friendIds = List<String>.from(userData['friends'] ?? []);
       final visibleUserIds = [...friendIds, currentUser.uid];
 
+      developer.log('=== POSTS STREAM DEBUG ===');
+      developer.log('User: ${currentUser.uid}, Friends Count: ${friendIds.length}');
+
       // 2. Query Firestore based on visibleUserIds count
-      // Firestore 'whereIn' supports up to 30 items
       if (visibleUserIds.length <= 10) {
         return _firestore.collection(_collection)
             .where('userId', whereIn: visibleUserIds)
@@ -38,8 +40,14 @@ class PostService {
             .snapshots()
             .map((snapshot) {
               final posts = snapshot.docs.map((doc) => Post.fromFirestore(doc)).toList();
-              // In-memory filter for isPublic (safely handles missing fields)
-              final filtered = posts.where((p) => p.isPublic).toList();
+              // Filter by isPublic and ignore expired moods
+              final filtered = posts.where((p) => p.isPublic && !p.isExpired).toList();
+              
+              developer.log('Fetched ${snapshot.docs.length} docs, ${filtered.length} visible');
+              for (var p in filtered.take(5)) {
+                developer.log('  - Post: ${p.id}, Type: ${p.type.name}, Repost: ${p.isRepost}');
+              }
+
               filtered.sort((a, b) => b.timestamp.compareTo(a.timestamp));
               return filtered.take(50).toList();
             });
@@ -51,8 +59,13 @@ class PostService {
             .map((snapshot) {
               final allPosts = snapshot.docs.map((doc) => Post.fromFirestore(doc)).toList();
               final filtered = allPosts.where((post) => 
-                visibleUserIds.contains(post.userId) && post.isPublic
+                visibleUserIds.contains(post.userId) && 
+                post.isPublic &&
+                !post.isExpired
               ).toList();
+
+              developer.log('Large list fetch: ${allPosts.length} docs, ${filtered.length} filtered');
+
               filtered.sort((a, b) => b.timestamp.compareTo(a.timestamp));
               return filtered.take(50).toList();
             });
@@ -67,27 +80,99 @@ class PostService {
         .snapshots()
         .map((snapshot) {
           final posts = snapshot.docs.map((doc) => Post.fromFirestore(doc)).toList();
-          // Filter by isPublic client-side (handles missing fields as true)
-          final publicPosts = posts.where((p) => p.isPublic).toList();
+          // Filter by isPublic and ignore expired moods
+          final publicPosts = posts.where((p) => p.isPublic && !p.isExpired).toList();
           publicPosts.sort((a, b) => b.timestamp.compareTo(a.timestamp));
           return publicPosts.take(50).toList();
         });
   }
 
-  /// Returns a real-time stream of posts for a specific user.
-  Stream<List<Post>> getPostsByUserStream(String userId) {
+  /// Get user's original posts ONLY (no reposts)
+  Stream<List<Post>> getUserPostsStream(String userId) {
+    developer.log('=== getUserPostsStream for $userId ===');
+    return _firestore
+        .collection(_collection)
+        .where('userId', isEqualTo: userId)
+        .snapshots()
+        .map((snapshot) {
+          developer.log('GET_USER_POSTS: Received ${snapshot.docs.length} docs from Firestore');
+          final posts = snapshot.docs
+            .map((doc) => Post.fromFirestore(doc))
+            .where((post) {
+              // ✅ Filter original content and non-expired moods locally
+              final keep = !post.isRepost && !post.isExpired;
+              if (!keep) developer.log('Filtering out: ${post.id} (isRepost: ${post.isRepost}, isExpired: ${post.isExpired})');
+              return keep;
+            })
+            .toList();
+          
+          // ✅ Sort locally to avoid index requirement
+          posts.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          
+          developer.log('Returning ${posts.length} original posts after local filter/sort');
+          return posts;
+        });
+  }
+
+  /// Get user's reposts ONLY
+  Stream<List<Post>> getUserRepostsStream(String userId) {
+    developer.log('=== getUserRepostsStream for $userId ===');
+    return _firestore
+        .collection(_collection)
+        .where('userId', isEqualTo: userId)
+        .snapshots()
+        .map((snapshot) {
+          developer.log('GET_USER_REPOSTS: Received ${snapshot.docs.length} docs from Firestore');
+          final posts = snapshot.docs
+            .map((doc) => Post.fromFirestore(doc))
+            .where((post) {
+              // ✅ Filter reposts locally
+              final keep = post.isRepost && !post.isExpired;
+              return keep;
+            })
+            .toList();
+          
+          // ✅ Sort locally
+          posts.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          
+          developer.log('Returning ${posts.length} reposts after local filter/sort');
+          return posts;
+        });
+  }
+
+  /// Returns a real-time stream of all posts for a specific user (legacy wrapper)
+  Stream<List<Post>> getPostsByUserStream(String userId, {bool excludeReposts = false}) {
+    if (excludeReposts) return getUserPostsStream(userId);
+    
+    return _firestore
+        .collection(_collection)
+        .where('userId', isEqualTo: userId)
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .map((QuerySnapshot snapshot) {
+      return snapshot.docs.map((doc) => Post.fromFirestore(doc)).toList();
+    });
+  }
+
+  /// Clean up expired mood posts (Call on app start or periodically)
+  Future<void> cleanupExpiredPosts() async {
     try {
-      return _firestore
+      final snapshot = await _firestore
           .collection(_collection)
-          .where('userId', isEqualTo: userId)
-          .orderBy('timestamp', descending: true)
-          .snapshots()
-          .map((QuerySnapshot snapshot) {
-        return snapshot.docs.map((doc) => Post.fromFirestore(doc)).toList();
-      });
-    } catch (e, stackTrace) {
-      developer.log('Error streaming user posts', error: e, stackTrace: stackTrace);
-      return Stream.value([]);
+          .where('expiresAt', isLessThan: Timestamp.now())
+          .get();
+
+      if (snapshot.docs.isEmpty) return;
+
+      final batch = _firestore.batch();
+      for (var doc in snapshot.docs) {
+        batch.delete(doc.reference);
+      }
+
+      await batch.commit();
+      developer.log('Deleted ${snapshot.docs.length} expired mood posts');
+    } catch (e) {
+      developer.log('Error cleaning up expired posts', error: e);
     }
   }
 
@@ -166,5 +251,106 @@ class PostService {
     final snapshot = await _firestore.collection(_collection).doc(postId).get();
     if (snapshot.exists) return Post.fromFirestore(snapshot);
     return null;
+  }
+
+  // ─── Repost Logic ───────────────────────────────────────────────────────
+
+  /// Creates a repost of an original post.
+  Future<void> repostPost(Post originalPost) async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) throw Exception('Not logged in');
+
+    // Get current reposter's info
+    final userDoc = await _firestore.collection('users').doc(currentUser.uid).get();
+    final userData = userDoc.data() ?? {};
+
+    // 1. Prevent duplicate reposts by this user
+    final existing = await _firestore
+        .collection(_collection)
+        .where('isRepost', isEqualTo: true)
+        .where('originalPostId', isEqualTo: originalPost.id)
+        .where('userId', isEqualTo: currentUser.uid)
+        .get();
+
+    if (existing.docs.isNotEmpty) {
+      throw Exception('You already reposted this!');
+    }
+
+    // 2. Create the Repost Post object
+    final repost = Post(
+      id: '',
+      userId: currentUser.uid,
+      username: userData['username'] ?? 'user',
+      avatarUrl: userData['photoURL'] ?? '',
+      content: originalPost.content,
+      caption: originalPost.caption,
+      type: originalPost.type,
+      timestamp: DateTime.now(), // Current interaction time
+      likes: 0,
+      comments: 0,
+      repostCount: 0,
+      likedBy: [],
+      isPublic: originalPost.isPublic,
+
+      // Mood Inherit Expiry (moods stay for 24h from original post)
+      expiresAt: originalPost.expiresAt,
+      moodEmoji: originalPost.moodEmoji,
+      moodLabel: originalPost.moodLabel,
+
+      // Repost Meta
+      isRepost: true,
+      originalPostId: originalPost.id,
+      originalUserId: originalPost.userId,
+      originalUsername: originalPost.username,
+      repostedBy: userData['username'] ?? 'user',
+      repostedAt: DateTime.now(),
+    );
+
+    // 3. Save Repost
+    await createPost(post: repost);
+
+    // 4. Update Repost Count on Original
+    await _firestore.collection(_collection).doc(originalPost.id).update({
+      'repostCount': FieldValue.increment(1),
+    });
+  }
+
+  /// Deletes a user's repost of a specific original post.
+  Future<void> undoRepost(Post originalPost) async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) return;
+
+    final existing = await _firestore
+        .collection(_collection)
+        .where('isRepost', isEqualTo: true)
+        .where('originalPostId', isEqualTo: originalPost.id)
+        .where('userId', isEqualTo: currentUser.uid)
+        .get();
+
+    if (existing.docs.isEmpty) return;
+
+    for (var doc in existing.docs) {
+      await doc.reference.delete();
+    }
+
+    // Decrement repost count
+    await _firestore.collection(_collection).doc(originalPost.id).update({
+      'repostCount': FieldValue.increment(-1),
+    });
+  }
+
+  /// Checks if the current user has already reposted a post.
+  Future<bool> hasReposted(String postId) async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) return false;
+
+    final snapshot = await _firestore
+        .collection(_collection)
+        .where('isRepost', isEqualTo: true)
+        .where('originalPostId', isEqualTo: postId)
+        .where('userId', isEqualTo: currentUser.uid)
+        .get();
+
+    return snapshot.docs.isNotEmpty;
   }
 }

@@ -9,16 +9,22 @@
       "dependencies": [
         "cloud_firestore",
         "cupertino_icons",
+        "ffmpeg_kit_flutter",
+        "file_picker",
         "firebase_auth",
         "firebase_core",
         "firebase_storage",
         "flutter",
+        "flutter_image_compress",
         "google_fonts",
         "google_sign_in",
         "image_picker",
         "path_provider",
         "shared_preferences",
+        "universal_html",
         "url_launcher",
+        "video_compress",
+        "video_editor",
         "video_player",
         "webview_flutter",
         "youtube_player_flutter"
@@ -51,6 +57,45 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "ffmpeg_kit_flutter",
+      "version": "6.0.3",
+      "dependencies": [
+        "ffmpeg_kit_flutter_platform_interface",
+        "flutter"
+      ]
+    },
+    {
+      "name": "video_editor",
+      "version": "3.0.0",
+      "dependencies": [
+        "flutter",
+        "path",
+        "path_provider",
+        "transparent_image",
+        "video_player",
+        "video_thumbnail"
+      ]
+    },
+    {
+      "name": "video_compress",
+      "version": "3.1.4",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
+      "name": "flutter_image_compress",
+      "version": "2.4.0",
+      "dependencies": [
+        "flutter",
+        "flutter_image_compress_common",
+        "flutter_image_compress_macos",
+        "flutter_image_compress_ohos",
+        "flutter_image_compress_platform_interface",
+        "flutter_image_compress_web"
       ]
     },
     {
@@ -307,6 +352,69 @@
         "stream_channel",
         "string_scanner",
         "term_glyph"
+      ]
+    },
+    {
+      "name": "ffmpeg_kit_flutter_platform_interface",
+      "version": "0.2.1",
+      "dependencies": [
+        "flutter",
+        "plugin_platform_interface"
+      ]
+    },
+    {
+      "name": "video_thumbnail",
+      "version": "0.5.6",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
+      "name": "transparent_image",
+      "version": "2.0.1",
+      "dependencies": []
+    },
+    {
+      "name": "flutter_image_compress_ohos",
+      "version": "0.0.3",
+      "dependencies": [
+        "flutter",
+        "flutter_image_compress_platform_interface"
+      ]
+    },
+    {
+      "name": "flutter_image_compress_macos",
+      "version": "1.0.3",
+      "dependencies": [
+        "flutter",
+        "flutter_image_compress_platform_interface"
+      ]
+    },
+    {
+      "name": "flutter_image_compress_web",
+      "version": "0.1.5",
+      "dependencies": [
+        "flutter",
+        "flutter_image_compress_platform_interface",
+        "flutter_web_plugins",
+        "web"
+      ]
+    },
+    {
+      "name": "flutter_image_compress_common",
+      "version": "1.0.6",
+      "dependencies": [
+        "flutter",
+        "flutter_image_compress_platform_interface"
+      ]
+    },
+    {
+      "name": "flutter_image_compress_platform_interface",
+      "version": "1.0.5",
+      "dependencies": [
+        "cross_file",
+        "flutter",
+        "plugin_platform_interface"
       ]
     },
     {
@@ -845,16 +953,36 @@
       ]
     },
     {
-      "name": "ffi",
-      "version": "2.2.0",
-      "dependencies": []
-    },
-    {
       "name": "plugin_platform_interface",
       "version": "2.1.8",
       "dependencies": [
         "meta"
       ]
+    },
+    {
+      "name": "web",
+      "version": "1.1.1",
+      "dependencies": []
+    },
+    {
+      "name": "flutter_web_plugins",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter"
+      ]
+    },
+    {
+      "name": "cross_file",
+      "version": "0.3.5+2",
+      "dependencies": [
+        "meta",
+        "web"
+      ]
+    },
+    {
+      "name": "ffi",
+      "version": "2.2.0",
+      "dependencies": []
     },
     {
       "name": "platform",
@@ -868,11 +996,6 @@
         "meta",
         "path"
       ]
-    },
-    {
-      "name": "web",
-      "version": "1.1.1",
-      "dependencies": []
     },
     {
       "name": "http_parser",
@@ -889,13 +1012,6 @@
       "version": "1.4.0",
       "dependencies": [
         "collection"
-      ]
-    },
-    {
-      "name": "flutter_web_plugins",
-      "version": "0.0.0",
-      "dependencies": [
-        "flutter"
       ]
     },
     {
@@ -926,14 +1042,6 @@
         "flutter",
         "http",
         "plugin_platform_interface"
-      ]
-    },
-    {
-      "name": "cross_file",
-      "version": "0.3.5+2",
-      "dependencies": [
-        "meta",
-        "web"
       ]
     },
     {
@@ -993,6 +1101,57 @@
       "name": "vm_service",
       "version": "15.0.2",
       "dependencies": []
+    },
+    {
+      "name": "universal_html",
+      "version": "2.3.0",
+      "dependencies": [
+        "async",
+        "charcode",
+        "collection",
+        "csslib",
+        "html",
+        "meta",
+        "source_span",
+        "typed_data",
+        "universal_io"
+      ]
+    },
+    {
+      "name": "universal_io",
+      "version": "2.3.1",
+      "dependencies": [
+        "collection",
+        "meta",
+        "typed_data"
+      ]
+    },
+    {
+      "name": "charcode",
+      "version": "1.4.0",
+      "dependencies": []
+    },
+    {
+      "name": "file_picker",
+      "version": "8.3.7",
+      "dependencies": [
+        "cross_file",
+        "ffi",
+        "flutter",
+        "flutter_plugin_android_lifecycle",
+        "flutter_web_plugins",
+        "path",
+        "plugin_platform_interface",
+        "web",
+        "win32"
+      ]
+    },
+    {
+      "name": "win32",
+      "version": "5.15.0",
+      "dependencies": [
+        "ffi"
+      ]
     }
   ],
   "configVersion": 1

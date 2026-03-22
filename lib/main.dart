@@ -5,6 +5,7 @@ import 'screens/login_screen.dart';
 import 'screens/main_screen.dart';
 import 'firebase_options.dart';
 import 'theme/app_theme.dart';
+import 'services/post_service.dart';
 
 /// The entry point of the Flutter application. 
 /// It initializes Firebase and sets up the app environment.
@@ -16,6 +17,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Background cleanup of expired posts
+  PostService.instance.cleanupExpiredPosts();
 
   // Runs the root widget of the application.
   runApp(const MyApp());

@@ -1,16 +1,22 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' as io;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 import '../models/reel_model.dart';
 import '../services/reel_service.dart';
-import '../services/auth_service.dart';
 import '../services/friends_service.dart';
 import '../theme/app_theme.dart';
+import '../utils/video_compressor.dart';
+import 'video_trimmer_screen.dart';
 
 // ─── Reels Page ───────────────────────────────────────────────────────────────
 
@@ -21,31 +27,273 @@ class ReelsPage extends StatefulWidget {
   State<ReelsPage> createState() => _ReelsPageState();
 }
 
-class _ReelsPageState extends State<ReelsPage> {
-  final PageController _pageController = PageController();
-  int _currentIndex = 0;
-  bool _showKakonekFeed = true;
-  List<Reel> _cachedReels = []; // Persistent cache — never goes blank
-
+class _ReelsPageState extends State<ReelsPage> 
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  late PageController _kakonekPageController;
+  late PageController _paraSaImoPageController;
+  int _kakonekIndex = 0;
+  int _paraSaImoIndex = 0;
+  final Set<String> _viewedReels = {};
+  
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _kakonekPageController = PageController();
+    _paraSaImoPageController = PageController();
+    
+    // Listen for tab changes
+    _tabController.addListener(() {
+      if (mounted) setState(() {});
+    });
+  }
+  
   @override
   void dispose() {
-    _pageController.dispose();
+    _tabController.dispose();
+    _kakonekPageController.dispose();
+    _paraSaImoPageController.dispose();
     super.dispose();
   }
 
-  void _showUploadSheet() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const _UploadReelSheet(),
-    );
+  Future<void> _navigateToUploadReel() async {
+    print('🎥 Upload button clicked');
+    
+    try {
+      // Check if user is logged in
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please log in first'), backgroundColor: Colors.red),
+          );
+        }
+        return;
+      }
+
+      print('Opening file picker...');
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.video,
+        allowMultiple: false,
+      );
+      
+      if (result == null || result.files.isEmpty) {
+        print('No file selected');
+        return;
+      }
+      
+      final file = result.files.first;
+      print('Video selected: ${file.name}');
+      print('Original size: ${VideoCompressor.formatFileSize(file.size)}');
+      
+      // Show compression dialog
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const Center(
+            child: Card(
+              color: Colors.black87,
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(color: Colors.white),
+                    SizedBox(height: 16),
+                    Text(
+                      'Compressing video...',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+      
+      // Get bytes (on Web, file.bytes is available; on Mobile, we read from path)
+      Uint8List? rawBytes;
+      if (kIsWeb) {
+        rawBytes = file.bytes;
+      } else if (file.path != null) {
+        rawBytes = await XFile(file.path!).readAsBytes();
+      }
+      
+      if (rawBytes == null) throw Exception('Could not read file data');
+
+      // 🎬 Compress video
+      final compressedBytes = await VideoCompressor.compressVideoToSize(
+        videoBytes: rawBytes,
+        fileName: file.name,
+        targetSizeKB: 1024, // 1MB target
+      );
+      
+      if (mounted) {
+        if (Navigator.canPop(context)) Navigator.pop(context); // Close compression dialog
+      }
+      
+      if (compressedBytes == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Could not compress video or it\'s too large for web.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+      
+      print('Compressed size: ${VideoCompressor.formatFileSize(compressedBytes.length)}');
+      
+      // Now upload the compressed bytes
+      await _executeUpload(compressedBytes, file.name);
+      
+    } catch (e, stackTrace) {
+      print('❌ ERROR picking video: $e');
+      print('Stack: $stackTrace');
+      if (mounted) {
+        if (Navigator.canPop(context)) Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Future<void> _executeUpload(Uint8List bytes, String fileName) async {
+    // Show uploading dialog
+    if (mounted) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(color: Colors.white),
+              SizedBox(height: 16),
+              Text('Uploading reel...', style: TextStyle(color: Colors.white)),
+            ],
+          ),
+        ),
+      );
+    }
+    
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception('Not logged in');
+      
+      print('📤 Uploading ${VideoCompressor.formatFileSize(bytes.length)}...');
+      
+      // Upload to Firebase Storage
+      final ref = FirebaseStorage.instance
+        .ref('reels/${user.uid}_${DateTime.now().millisecondsSinceEpoch}.mp4');
+      
+      await ref.putData(bytes, SettableMetadata(contentType: 'video/mp4'));
+      final url = await ref.getDownloadURL();
+      
+      print('✅ Upload complete: $url');
+      
+      // Fetch user data
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      final userData = userDoc.data() ?? {};
+      
+      // Create Reel document
+      await FirebaseFirestore.instance.collection('reels').add({
+        'userId': user.uid,
+        'username': userData['username'] ?? 'user',
+        'displayName': userData['displayName'] ?? 'User',
+        'avatarUrl': userData['photoURL'] ?? '',
+        'videoUrl': url,
+        'caption': '',
+        'hashtags': [],
+        'timestamp': FieldValue.serverTimestamp(),
+        'likes': 0,
+        'views': 0,
+        'comments': 0,
+        'likedBy': [],
+        'audioName': 'Original Audio - ${userData['username'] ?? 'user'}',
+        'isPublic': true,
+      });
+      
+      // Update user's reel count
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).update({
+        'reelCount': FieldValue.increment(1),
+      });
+      
+      if (mounted) {
+        if (Navigator.canPop(context)) Navigator.pop(context); // Close uploading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Reel uploaded successfully! 🎉'), backgroundColor: Colors.green),
+        );
+      }
+    } catch (e) {
+      print('❌ Upload failed: $e');
+      if (mounted) {
+        if (Navigator.canPop(context)) Navigator.pop(context); // Close dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Upload failed: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
+  Future<void> _trackReelView(Reel reel) async {
+    // Only track once per session
+    if (_viewedReels.contains(reel.id)) return;
+    _viewedReels.add(reel.id);
+    
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) return;
+      
+      // Check if already viewed in DB (more robust than session-only)
+      final viewDoc = await FirebaseFirestore.instance
+        .collection('reels')
+        .doc(reel.id)
+        .collection('views')
+        .doc(currentUser.uid)
+        .get();
+      
+      if (viewDoc.exists) return;  // Already viewed
+      
+      // Mark as viewed
+      await FirebaseFirestore.instance
+        .collection('reels')
+        .doc(reel.id)
+        .collection('views')
+        .doc(currentUser.uid)
+        .set({
+          'userId': currentUser.uid,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+      
+      // Increment view count
+      await FirebaseFirestore.instance
+        .collection('reels')
+        .doc(reel.id)
+        .update({
+          'views': FieldValue.increment(1),
+        });
+    } catch (e) {
+      debugPrint('Error tracking view: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
-    final currentUserId = AuthService().currentUser?.uid ?? '';
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (currentUserId == null) {
+      return const Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(child: CircularProgressIndicator(color: AppTheme.primaryPurple)),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -53,112 +301,177 @@ class _ReelsPageState extends State<ReelsPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _TopTab(
-              label: 'Kakonek',
-              isSelected: _showKakonekFeed,
-              onTap: () => setState(() => _showKakonekFeed = true),
-            ),
-            const SizedBox(width: 24),
-            _TopTab(
-              label: 'Para sa Iyo',
-              isSelected: !_showKakonekFeed,
-              onTap: () => setState(() => _showKakonekFeed = false),
-            ),
+        title: TabBar(
+          controller: _tabController,
+          indicatorColor: Colors.white,
+          indicatorWeight: 2,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white60,
+          labelStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          tabs: const [
+            Tab(text: 'Kakonek'),
+            Tab(text: 'Para sa Imo'),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.video_call_rounded, color: Colors.white),
-            tooltip: 'Upload Reel',
-            onPressed: _showUploadSheet,
-          ),
-        ],
-      ),
-      body: StreamBuilder<List<Reel>>(
-        stream: ReelService.instance.getReelsStream(),
-        builder: (context, snapshot) {
-          // Persistent cache: never blank on transient empty emit
-          if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-            _cachedReels = snapshot.data!;
-          }
-
-          if (_cachedReels.isEmpty) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(
-                    color: AppTheme.primaryPurple),
-              );
-            }
-            return _EmptyReelsState(onUpload: _showUploadSheet);
-          }
-
-          return PageView.builder(
-            controller: _pageController,
-            scrollDirection: Axis.vertical,
-            itemCount: _cachedReels.length,
-            onPageChanged: (index) {
-              setState(() => _currentIndex = index);
-              ReelService.instance.incrementViews(_cachedReels[index].id);
+            icon: const Icon(Icons.camera_alt_outlined, color: Colors.white),
+            onPressed: () {
+              print('Camera icon pressed');
+              _navigateToUploadReel();
             },
-            itemBuilder: (context, index) => _ReelPlayer(
-              key: ValueKey(_cachedReels[index].id),
-              reel: _cachedReels[index],
-              currentUserId: currentUserId,
-              isActive: index == _currentIndex,
-            ),
-          );
-        },
+          ),
+        ],
       ),
-    );
-  }
-}
-
-// ─── Top Tab ──────────────────────────────────────────────────────────────────
-
-class _TopTab extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-  const _TopTab(
-      {required this.label,
-      required this.isSelected,
-      required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      body: TabBarView(
+        controller: _tabController,
         children: [
-          AnimatedDefaultTextStyle(
-            duration: const Duration(milliseconds: 200),
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight:
-                  isSelected ? FontWeight.bold : FontWeight.normal,
-              color: Colors.white,
-            ),
-            child: Text(label),
-          ),
-          const SizedBox(height: 2),
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            height: 2,
-            width: isSelected ? 24 : 0,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(1),
-            ),
-          ),
+          _buildKakonekFeed(currentUserId),
+          _buildParaSaImoFeed(currentUserId),
         ],
       ),
     );
   }
+
+  // ─── Feed Builders ────────────────────────────────────────────────────────
+  Widget _buildKakonekFeed(String currentUserId) {
+    return StreamBuilder<List<Reel>>(
+      stream: _getKakonekReelsStream(currentUserId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator(color: AppTheme.primaryPurple));
+        }
+
+        final reels = snapshot.data ?? [];
+        if (reels.isEmpty) {
+          return _EmptyReelsState(
+            onUpload: _navigateToUploadReel,
+            message: 'No reels from your Kakonek yet',
+          );
+        }
+
+        return PageView.builder(
+          controller: _kakonekPageController,
+          scrollDirection: Axis.vertical,
+          itemCount: reels.length,
+          onPageChanged: (index) {
+            setState(() => _kakonekIndex = index);
+            _trackReelView(reels[index]);
+          },
+          itemBuilder: (context, index) {
+            return _ReelPlayer(
+              key: ValueKey(reels[index].id),
+              reel: reels[index],
+              currentUserId: currentUserId,
+              isActive: index == _kakonekIndex,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildParaSaImoFeed(String currentUserId) {
+    return StreamBuilder<List<Reel>>(
+      stream: _getParaSaImoReelsStream(currentUserId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator(color: AppTheme.primaryPurple));
+        }
+
+        final reels = snapshot.data ?? [];
+        if (reels.isEmpty) {
+          return _EmptyReelsState(
+            onUpload: _navigateToUploadReel,
+            message: 'No reels available',
+          );
+        }
+
+        return PageView.builder(
+          controller: _paraSaImoPageController,
+          scrollDirection: Axis.vertical,
+          itemCount: reels.length,
+          onPageChanged: (index) {
+            setState(() => _paraSaImoIndex = index);
+            _trackReelView(reels[index]);
+          },
+          itemBuilder: (context, index) {
+            return _ReelPlayer(
+              key: ValueKey(reels[index].id),
+              reel: reels[index],
+              currentUserId: currentUserId,
+              isActive: index == _paraSaImoIndex,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // ─── Stream for Kakonek (friends) ──────────────────────────────────────────
+  Stream<List<Reel>> _getKakonekReelsStream(String currentUserId) async* {
+    final userStream = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUserId)
+      .snapshots();
+    
+    await for (final userDoc in userStream) {
+      final userData = userDoc.data() ?? {};
+      final friendIds = List<String>.from(userData['friends'] ?? []);
+      
+      if (friendIds.isEmpty) {
+        yield <Reel>[];
+        continue;
+      }
+      
+      final snapshot = await FirebaseFirestore.instance
+        .collection('reels')
+        .where('userId', whereIn: friendIds.take(10).toList())
+        .orderBy('timestamp', descending: true)
+        .limit(50)
+        .get();
+      
+      final reels = snapshot.docs
+        .map((doc) => Reel.fromFirestore(doc))
+        .toList();
+      
+      final hiddenDocs = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUserId)
+        .collection('hidden_reels')
+        .get();
+      
+      final hiddenIds = hiddenDocs.docs.map((d) => d.id).toSet();
+      yield reels.where((r) => !hiddenIds.contains(r.id)).toList();
+    }
+  }
+
+  // ─── Stream for Para sa Imo (discover) ──────────────────────────────────────
+  Stream<List<Reel>> _getParaSaImoReelsStream(String currentUserId) async* {
+    final reelsStream = FirebaseFirestore.instance
+      .collection('reels')
+      .where('isPublic', isEqualTo: true)
+      .orderBy('timestamp', descending: true)
+      .limit(50)
+      .snapshots();
+    
+    await for (final snapshot in reelsStream) {
+      final reels = snapshot.docs
+        .map((doc) => Reel.fromFirestore(doc))
+        .toList();
+      
+      final hiddenDocs = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUserId)
+        .collection('hidden_reels')
+        .get();
+      
+      final hiddenIds = hiddenDocs.docs.map((d) => d.id).toSet();
+      yield reels.where((r) => !hiddenIds.contains(r.id)).toList();
+    }
+  }
 }
+
 
 // ─── Individual Reel Player ───────────────────────────────────────────────────
 
@@ -189,10 +502,8 @@ class _ReelPlayerState extends State<_ReelPlayer>
   // ─── Like ───────────────────────────────────────────────────────────────────
   late bool _isLiked;
   late int _likesCount;
-
-  // ─── Follow ─────────────────────────────────────────────────────────────────
   bool _isSaved = false;
-  bool _isFollowing = false;
+  late Stream<bool> _friendStatusStream;
 
   // ─── Double-tap heart animation ─────────────────────────────────────────────
   late AnimationController _heartCtrl;
@@ -204,6 +515,7 @@ class _ReelPlayerState extends State<_ReelPlayer>
     super.initState();
     _isLiked = widget.reel.isLikedBy(widget.currentUserId);
     _likesCount = widget.reel.likes;
+    _friendStatusStream = FriendsService.instance.isFriendStream(widget.reel.userId);
 
     _heartCtrl = AnimationController(
         vsync: this,
@@ -270,8 +582,7 @@ class _ReelPlayerState extends State<_ReelPlayer>
           // On Mobile: decode bytes → write to temp file → play from file
           final bytes = base64Decode(url.split(',').last);
           final tempDir = await getTemporaryDirectory();
-          final tempFile =
-              File('${tempDir.path}/reel_${widget.reel.id}.mp4');
+          final tempFile = io.File('${tempDir.path}/reel_${widget.reel.id}.mp4');
           await tempFile.writeAsBytes(bytes);
           controller = VideoPlayerController.file(tempFile);
         }
@@ -336,32 +647,391 @@ class _ReelPlayerState extends State<_ReelPlayer>
   }
 
   // ─── Follow ─────────────────────────────────────────────────────────────────
-  void _toggleFollow() {
-    setState(() => _isFollowing = !_isFollowing);
-    if (_isFollowing) {
-      FriendsService.instance
-          .sendFriendRequest(widget.reel.userId)
-          .catchError((_) {
-        if (mounted) setState(() => _isFollowing = false);
-      });
+  Future<void> _toggleFriend(String userId) async {
+    try {
+      final isFriend = await FriendsService.instance
+        .isFriendStream(userId)
+        .first;
+      
+      if (isFriend) {
+        await FriendsService.instance.removeFriend(userId);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Removed from Kakonek'),
+              duration: Duration(seconds: 1),
+            ),
+          );
+        }
+      } else {
+        await FriendsService.instance.sendFriendRequest(userId);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Friend request sent!'),
+              duration: Duration(seconds: 1),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Error toggling friend: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
     }
   }
 
-  void _showComments() => showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (_) => _CommentsSheet(reel: widget.reel),
-      );
-
-  void _showOptions() => showModalBottomSheet(
-        context: context,
-        backgroundColor: Colors.transparent,
-        builder: (_) => _MoreOptionsSheet(
-          reel: widget.reel,
-          currentUserId: widget.currentUserId,
+  void _showComments() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        maxChildSize: 0.95,
+        minChildSize: 0.5,
+        builder: (context, scrollController) => Container(
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceDark,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            children: [
+              // Handle bar
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                decoration: BoxDecoration(
+                  color: Colors.grey[700],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              
+              // Header
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Comments',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                        .collection('reels')
+                        .doc(widget.reel.id)
+                        .collection('comments')
+                        .snapshots(),
+                      builder: (context, snapshot) {
+                        final count = snapshot.data?.docs.length ?? 0;
+                        return Text(
+                          '$count',
+                          style: const TextStyle(
+                            color: AppTheme.textSecondary,
+                            fontSize: 14,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              
+              const Divider(color: Colors.white10),
+              
+              // Comments list
+              Expanded(
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                    .collection('reels')
+                    .doc(widget.reel.id)
+                    .collection('comments')
+                    .orderBy('timestamp', descending: true)
+                    .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: AppTheme.primaryPurple,
+                        ),
+                      );
+                    }
+                    
+                    final comments = snapshot.data!.docs;
+                    
+                    if (comments.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'No comments yet\nBe the first to comment!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: AppTheme.textSecondary,
+                          ),
+                        ),
+                      );
+                    }
+                    
+                    return ListView.builder(
+                      controller: scrollController,
+                      padding: const EdgeInsets.all(16),
+                      itemCount: comments.length,
+                      itemBuilder: (context, index) {
+                        final comment = comments[index].data() as Map<String, dynamic>;
+                        return _CommentItem(comment: comment);
+                      },
+                    );
+                  },
+                ),
+              ),
+              
+              // Comment input
+              _CommentInput(reelId: widget.reel.id),
+            ],
+          ),
         ),
-      );
+      ),
+    );
+  }
+
+  void _showReelOptions() {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    final isOwnReel = widget.reel.userId == currentUserId;
+    
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.surfaceDark,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(top: 12, bottom: 20),
+              decoration: BoxDecoration(
+                color: Colors.grey[700],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            
+            // Save option
+            _MenuOption(
+              icon: Icons.bookmark_outline,
+              title: 'Save',
+              onTap: () {
+                Navigator.pop(context);
+                _saveReel(widget.reel);
+              },
+            ),
+            
+            if (!isOwnReel) ...[
+              const Divider(color: Colors.white10),
+              
+              // Not Interested
+              _MenuOption(
+                icon: Icons.not_interested,
+                title: 'Not interested',
+                subtitle: 'Hide this reel',
+                onTap: () {
+                  Navigator.pop(context);
+                  _hideReel(widget.reel);
+                },
+              ),
+              
+              const Divider(color: Colors.white10),
+              
+              // Mute reposts
+              _MenuOption(
+                icon: Icons.volume_off_outlined,
+                title: 'Mute reposts from @${widget.reel.username}',
+                onTap: () {
+                  Navigator.pop(context);
+                  _muteRepostsFrom(widget.reel.userId);
+                },
+              ),
+            ],
+            
+            if (isOwnReel) ...[
+              const Divider(color: Colors.white10),
+              
+              // Delete (own reel)
+              _MenuOption(
+                icon: Icons.delete_outline,
+                title: 'Delete',
+                isDestructive: true,
+                onTap: () {
+                  Navigator.pop(context);
+                  _deleteReel(widget.reel);
+                },
+              ),
+            ],
+            
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Save reel
+  Future<void> _saveReel(Reel reel) async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) return;
+      
+      await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('saved')
+        .doc(reel.id)
+        .set({
+          'type': 'reel',
+          'reelId': reel.id,
+          'savedAt': FieldValue.serverTimestamp(),
+        });
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Reel saved!'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error saving reel: $e');
+    }
+  }
+
+  // Hide reel (Not Interested)
+  Future<void> _hideReel(Reel reel) async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) return;
+      
+      await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('hidden_reels')
+        .doc(reel.id)
+        .set({
+          'reelId': reel.id,
+          'hiddenAt': FieldValue.serverTimestamp(),
+        });
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Reel hidden. We\'ll show you less like this.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error hiding reel: $e');
+    }
+  }
+
+  // Mute reposts from user
+  Future<void> _muteRepostsFrom(String userId) async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) return;
+      
+      await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('muted_reposts')
+        .doc(userId)
+        .set({
+          'userId': userId,
+          'mutedAt': FieldValue.serverTimestamp(),
+        });
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Reposts from this user are now muted'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error muting reposts: $e');
+    }
+  }
+
+  // Delete own reel
+  Future<void> _deleteReel(Reel reel) async {
+    // Show confirmation
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppTheme.surfaceDark,
+        title: const Text(
+          'Delete Reel?',
+          style: TextStyle(color: Colors.white),
+        ),
+        content: const Text(
+          'This reel will be permanently deleted.',
+          style: TextStyle(color: AppTheme.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    
+    if (confirm != true) return;
+    
+    final currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) return;
+    
+    try {
+      await ReelService.instance.deleteReel(reel.id, currentUser.uid);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Reel deleted'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error deleting reel: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    }
+  }
 
   String _fmt(int c) {
     if (c >= 1000000) return '${(c / 1000000).toStringAsFixed(1)}M';
@@ -522,26 +1192,32 @@ class _ReelPlayerState extends State<_ReelPlayer>
                       if (!isOwn)
                         Positioned(
                           bottom: -6,
-                          child: GestureDetector(
-                            onTap: _toggleFollow,
-                            child: Container(
-                              padding: const EdgeInsets.all(3),
-                              decoration: BoxDecoration(
-                                color: _isFollowing
-                                    ? Colors.grey
-                                    : AppTheme.primaryPurple,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                    color: Colors.black, width: 1.5),
-                              ),
-                              child: Icon(
-                                _isFollowing
-                                    ? Icons.check
-                                    : Icons.add,
-                                size: 12,
-                                color: Colors.white,
-                              ),
-                            ),
+                          child: StreamBuilder<bool>(
+                            stream: _friendStatusStream,
+                            builder: (context, snapshot) {
+                              final isFriend = snapshot.data ?? false;
+                              return GestureDetector(
+                                onTap: () => _toggleFriend(widget.reel.userId),
+                                child: Container(
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    color: isFriend
+                                        ? Colors.grey
+                                        : AppTheme.primaryPurple,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: Colors.black, width: 1.5),
+                                  ),
+                                  child: Icon(
+                                    isFriend
+                                        ? Icons.check
+                                        : Icons.add,
+                                    size: 12,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
                     ],
@@ -593,7 +1269,7 @@ class _ReelPlayerState extends State<_ReelPlayer>
                 _ActionBtn(
                   icon: Icons.more_horiz,
                   label: 'More',
-                  onTap: _showOptions,
+                  onTap: _showReelOptions,
                 ),
               ],
             ),
@@ -623,31 +1299,44 @@ class _ReelPlayerState extends State<_ReelPlayer>
                         ],
                       ),
                     ),
-                    if (!isOwn) ...[
-                      const SizedBox(width: 10),
-                      GestureDetector(
-                        onTap: _toggleFollow,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: _isFollowing
-                                ? Colors.white24
-                                : Colors.transparent,
-                            border:
-                                Border.all(color: Colors.white),
-                            borderRadius: BorderRadius.circular(6),
+                    // Follow/Kakonek button
+                    StreamBuilder<bool>(
+                      stream: _friendStatusStream,
+                      builder: (context, snapshot) {
+                        final isFriend = snapshot.data ?? false;
+                        final isOwnReel = widget.reel.userId == widget.currentUserId;
+                        
+                        if (isOwnReel) return const SizedBox.shrink();
+                        
+                        return GestureDetector(
+                          onTap: () => _toggleFriend(widget.reel.userId),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isFriend 
+                                ? Colors.transparent 
+                                : AppTheme.primaryPurple,
+                              borderRadius: BorderRadius.circular(6),
+                              border: isFriend
+                                ? Border.all(color: Colors.white, width: 1.5)
+                                : null,
+                            ),
+                            child: Text(
+                              isFriend ? 'Kakonek' : 'Follow',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
-                          child: Text(
-                            _isFollowing ? 'Requested' : 'Follow',
-                            style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ],
+                        );
+                      },
+                    ),
                   ]),
                   const SizedBox(height: 8),
 
@@ -752,7 +1441,12 @@ class _ActionBtn extends StatelessWidget {
 
 class _EmptyReelsState extends StatelessWidget {
   final VoidCallback onUpload;
-  const _EmptyReelsState({required this.onUpload});
+  final String message;
+
+  const _EmptyReelsState({
+    required this.onUpload,
+    this.message = 'No reels yet',
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -760,28 +1454,22 @@ class _EmptyReelsState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.videocam_outlined, size: 80, color: Colors.grey[700]),
+          Icon(Icons.video_collection_outlined, color: Colors.white30, size: 80),
           const SizedBox(height: 16),
-          const Text('No Reels Yet',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          Text('Be the first to share a reel!',
-              style: TextStyle(color: Colors.grey[500], fontSize: 14)),
+          Text(
+            message,
+            style: const TextStyle(color: Colors.white70, fontSize: 16),
+          ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: onUpload,
             icon: const Icon(Icons.add),
-            label: const Text('Upload Reel'),
+            label: const Text('Create First Reel'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.primaryPurple,
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24)),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             ),
           ),
         ],
@@ -995,216 +1683,247 @@ class _UploadReelSheetState extends State<_UploadReelSheet> {
   }
 }
 
-// ─── Comments Sheet ───────────────────────────────────────────────────────────
-
-class _CommentsSheet extends StatefulWidget {
-  final Reel reel;
-  const _CommentsSheet({required this.reel});
-
-  @override
-  State<_CommentsSheet> createState() => _CommentsSheetState();
-}
-
-class _CommentsSheetState extends State<_CommentsSheet> {
-  final _ctrl = TextEditingController();
-  final List<Map<String, String>> _localComments = [];
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
+// Comment Item Widget
+class _CommentItem extends StatelessWidget {
+  final Map<String, dynamic> comment;
+  const _CommentItem({required this.comment});
+  
+  String _formatTimestamp(dynamic timestamp) {
+    if (timestamp == null) return '';
+    if (timestamp is! Timestamp) return '';
+    final date = timestamp.toDate();
+    final diff = DateTime.now().difference(date);
+    
+    if (diff.inMinutes < 1) return 'just now';
+    if (diff.inHours < 1) return '${diff.inMinutes}m ago';
+    if (diff.inDays < 1) return '${diff.inHours}h ago';
+    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    return '${date.day}/${date.month}/${date.year}';
   }
-
+  
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.75,
-      decoration: const BoxDecoration(
-        color: Color(0xFF1A1A2E),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(children: [
-        Center(
-          child: Container(
-            margin: const EdgeInsets.only(top: 12, bottom: 8),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-                color: Colors.white24,
-                borderRadius: BorderRadius.circular(2)),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: 16,
+            backgroundColor: Colors.grey[800],
+            child: const Icon(Icons.person, size: 16, color: Colors.grey),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Text(
-            '${widget.reel.comments + _localComments.length} Comments',
-            style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16),
-          ),
-        ),
-        Divider(height: 1, color: Colors.white.withOpacity(0.1)),
-        Expanded(
-          child: _localComments.isEmpty
-              ? Center(
-                  child: Text('No comments yet',
-                      style: TextStyle(color: Colors.grey[600])))
-              : ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  itemCount: _localComments.length,
-                  itemBuilder: (context, i) {
-                    final c = _localComments[i];
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: AppTheme.primaryPurple,
-                        child: Text(c['user']![0].toUpperCase(),
-                            style: const TextStyle(color: Colors.white)),
-                      ),
-                      title: Text(c['user']!,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13)),
-                      subtitle: Text(c['text']!,
-                          style: const TextStyle(color: Colors.white70)),
-                    );
-                  },
-                ),
-        ),
-        Container(
-          padding: EdgeInsets.fromLTRB(
-              16, 8, 16, MediaQuery.of(context).viewInsets.bottom + 12),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1A1A2E),
-            border: Border(
-                top: BorderSide(color: Colors.white.withOpacity(0.1))),
-          ),
-          child: Row(children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: TextField(
-                  controller: _ctrl,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    hintText: 'Add a comment...',
-                    hintStyle: TextStyle(color: Colors.white38),
-                    border: InputBorder.none,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  comment['username'] ?? 'User',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
                   ),
                 ),
-              ),
+                const SizedBox(height: 4),
+                Text(
+                  comment['text'] ?? '',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _formatTimestamp(comment['timestamp']),
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 11,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 8),
-            GestureDetector(
-              onTap: () {
-                if (_ctrl.text.isNotEmpty) {
-                  setState(() {
-                    _localComments
-                        .insert(0, {'user': 'You', 'text': _ctrl.text});
-                    _ctrl.clear();
-                  });
-                }
-              },
-              child: const Icon(Icons.send_rounded,
-                  color: AppTheme.primaryPurple),
-            ),
-          ]),
-        ),
-      ]),
+          ),
+        ],
+      ),
     );
   }
 }
 
-// ─── More Options Sheet ───────────────────────────────────────────────────────
+// Comment Input Widget
+class _CommentInput extends StatefulWidget {
+  final String reelId;
+  const _CommentInput({required this.reelId});
+  
+  @override
+  State<_CommentInput> createState() => _CommentInputState();
+}
 
-class _MoreOptionsSheet extends StatelessWidget {
-  final Reel reel;
-  final String currentUserId;
-  const _MoreOptionsSheet(
-      {required this.reel, required this.currentUserId});
-
+class _CommentInputState extends State<_CommentInput> {
+  final TextEditingController _controller = TextEditingController();
+  bool _isPosting = false;
+  
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+  
+  Future<void> _postComment() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+    
+    setState(() => _isPosting = true);
+    
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) return;
+      
+      // Get user info
+      final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser.uid)
+        .get();
+      final userData = userDoc.data() ?? {};
+      
+      // Add comment
+      await FirebaseFirestore.instance
+        .collection('reels')
+        .doc(widget.reelId)
+        .collection('comments')
+        .add({
+          'userId': currentUser.uid,
+          'username': userData['username'] ?? 'User',
+          'photoURL': userData['photoURL'] ?? '',
+          'text': text,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+      
+      // Increment comment count
+      await FirebaseFirestore.instance
+        .collection('reels')
+        .doc(widget.reelId)
+        .update({
+          'comments': FieldValue.increment(1),
+        });
+      
+      _controller.clear();
+      if (mounted) {
+        FocusScope.of(context).unfocus();
+      }
+    } catch (e) {
+      debugPrint('Error posting comment: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isPosting = false);
+      }
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
-    final isOwner = reel.userId == currentUserId;
-    final opts = [
-      {'icon': Icons.bookmark_border, 'label': 'Save Video', 'color': Colors.white},
-      {'icon': Icons.link, 'label': 'Copy Link', 'color': Colors.white},
-      {'icon': Icons.reply_rounded, 'label': 'Share', 'color': Colors.white},
-      {'icon': Icons.volume_off_outlined, 'label': 'Mute', 'color': Colors.white},
-      if (!isOwner) ...[ 
-        {'icon': Icons.not_interested, 'label': 'Not Interested', 'color': Colors.orange},
-        {'icon': Icons.flag_outlined, 'label': 'Report', 'color': Colors.red},
-        {'icon': Icons.block, 'label': 'Block User', 'color': Colors.red},
-      ],
-      if (isOwner)
-        {'icon': Icons.delete_outline, 'label': 'Delete', 'color': Colors.red},
-    ];
-
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF1A1A2E),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 8,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 8,
       ),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Center(
-          child: Container(
-            margin: const EdgeInsets.only(top: 12, bottom: 4),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-                color: Colors.white24,
-                borderRadius: BorderRadius.circular(2)),
-          ),
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundDark,
+        border: Border(
+          top: BorderSide(color: Colors.white.withOpacity(0.1)),
         ),
-        GridView.count(
-          shrinkWrap: true,
-          crossAxisCount: 4,
-          padding: const EdgeInsets.all(16),
-          children: opts.map((opt) {
-            return GestureDetector(
-              onTap: () async {
-                Navigator.pop(context);
-                if (opt['label'] == 'Delete') {
-                  await ReelService.instance
-                      .deleteReel(reel.id, currentUserId);
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Reel deleted')));
-                  }
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('${opt['label']} tapped')));
-                }
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.08),
-                        shape: BoxShape.circle),
-                    child: Icon(opt['icon'] as IconData,
-                        color: opt['color'] as Color, size: 22),
+      ),
+      child: SafeArea(
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _controller,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Add a comment...',
+                  hintStyle: const TextStyle(color: AppTheme.textSecondary),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide.none,
                   ),
-                  const SizedBox(height: 6),
-                  Text(opt['label'] as String,
-                      style: TextStyle(
-                          fontSize: 11, color: opt['color'] as Color),
-                      textAlign: TextAlign.center,
-                      maxLines: 2),
-                ],
+                  filled: true,
+                  fillColor: AppTheme.surfaceDark,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                ),
+                maxLines: null,
+                textCapitalization: TextCapitalization.sentences,
               ),
-            );
-          }).toList(),
+            ),
+            const SizedBox(width: 8),
+            _isPosting
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppTheme.primaryPurple,
+                  ),
+                )
+              : IconButton(
+                  icon: const Icon(
+                    Icons.send,
+                    color: AppTheme.primaryPurple,
+                  ),
+                  onPressed: _postComment,
+                ),
+          ],
         ),
-        const SizedBox(height: 16),
-      ]),
+      ),
+    );
+  }
+}
+
+class _MenuOption extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String? subtitle;
+  final VoidCallback onTap;
+  final bool isDestructive;
+  
+  const _MenuOption({
+    required this.icon,
+    required this.title,
+    this.subtitle,
+    required this.onTap,
+    this.isDestructive = false,
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(
+        icon,
+        color: isDestructive ? Colors.red : Colors.white,
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          color: isDestructive ? Colors.red : Colors.white,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      subtitle: subtitle != null
+        ? Text(
+            subtitle!,
+            style: const TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: 12,
+            ),
+          )
+        : null,
+      onTap: onTap,
     );
   }
 }

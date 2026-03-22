@@ -48,6 +48,12 @@ dependencies:
   firebase_storage: ^12.4.10
   google_fonts: ^8.0.2
   path_provider: ^2.1.4
+  flutter_image_compress: ^2.3.0
+  video_compress: ^3.1.2
+  video_editor: ^3.0.0
+  ffmpeg_kit_flutter: ^6.0.3
+  file_picker: ^8.0.0+1
+  universal_html: ^2.2.4
 
 dev_dependencies:
   flutter_test:

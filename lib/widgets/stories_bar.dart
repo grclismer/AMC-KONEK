@@ -7,6 +7,7 @@ import '../services/story_service.dart';
 import '../models/story_model.dart';
 import '../theme/app_theme.dart';
 import '../screens/story_viewer_screen.dart';
+import '../services/storage_service.dart';
 
 class StoriesBar extends StatefulWidget {
   const StoriesBar({super.key});
@@ -276,13 +277,15 @@ class _StoriesBarState extends State<StoriesBar> {
         );
       }
       
-      final bytes = await image.readAsBytes();
-      final base64Image = 'data:image/jpeg;base64,${base64Encode(bytes)}';
-      
+      final imageUrl = await StorageService.instance.uploadImage(
+        image.path,
+        folder: 'stories',
+      );
+
       final userDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .get();
+          .collection('users')
+          .doc(user.uid)
+          .get();
       
       final userData = userDoc.data() ?? {};
       
@@ -294,13 +297,14 @@ class _StoriesBarState extends State<StoriesBar> {
         avatarUrl: userData['photoURL'] ?? 
                    user.photoURL ?? 
                    '',
-        mediaUrl: base64Image,
+        mediaUrl: imageUrl,
         mediaType: 'image',
       );
       
       if (mounted) {
+        final messenger = ScaffoldMessenger.of(context);
         Navigator.pop(context); // Close loading
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           const SnackBar(
             content: Text('Story uploaded!'),
             backgroundColor: Colors.green,

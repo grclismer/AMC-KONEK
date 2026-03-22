@@ -120,6 +120,7 @@ class ChatService {
   }
   
   // Stream of all chats for the current user
+  // Modified to use in-memory sorting to avoid Firestore index requirements.
   Stream<List<Chat>> getChatsStream() {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser == null) return Stream.value([]);
@@ -127,15 +128,15 @@ class ChatService {
     return _firestore
       .collection('chats')
       .where('participants', arrayContains: currentUser.uid)
-      .orderBy('lastMessageTime', descending: true)
       .snapshots(includeMetadataChanges: false)
-      .map((snapshot) => snapshot.docs
-        .map((doc) => Chat.fromFirestore(doc))
-        .toList())
+      .map((snapshot) {
+        final chats = snapshot.docs.map((doc) => Chat.fromFirestore(doc)).toList();
+        // Sort in-memory by lastMessageTime descending
+        chats.sort((a, b) => b.lastMessageTime.compareTo(a.lastMessageTime));
+        return chats;
+      })
       .handleError((error) {
-        // Likely missing composite index. Log it but don't crash the stream.
-        // Fix: go to the URL printed in the debug console to create the index.
-        print('Chat stream error (check Firestore index): $error');
+        print('Chat stream error: $error');
       });
   }
   
@@ -181,14 +182,14 @@ class ChatService {
     });
   }
   
-  // Helper for image messages (usually content is a URL or base64)
+  // Helper for image messages (usually content is a URL)
   Future<void> sendImageMessage({
     required String chatId,
-    required String base64Image,
+    required String imageUrl,
   }) async {
     await sendMessage(
       chatId: chatId,
-      content: base64Image,
+      content: imageUrl,
       type: MessageType.image,
     );
   }
