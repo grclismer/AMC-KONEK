@@ -1,0 +1,79 @@
+﻿Running Gradle task 'assembleRelease'...                        
+flutter : 
+At line:1 char:1
++ flutter --no-color 
+build apk > 
+build_error.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (:String) [],    
+ RemoteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+FAILURE: Build failed 
+with an exception.
+
+* What went wrong:
+A problem occurred 
+configuring project ':f
+lutter_inappwebview'.
+> Could not create an 
+instance of type com.an
+droid.build.api.variant
+.impl.LibraryVariantBui
+lderImpl.
+   > Namespace not 
+specified. Specify a 
+namespace in the 
+module's build file: 
+C:\Users\Lismer Palce\A
+ppData\Local\Pub\Cache\
+hosted\pub.dev\flutter_
+inappwebview-5.8.0\andr
+oid\build.gradle. See h
+ttps://d.android.com/r/
+tools/upgrade-assistant
+/set-namespace for 
+information about 
+setting the namespace.
+
+     If you've 
+specified the package 
+attribute in the 
+source 
+AndroidManifest.xml, 
+you can use the AGP 
+Upgrade Assistant to 
+migrate to the 
+namespace value in the 
+build file. Refer to ht
+tps://d.android.com/r/t
+ools/upgrade-assistant/
+agp-upgrade-assistant 
+for general 
+information about 
+using the AGP Upgrade 
+Assistant.
+
+* Try:
+> Run with 
+--stacktrace option to 
+get the stack trace.
+> Run with --info or 
+--debug option to get 
+more log output.
+> Run with --scan to 
+get full insights.
+> Get more help at http
+s://help.gradle.org.
+
+BUILD FAILED in 29s
+Running Gradle task 'assembleRelease'...                           32.0s
+Gradle task 
+assembleRelease failed 
+with exit code 1

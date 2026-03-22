@@ -1,0 +1,474 @@
+import 'package:flutter/material.dart';
+import 'youtube_player_widget.dart';
+import 'tiktok_player_placeholder.dart';
+import '../models/post_model.dart';
+import '../services/post_service.dart';
+import '../services/auth_service.dart';
+import '../models/comment_model.dart';
+import '../services/comment_service.dart';
+import '../screens/comments_screen.dart';
+import '../theme/app_theme.dart';
+import '../theme/animations.dart';
+import '../screens/profile_screen.dart';
+import 'dart:convert';
+import 'dart:developer' as developer;
+import '../widgets/user_photo_widget.dart';
+
+class PostWidget extends StatefulWidget {
+  final Post post;
+
+  const PostWidget({super.key, required this.post});
+
+  @override
+  State<PostWidget> createState() => _PostWidgetState();
+}
+
+class _PostWidgetState extends State<PostWidget> {
+  late bool _isLiked;
+  late int _likeCount;
+  final String? _currentUserId = AuthService().currentUser?.uid;
+
+  @override
+  void initState() {
+    super.initState();
+    _likeCount = widget.post.likes;
+    _isLiked = _currentUserId != null && widget.post.likedBy.contains(_currentUserId);
+  }
+
+  @override
+  void didUpdateWidget(covariant PostWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.post.likes != oldWidget.post.likes || widget.post.likedBy != oldWidget.post.likedBy) {
+      _likeCount = widget.post.likes;
+      _isLiked = _currentUserId != null && widget.post.likedBy.contains(_currentUserId);
+    }
+  }
+
+  Future<void> _handleLike() async {
+    if (_currentUserId == null) return;
+    
+    // Save previous state for rollback
+    final bool previousIsLiked = _isLiked;
+    final int previousLikeCount = _likeCount;
+
+    // Optimistic UI update
+    setState(() {
+      _isLiked = !_isLiked;
+      _likeCount += _isLiked ? 1 : -1;
+    });
+
+    try {
+      if (_isLiked) {
+        await PostService.instance.likePost(widget.post.id, _currentUserId);
+      } else {
+        await PostService.instance.unlikePost(widget.post.id, _currentUserId);
+      }
+    } catch (e) {
+      // Rollback UI update if Firebase fails
+      setState(() {
+        _isLiked = previousIsLiked;
+        _likeCount = previousLikeCount;
+      });
+      developer.log('Error toggling like', error: e);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to update like status. Please try again.')),
+        );
+      }
+    }
+  }
+
+
+
+  String _formatTimestamp(DateTime timestamp) {
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+    
+    String relative;
+    if (difference.inSeconds < 60) {
+      relative = 'Just now';
+    } else if (difference.inMinutes < 60) {
+      relative = '${difference.inMinutes}m ago';
+    } else if (difference.inHours < 24) {
+      relative = '${difference.inHours}h ago';
+    } else if (difference.inDays < 7) {
+      relative = '${difference.inDays}d ago';
+    } else {
+      relative = '${timestamp.day}/${timestamp.month}/${timestamp.year}';
+    }
+    
+    return relative;
+  }
+
+  String _getExactTime(DateTime timestamp) {
+    final hour = timestamp.hour;
+    final minute = timestamp.minute.toString().padLeft(2, '0');
+    final period = hour >= 12 ? 'PM' : 'AM';
+    final displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+    
+    return '$displayHour:$minute $period';
+  }
+
+  String _getFullTimestamp(DateTime timestamp) {
+    return '${_formatTimestamp(timestamp)} • ${_getExactTime(timestamp)}';
+  }
+
+  void _showDeleteConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Delete Post?"),
+          content: const Text("Are you sure you want to delete this post? This action cannot be undone."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel", style: TextStyle(color: Colors.black87)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close confirmation dialog
+                _handleDeletePost();
+              },
+              child: const Text("Delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _handleDeletePost() async {
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      await PostService.instance.deletePost(widget.post.id);
+      if (mounted) {
+        Navigator.pop(context); // Close loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Post deleted')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // Close loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete post: $e')),
+        );
+      }
+    }
+  }
+
+  void _navigateToComments() {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => CommentsScreen(post: widget.post)));
+  }
+
+  void _showPostOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) => Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Container(
+                width: 40, 
+                height: 4, 
+                margin: const EdgeInsets.only(bottom: 8), 
+                decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))
+              )),
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('About this account'),
+              onTap: () => Navigator.pop(context),
+            ),
+            if (_currentUserId == widget.post.userId)
+              ListTile(
+                leading: const Icon(Icons.delete_outline, color: Colors.red),
+                title: const Text('Delete Post', style: TextStyle(color: Colors.red)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showDeleteConfirmationDialog();
+                },
+              )
+            else
+              ListTile(
+                leading: const Icon(Icons.report_problem_outlined, color: Colors.red),
+                title: const Text('Report Post', style: TextStyle(color: Colors.red)),
+                onTap: () => Navigator.pop(context),
+              ),
+            ListTile(
+              leading: const Icon(Icons.link),
+              title: const Text('Copy Link'),
+              onTap: () => Navigator.pop(context),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceDark,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryPurple.withOpacity(0.15),
+            blurRadius: 10,
+            spreadRadius: 1,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: AppTheme.primaryPink.withOpacity(0.1),
+            blurRadius: 10,
+            spreadRadius: -2,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () => Navigator.push(context, SlidePageRoute(page: ProfileScreen(userId: widget.post.userId))),
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: AppTheme.primaryGradient,
+                    ),
+                    child: UserPhotoWidget(
+                      userId: widget.post.userId,
+                      radius: 18,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => Navigator.push(context, SlidePageRoute(page: ProfileScreen(userId: widget.post.userId))),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.post.username.isNotEmpty ? widget.post.username : "Unknown User",
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
+                        ),
+                        Text(
+                          _getFullTimestamp(widget.post.timestamp),
+                          style: TextStyle(color: Colors.grey[500], fontSize: 11),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.more_horiz, size: 20, color: Colors.white),
+                  onPressed: _showPostOptions,
+                ),
+              ],
+            ),
+          ),
+
+          // Caption
+          if (widget.post.caption != null && widget.post.caption!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Text(
+                widget.post.caption!, 
+                style: const TextStyle(fontSize: 14, color: AppTheme.textPrimary, height: 1.4),
+              ),
+            ),
+
+          // Content
+          if (widget.post.type == PostType.text)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Text(
+                widget.post.content, 
+                style: const TextStyle(fontSize: 15, color: AppTheme.textPrimary, height: 1.4),
+              ),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  color: AppTheme.surfaceLighter,
+                  constraints: const BoxConstraints(minHeight: 200, maxHeight: 500),
+                  width: double.infinity,
+                  child: _buildContent(),
+                ),
+              ),
+            ),
+
+          // Interaction Bar
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+            child: Row(
+              children: [
+                _buildAnimatedLikeButton(),
+                _actionButton(
+                  icon: Icons.chat_bubble_outline_rounded,
+                  label: widget.post.comments.toString(),
+                  onTap: _navigateToComments,
+                ),
+                BounceClick(
+                  onTap: () {},
+                  child: _actionButton(
+                    icon: Icons.share_rounded,
+                    label: "Share",
+                    onTap: () {},
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.bookmark_border_rounded, color: AppTheme.textSecondary, size: 24),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+          ),
+
+          // Top Replies Preview
+          StreamBuilder<List<Comment>>(
+            stream: CommentService.instance.getLatestCommentsStream(widget.post.id, limit: 2),
+            builder: (context, snapshot) {
+              final topComments = snapshot.data ?? [];
+              if (topComments.isEmpty) return const SizedBox.shrink();
+
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
+                child: GestureDetector(
+                  onTap: _navigateToComments,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceLighter.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (widget.post.comments > 2)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Row(
+                              children: [
+                                Text(
+                                  "View all ${widget.post.comments} comments",
+                                  style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary, fontWeight: FontWeight.w500),
+                                ),
+                                const SizedBox(width: 4),
+                                const Icon(Icons.arrow_forward_ios, size: 10, color: AppTheme.textSecondary),
+                              ],
+                            ),
+                          )
+                        else
+                          const Padding(
+                            padding: EdgeInsets.only(bottom: 6),
+                            child: Text(
+                              "Top Comments",
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary),
+                            ),
+                          ),
+                        ...topComments.reversed.map<Widget>(
+                          (comment) => Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: RichText(
+                              text: TextSpan(
+                                style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13, height: 1.3),
+                                children: [
+                                  TextSpan(text: "${comment.username}  ", style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  TextSpan(text: comment.text),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent() {
+    if (widget.post.type == PostType.video) return YoutubePlayerWidget(videoUrl: widget.post.content);
+    if (widget.post.type == PostType.tiktok) return TikTokPlayerPlaceholder(url: widget.post.content);
+    if (widget.post.type == PostType.image) return AnimatedBlurImage(imageUrl: widget.post.content, fit: BoxFit.cover);
+    return const SizedBox();
+  }
+
+  Widget _buildAnimatedLikeButton() {
+    return BounceClick(
+      onTap: _handleLike,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          children: [
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+              child: _isLiked
+                  ? ShaderMask(
+                      key: const ValueKey('liked'),
+                      shaderCallback: (bounds) => AppTheme.primaryGradient.createShader(bounds),
+                      child: const Icon(Icons.favorite_rounded, size: 24, color: Colors.white),
+                    )
+                  : const Icon(Icons.favorite_border_rounded, size: 24, key: ValueKey('unliked'), color: AppTheme.textSecondary),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              _likeCount.toString(), 
+              style: TextStyle(
+                fontSize: 13, 
+                color: _isLiked ? AppTheme.primaryPink : AppTheme.textSecondary, 
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _actionButton({required IconData icon, required String label, Color? color, required VoidCallback onTap}) {
+    return BounceClick(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          children: [
+            Icon(icon, size: 24, color: color ?? AppTheme.textSecondary),
+            const SizedBox(width: 6),
+            Text(label, style: TextStyle(fontSize: 13, color: color ?? AppTheme.textSecondary, fontWeight: FontWeight.w600)),
+          ],
+        ),
+      ),
+    );
+  }
+}
