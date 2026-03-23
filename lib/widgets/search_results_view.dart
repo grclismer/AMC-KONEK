@@ -10,7 +10,7 @@ import '../theme/animations.dart';
 class SearchResultsView extends StatefulWidget {
   final String query;
   
-  const SearchResultsView({
+  SearchResultsView({
     super.key,
     required this.query,
   });
@@ -42,7 +42,7 @@ class _SearchResultsViewState extends State<SearchResultsView> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppTheme.backgroundDark,
+      color: AppTheme.background(context),
       child: widget.query.isEmpty
         ? _buildRecommendations()
         : _buildSearchResults(),
@@ -58,11 +58,11 @@ class _SearchResultsViewState extends State<SearchResultsView> {
         }
         
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(
+          return Center(
             child: Text(
               'No recommendations yet',
               style: TextStyle(
-                color: AppTheme.textSecondary,
+                color: AppTheme.adaptiveTextSecondary(context),
                 fontSize: 14,
               ),
             ),
@@ -72,16 +72,16 @@ class _SearchResultsViewState extends State<SearchResultsView> {
         final users = snapshot.data!;
         
         return ListView(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: EdgeInsets.symmetric(vertical: 8),
           children: [
-            const Padding(
+            Padding(
               padding: EdgeInsets.fromLTRB(16, 16, 16, 12),
               child: Text(
                 'Suggested for you',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppTheme.adaptiveText(context),
                   letterSpacing: 0.5,
                 ),
               ),
@@ -112,13 +112,13 @@ class _SearchResultsViewState extends State<SearchResultsView> {
                 Icon(
                   Icons.search_off_rounded,
                   size: 64,
-                  color: AppTheme.textSecondary.withOpacity(0.2),
+                  color: AppTheme.adaptiveTextSecondary(context).withOpacity(0.2),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 Text(
                   'No results for "${widget.query}"',
-                  style: const TextStyle(
-                    color: AppTheme.textSecondary,
+                  style: TextStyle(
+                    color: AppTheme.adaptiveTextSecondary(context),
                     fontSize: 15,
                   ),
                 ),
@@ -130,7 +130,7 @@ class _SearchResultsViewState extends State<SearchResultsView> {
         final users = snapshot.data!;
         
         return ListView.builder(
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: EdgeInsets.symmetric(vertical: 8),
           itemCount: users.length,
           itemBuilder: (context, index) {
             return FadeInStaggered(
@@ -145,25 +145,25 @@ class _SearchResultsViewState extends State<SearchResultsView> {
   
   Widget _buildLoadingList() {
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       itemCount: 6,
       itemBuilder: (context, index) => Padding(
-        padding: const EdgeInsets.only(bottom: 16),
+        padding: EdgeInsets.only(bottom: 16),
         child: Row(
           children: [
-            const ShimmerBox(width: 52, height: 52, borderRadius: 26),
-            const SizedBox(width: 12),
+            ShimmerBox(width: 52, height: 52, borderRadius: 26),
+            SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   ShimmerBox(width: 140, height: 16),
                   SizedBox(height: 8),
                   ShimmerBox(width: 100, height: 12),
                 ],
               ),
             ),
-            const ShimmerBox(width: 80, height: 32, borderRadius: 16),
+            ShimmerBox(width: 80, height: 32, borderRadius: 16),
           ],
         ),
       ),
@@ -172,7 +172,7 @@ class _SearchResultsViewState extends State<SearchResultsView> {
   
   Widget _buildUserTile(UserModel user) {
     final currentUid = FirebaseAuth.instance.currentUser?.uid;
-    if (currentUid == null) return const SizedBox();
+    if (currentUid == null) return SizedBox();
 
     return FutureBuilder<FriendshipStatus>(
       future: FriendsService.instance.getFriendshipStatus(currentUid, user.uid),
@@ -180,7 +180,7 @@ class _SearchResultsViewState extends State<SearchResultsView> {
         final status = statusSnapshot.data ?? FriendshipStatus.notFriends;
         
         return ListTile(
-          contentPadding: const EdgeInsets.symmetric(
+          contentPadding: EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 4,
           ),
@@ -190,25 +190,25 @@ class _SearchResultsViewState extends State<SearchResultsView> {
               // Navigate to user profile here
             },
             child: Container(
-              padding: const EdgeInsets.all(2),
+              padding: EdgeInsets.all(2),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: AppTheme.primaryGradient,
               ),
               child: CircleAvatar(
                 radius: 26,
-                backgroundColor: AppTheme.surfaceLighter,
+                backgroundColor: AppTheme.surfaceColor(context),
                 backgroundImage: _getProfileImage(user.photoURL),
                 child: _getProfileImage(user.photoURL) == null
-                  ? const Icon(Icons.person_rounded, size: 28, color: Colors.white24)
+                  ? Icon(Icons.person_rounded, size: 28, color: AppTheme.adaptiveSubtle(context))
                   : null,
               ),
             ),
           ),
           title: Text(
             user.displayName,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: AppTheme.adaptiveText(context),
               fontWeight: FontWeight.w600,
               fontSize: 15,
             ),
@@ -222,7 +222,7 @@ class _SearchResultsViewState extends State<SearchResultsView> {
                   ? '$mutualCount mutual kakonek' 
                   : '@${user.username}',
                 style: TextStyle(
-                  color: AppTheme.textSecondary.withOpacity(0.7),
+                  color: AppTheme.adaptiveTextSecondary(context).withOpacity(0.7),
                   fontSize: 12,
                 ),
               );
@@ -244,7 +244,7 @@ class _SearchResultsViewState extends State<SearchResultsView> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16),
     );
 
     switch (status) {
@@ -253,7 +253,7 @@ class _SearchResultsViewState extends State<SearchResultsView> {
           onPressed: null,
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            children: const [
+            children: [
               Icon(Icons.check_rounded, size: 16, color: AppTheme.primaryPurple),
               SizedBox(width: 4),
               Text(
@@ -277,10 +277,10 @@ class _SearchResultsViewState extends State<SearchResultsView> {
               borderRadius: BorderRadius.circular(18),
             ),
           ),
-          child: const Text(
+          child: Text(
             'Pending',
             style: TextStyle(
-              color: AppTheme.textSecondary,
+              color: AppTheme.adaptiveTextSecondary(context),
               fontSize: 12,
             ),
           ),
@@ -294,10 +294,10 @@ class _SearchResultsViewState extends State<SearchResultsView> {
           style: buttonStyle.copyWith(
             backgroundColor: MaterialStateProperty.all(AppTheme.primaryPurple),
           ),
-          child: const Text(
+          child: Text(
             'Accept',
             style: TextStyle(
-              color: Colors.white,
+              color: AppTheme.adaptiveText(context),
               fontSize: 13,
               fontWeight: FontWeight.bold,
             ),
@@ -312,7 +312,7 @@ class _SearchResultsViewState extends State<SearchResultsView> {
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text('Kakonek request sent!'),
+                    content: Text('Kakonek request sent!'),
                     backgroundColor: AppTheme.primaryPurple,
                     behavior: SnackBarBehavior.floating,
                   ),
@@ -330,10 +330,10 @@ class _SearchResultsViewState extends State<SearchResultsView> {
           style: buttonStyle.copyWith(
             backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.08)),
           ),
-          child: const Text(
+          child: Text(
             'Add',
             style: TextStyle(
-              color: Colors.white,
+              color: AppTheme.adaptiveText(context),
               fontSize: 13,
               fontWeight: FontWeight.bold,
             ),

@@ -21,6 +21,7 @@ class Post {
   final int likes;
   final int comments;
   final int repostCount; // ── New field ─────────────────────────────────────
+  final String privacy;
   final List<String> likedBy;
   final bool isPublic;
 
@@ -49,6 +50,7 @@ class Post {
     this.likes = 0,
     this.comments = 0,
     this.repostCount = 0,
+    this.privacy = 'public',
     this.likedBy = const [],
     this.isPublic = true,
     this.expiresAt,
@@ -79,6 +81,7 @@ class Post {
       likes: data['likes'] ?? 0,
       comments: data['comments'] ?? 0,
       repostCount: data['repostCount'] ?? 0,
+      privacy: data['privacy'] ?? (data['isPublic'] == true ? 'public' : 'friends'),
       likedBy: List<String>.from(data['likedBy'] ?? []),
       isPublic: data['isPublic'] ?? true,
       expiresAt: (data['expiresAt'] as Timestamp?)?.toDate(),
@@ -105,8 +108,9 @@ class Post {
       'likes': likes,
       'comments': comments,
       'repostCount': repostCount,
+      'privacy': privacy,
       'likedBy': likedBy,
-      'isPublic': isPublic,
+      'isPublic': privacy == 'public',
       'expiresAt': expiresAt != null ? Timestamp.fromDate(expiresAt!) : null,
       'moodEmoji': moodEmoji,
       'moodLabel': moodLabel,
@@ -118,6 +122,8 @@ class Post {
       'repostedAt': repostedAt != null ? Timestamp.fromDate(repostedAt!) : null,
     };
   }
+
+  bool get isPrivate => privacy == 'private';
 
   // Check if post has expired
   bool get isExpired {

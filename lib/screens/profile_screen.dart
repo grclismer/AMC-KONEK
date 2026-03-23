@@ -14,17 +14,20 @@ import '../models/post_model.dart';
 import '../models/reel_model.dart';
 import '../theme/app_theme.dart';
 import '../theme/animations.dart';
+import 'package:social_media_app/utils/app_localizations.dart';
 import 'settings_screen.dart';
 import '../widgets/user_photo_widget.dart';
 import '../widgets/post_widget.dart';
 import 'dart:developer' as developer;
+import '../utils/error_handler.dart';
+import '../utils/app_localizations.dart';
 
 // ─── Profile Screen ───────────────────────────────────────────────────────────
 
 class ProfileScreen extends StatefulWidget {
   final String? userId; // null = current logged-in user
   final bool isStandalone;
-  const ProfileScreen({super.key, this.userId, this.isStandalone = true});
+  ProfileScreen({super.key, this.userId, this.isStandalone = true});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -36,6 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   final PostService _postService = PostService();
   final FriendsService _friendsService = FriendsService();
   late final TabController _tabController;
+  AppLocalizations get _l => AppLocalizations.instance;
 
   String get targetUid =>
       widget.userId ?? _authService.currentUser?.uid ?? '';
@@ -63,8 +67,8 @@ class _ProfileScreenState extends State<ProfileScreen>
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting &&
             !snapshot.hasData) {
-          return const Scaffold(
-            backgroundColor: AppTheme.backgroundDark,
+          return Scaffold(
+            backgroundColor: AppTheme.background(context),
             body: Center(
                 child: CircularProgressIndicator(
                     color: AppTheme.primaryPurple)),
@@ -82,10 +86,10 @@ class _ProfileScreenState extends State<ProfileScreen>
         if (createdAt is Timestamp) {
           final date = createdAt.toDate();
           final months = [
-            '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+            '', _l.t('month_jan'), _l.t('month_feb'), _l.t('month_mar'), _l.t('month_apr'), _l.t('month_may'), _l.t('month_jun'),
+            _l.t('month_jul'), _l.t('month_aug'), _l.t('month_sep'), _l.t('month_oct'), _l.t('month_nov'), _l.t('month_dec')
           ];
-          joinDate = 'Joined ${months[date.month]} ${date.year}';
+          joinDate = '${_l.t('profile_joined')} ${months[date.month]} ${date.year}';
         }
 
         final content = _buildProfileContent(
@@ -94,23 +98,23 @@ class _ProfileScreenState extends State<ProfileScreen>
         if (!widget.isStandalone) return content;
 
         return Scaffold(
-          backgroundColor: AppTheme.backgroundDark,
+          backgroundColor: AppTheme.background(context),
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: Text(
               '@$username',
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: AppTheme.adaptiveText(context), fontWeight: FontWeight.bold),
             ),
             actions: [
               if (isOwnProfile)
                 IconButton(
-                  icon: const Icon(Icons.settings_outlined,
-                      color: Colors.white),
+                  icon: Icon(Icons.settings_outlined,
+                      color: AppTheme.adaptiveText(context)),
                   onPressed: () => Navigator.push(
                     context,
-                    SlidePageRoute(page: const SettingsScreen()),
+                    SlidePageRoute(page: SettingsScreen()),
                   ),
                 ),
             ],
@@ -138,7 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             children: [
               // ── Avatar + Stats row ─────────────────────────────────────────
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                padding: EdgeInsets.fromLTRB(20, 16, 20, 0),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -153,14 +157,14 @@ class _ProfileScreenState extends State<ProfileScreen>
                         borderWidth: 3,
                       ),
                     ),
-                    const SizedBox(width: 24),
+                    SizedBox(width: 24),
                     // Stats — live counts from streams
                     Expanded(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           _LiveStatColumn(
-                            label: 'Posts',
+                            label: _l.t('profile_posts'),
                             userId: targetUid,
                             stream: _postService
                                 .getPostsByUserStream(targetUid),
@@ -168,7 +172,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 posts.length.toString(),
                           ),
                           _LiveStatColumn(
-                            label: 'Reels',
+                            label: _l.t('profile_reels'),
                             userId: targetUid,
                             stream: ReelService.instance
                                 .getUserReelsStream(targetUid),
@@ -178,7 +182,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                           GestureDetector(
                             onTap: () => _showKakonekList(context),
                             child: _buildStatColumn(
-                              'Kakonek',
+                              _l.t('profile_kakonek'),
                               userData['friendCount']?.toString() ?? '0',
                             ),
                           ),
@@ -191,40 +195,40 @@ class _ProfileScreenState extends State<ProfileScreen>
 
               // ── Name, @username, bio, joined ───────────────────────────────
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+                padding: EdgeInsets.fromLTRB(20, 14, 20, 0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       displayName,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: AppTheme.adaptiveText(context),
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    SizedBox(height: 2),
                     Text(
                       '@$username',
-                      style: const TextStyle(
-                          color: AppTheme.textSecondary, fontSize: 14),
+                      style: TextStyle(
+                          color: AppTheme.adaptiveTextSecondary(context), fontSize: 14),
                     ),
                     if (bio.isNotEmpty) ...[
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       Text(
                         bio,
-                        style: const TextStyle(
-                            color: Colors.white, fontSize: 14),
+                        style: TextStyle(
+                            color: AppTheme.adaptiveText(context), fontSize: 14),
                       ),
                     ],
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     Row(children: [
-                      const Icon(Icons.calendar_today_outlined,
-                          size: 12, color: AppTheme.textSecondary),
-                      const SizedBox(width: 4),
+                      Icon(Icons.calendar_today_outlined,
+                          size: 12, color: AppTheme.adaptiveTextSecondary(context)),
+                      SizedBox(width: 4),
                       Text(joinDate,
-                          style: const TextStyle(
-                              color: AppTheme.textSecondary,
+                          style: TextStyle(
+                              color: AppTheme.adaptiveTextSecondary(context),
                               fontSize: 12)),
                     ]),
                   ],
@@ -233,11 +237,11 @@ class _ProfileScreenState extends State<ProfileScreen>
 
               // ── Action buttons ─────────────────────────────────────────────
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+                padding: EdgeInsets.fromLTRB(20, 14, 20, 0),
                 child: _buildActionButtons(userData),
               ),
 
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
             ],
           ),
         ),
@@ -250,14 +254,14 @@ class _ProfileScreenState extends State<ProfileScreen>
               controller: _tabController,
               indicatorColor: AppTheme.primaryPurple,
               indicatorWeight: 2.5,
-              labelColor: Colors.white,
-              unselectedLabelColor: AppTheme.textSecondary,
+              labelColor: AppTheme.primaryPurple,
+              unselectedLabelColor: AppTheme.adaptiveTextSecondary(context),
               tabs: [
-                const Tab(icon: Icon(Icons.grid_on_outlined)),
-                const Tab(icon: Icon(Icons.video_library_outlined)),
-                const Tab(icon: Icon(Icons.repeat_rounded)),
-                if (isOwnProfile) const Tab(icon: Icon(Icons.bookmark_border_rounded)),
-                if (isOwnProfile) const Tab(icon: Icon(Icons.lock_outline_rounded)),
+                Tab(icon: Icon(Icons.grid_on_outlined)),
+                Tab(icon: Icon(Icons.video_library_outlined)),
+                Tab(icon: Icon(Icons.repeat_rounded)),
+                if (isOwnProfile) Tab(icon: Icon(Icons.bookmark_border_rounded)),
+                if (isOwnProfile) Tab(icon: Icon(Icons.lock_outline_rounded)),
               ],
             ),
           ),
@@ -282,16 +286,16 @@ class _ProfileScreenState extends State<ProfileScreen>
       children: [
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.white),
+              color: AppTheme.adaptiveText(context)),
         ),
-        const SizedBox(height: 3),
+        SizedBox(height: 3),
         Text(
           label,
-          style: const TextStyle(
-              fontSize: 12, color: AppTheme.textSecondary),
+          style: TextStyle(
+              fontSize: 12, color: AppTheme.adaptiveTextSecondary(context)),
         ),
       ],
     );
@@ -304,10 +308,10 @@ class _ProfileScreenState extends State<ProfileScreen>
         child: ElevatedButton(
           onPressed: () => Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const SettingsScreen()),
+            MaterialPageRoute(builder: (_) => SettingsScreen()),
           ),
           style: ElevatedButton.styleFrom(
-            backgroundColor: AppTheme.surfaceDark,
+            backgroundColor: AppTheme.surface(context),
             foregroundColor: Colors.white,
             elevation: 0,
             shape: RoundedRectangleBorder(
@@ -315,7 +319,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                 side:
                     BorderSide(color: Colors.white.withOpacity(0.15))),
           ),
-          child: const Text('Edit Profile',
+          child: Text(_l.t('profile_edit_profile'),
               style: TextStyle(fontWeight: FontWeight.w600)),
         ),
       );
@@ -331,19 +335,19 @@ class _ProfileScreenState extends State<ProfileScreen>
               onPressed: () => _toggleFriend(userData),
               style: ElevatedButton.styleFrom(
                 backgroundColor: isFriend
-                    ? AppTheme.surfaceDark
+                    ? AppTheme.surface(context)
                     : AppTheme.primaryPurple,
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
               ),
-              child: Text(isFriend ? 'Kakonek ✓' : 'Add Kakonek'),
+              child: Text(isFriend ? '${_l.t('profile_kakonek')} ✓' : _l.t('profile_add_kakonek')),
             );
           },
         ),
       ),
-      const SizedBox(width: 10),
+      SizedBox(width: 10),
       Expanded(
         child: OutlinedButton(
           onPressed: () {},
@@ -354,7 +358,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12)),
           ),
-          child: const Text('Message'),
+          child: Text(_l.t('profile_message')),
         ),
       ),
     ]);
@@ -372,7 +376,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error: $e')));
+            .showSnackBar(SnackBar(content: Text(AppErrorHandler.postError(e))));
       }
     }
   }
@@ -387,8 +391,8 @@ class _ProfileScreenState extends State<ProfileScreen>
         maxChildSize: 0.9,
         minChildSize: 0.3,
         builder: (context, scrollController) => Container(
-          decoration: const BoxDecoration(
-            color: AppTheme.surfaceDark,
+          decoration: BoxDecoration(
+            color: AppTheme.surface(context),
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Column(
@@ -396,28 +400,28 @@ class _ProfileScreenState extends State<ProfileScreen>
               Container(
                 width: 40,
                 height: 4,
-                margin: const EdgeInsets.only(top: 12, bottom: 8),
-                decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)),
+                margin: EdgeInsets.only(top: 12, bottom: 8),
+                decoration: BoxDecoration(color: AppTheme.adaptiveSubtle(context), borderRadius: BorderRadius.circular(2)),
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(16),
-                child: Text('Kakonek', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                child: Text('Kakonek', style: TextStyle(color: AppTheme.adaptiveText(context), fontSize: 18, fontWeight: FontWeight.bold)),
               ),
-              const Divider(color: Colors.white10),
+              Divider(color: AppTheme.adaptiveSubtle(context)),
               Expanded(
                 child: StreamBuilder<DocumentSnapshot>(
                   stream: FirebaseFirestore.instance.collection('users').doc(targetUid).snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
-                      return const Center(child: CircularProgressIndicator(color: AppTheme.primaryPurple));
+                      return Center(child: CircularProgressIndicator(color: AppTheme.primaryPurple));
                     }
                     if (!snapshot.hasData || !snapshot.data!.exists) {
-                      return const Center(child: Text('No Kakonek yet', style: TextStyle(color: AppTheme.textSecondary)));
+                      return Center(child: Text(_l.t('profile_no_kakonek'), style: TextStyle(color: AppTheme.adaptiveTextSecondary(context))));
                     }
                     final data = snapshot.data!.data() as Map<String, dynamic>;
                     final friends = List<String>.from(data['friends'] ?? []);
                     if (friends.isEmpty) {
-                      return const Center(child: Text('No Kakonek yet', style: TextStyle(color: AppTheme.textSecondary)));
+                      return Center(child: Text(_l.t('profile_no_kakonek'), style: TextStyle(color: AppTheme.adaptiveTextSecondary(context))));
                     }
                     return ListView.builder(
                       controller: scrollController,
@@ -428,15 +432,15 @@ class _ProfileScreenState extends State<ProfileScreen>
                           future: FirebaseFirestore.instance.collection('users').doc(friendId).get(),
                           builder: (context, friendSnap) {
                             if (!friendSnap.hasData || !friendSnap.data!.exists) {
-                              return const SizedBox.shrink();
+                              return SizedBox.shrink();
                             }
                             final friendData = friendSnap.data!.data() as Map<String, dynamic>;
                             final displayName = friendData['displayName'] ?? 'User';
                             final username = friendData['username'] ?? '';
                             return ListTile(
                               leading: UserPhotoWidget(userId: friendId, radius: 20),
-                              title: Text(displayName, style: const TextStyle(color: Colors.white)),
-                              subtitle: Text('@$username', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
+                              title: Text(displayName, style: TextStyle(color: AppTheme.adaptiveText(context))),
+                              subtitle: Text('@$username', style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 12)),
                               onTap: () {
                                 Navigator.pop(context);
                                 Navigator.push(this.context, MaterialPageRoute(builder: (_) => ProfileScreen(userId: friendId)));
@@ -484,7 +488,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                 stream: userStream,
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
-                    return const CircularProgressIndicator(
+                    return CircularProgressIndicator(
                       color: AppTheme.primaryPurple,
                     );
                   }
@@ -500,7 +504,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         color: Colors.grey[800],
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.person,
                         size: 100,
                         color: Colors.grey,
@@ -529,7 +533,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         color: Colors.grey[800],
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.person,
                         size: 100,
                         color: Colors.grey,
@@ -558,9 +562,9 @@ class _ProfileScreenState extends State<ProfileScreen>
               top: 40,
               right: 20,
               child: IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.close,
-                  color: Colors.white,
+                  color: AppTheme.adaptiveText(context),
                   size: 32,
                 ),
                 onPressed: () => Navigator.pop(context),
@@ -581,7 +585,7 @@ class _LiveStatColumn<T> extends StatelessWidget {
   final Stream<List<T>> stream;
   final String Function(List<T>) valueFromData;
 
-  const _LiveStatColumn({
+  _LiveStatColumn({
     required this.label,
     required this.userId,
     required this.stream,
@@ -599,16 +603,16 @@ class _LiveStatColumn<T> extends StatelessWidget {
           children: [
             Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white),
+                  color: AppTheme.adaptiveText(context)),
             ),
-            const SizedBox(height: 3),
+            SizedBox(height: 3),
             Text(
               label,
-              style: const TextStyle(
-                  fontSize: 12, color: AppTheme.textSecondary),
+              style: TextStyle(
+                  fontSize: 12, color: AppTheme.adaptiveTextSecondary(context)),
             ),
           ],
         );
@@ -621,13 +625,13 @@ class _LiveStatColumn<T> extends StatelessWidget {
 
 class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
   final TabBar tabBar;
-  const _StickyTabBarDelegate(this.tabBar);
+  _StickyTabBarDelegate(this.tabBar);
 
   @override
   Widget build(
           BuildContext context, double shrinkOffset, bool overlapsContent) =>
       Container(
-        color: AppTheme.backgroundDark,
+        color: AppTheme.background(context),
         child: tabBar,
       );
 
@@ -647,7 +651,8 @@ class _PostsGridTab extends StatelessWidget {
   final String userId;
   final PostService postService;
 
-  const _PostsGridTab({required this.userId, required this.postService});
+  _PostsGridTab({required this.userId, required this.postService});
+  AppLocalizations get _l => AppLocalizations.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -662,12 +667,12 @@ class _PostsGridTab extends StatelessWidget {
         
         if (snapshot.hasError) {
           developer.log('POSTS TAB ERROR: ${snapshot.error}');
-          return Center(child: Text('Error loading posts: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+          return Center(child: Text('${_l.t('profile_error_posts')}: ${snapshot.error}', style: TextStyle(color: Colors.red)));
         }
 
         if (snapshot.connectionState == ConnectionState.waiting &&
             !snapshot.hasData) {
-          return const Center(
+          return Center(
               child: CircularProgressIndicator(
                   color: AppTheme.primaryPurple));
         }
@@ -682,18 +687,18 @@ class _PostsGridTab extends StatelessWidget {
               children: [
                 Icon(Icons.grid_off_outlined,
                     size: 56, color: Colors.grey[700]),
-                const SizedBox(height: 12),
-                const Text('No posts yet',
+                SizedBox(height: 12),
+                Text(_l.t('profile_no_posts'),
                     style: TextStyle(
-                        color: AppTheme.textSecondary, fontSize: 15)),
+                        color: AppTheme.adaptiveTextSecondary(context), fontSize: 15)),
               ],
             ),
           );
         }
 
         return GridView.builder(
-          padding: const EdgeInsets.all(1),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          padding: EdgeInsets.all(1),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
             crossAxisSpacing: 1.5,
             mainAxisSpacing: 1.5,
@@ -727,9 +732,9 @@ class _PostsGridTab extends StatelessWidget {
         minChildSize: 0.5,
         builder: (_, controller) => Container(
           decoration: BoxDecoration(
-            color: AppTheme.backgroundDark,
+            color: AppTheme.background(context),
             borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(20)),
+                BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Column(
             children: [
@@ -738,9 +743,9 @@ class _PostsGridTab extends StatelessWidget {
                 child: Container(
                   width: 40,
                   height: 4,
-                  margin: const EdgeInsets.only(top: 12, bottom: 8),
+                  margin: EdgeInsets.only(top: 12, bottom: 8),
                   decoration: BoxDecoration(
-                      color: Colors.white24,
+                      color: AppTheme.adaptiveSubtle(context),
                       borderRadius: BorderRadius.circular(2)),
                 ),
               ),
@@ -763,7 +768,7 @@ class _PostsGridTab extends StatelessWidget {
 class _PostGridCell extends StatelessWidget {
   final Post post;
   final bool isRepost;
-  const _PostGridCell({required this.post, this.isRepost = false});
+  _PostGridCell({required this.post, this.isRepost = false});
 
   ImageProvider? _getImage(String url) {
     if (url.isEmpty) return null;
@@ -786,18 +791,18 @@ class _PostGridCell extends StatelessWidget {
       return Stack(fit: StackFit.expand, children: [
         imageProvider != null
             ? Image(image: imageProvider, fit: BoxFit.cover)
-            : Container(color: AppTheme.surfaceDark),
+            : Container(color: AppTheme.surface(context)),
         if (isRepost)
           Positioned(
             bottom: 4,
             right: 4,
             child: Container(
-              padding: const EdgeInsets.all(2),
+              padding: EdgeInsets.all(2),
               decoration: BoxDecoration(
                 color: Colors.black45,
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: const Icon(Icons.repeat_rounded,
+              child: Icon(Icons.repeat_rounded,
                   size: 11, color: Colors.green),
             ),
           )
@@ -818,7 +823,7 @@ class _PostGridCell extends StatelessWidget {
           gradient: LinearGradient(
             colors: [
               Colors.amber.withOpacity(0.3),
-              AppTheme.surfaceDark,
+              AppTheme.surface(context),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -832,12 +837,12 @@ class _PostGridCell extends StatelessWidget {
                 children: [
                   Text(
                     post.moodEmoji ?? '😊',
-                    style: const TextStyle(fontSize: 28),
+                    style: TextStyle(fontSize: 28),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     post.moodLabel ?? 'Happy',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.amber,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
@@ -848,7 +853,7 @@ class _PostGridCell extends StatelessWidget {
               ),
             ),
             if (isRepost)
-              const Positioned(
+              Positioned(
                 bottom: 4,
                 right: 4,
                 child: Icon(Icons.repeat_rounded, size: 14, color: Colors.green),
@@ -864,29 +869,29 @@ class _PostGridCell extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             AppTheme.primaryPurple.withOpacity(0.4),
-            AppTheme.surfaceDark,
+            AppTheme.surface(context),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
       ),
-      padding: const EdgeInsets.all(8),
+      padding: EdgeInsets.all(8),
       child: Stack(
         children: [
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.article_outlined,
-                  color: AppTheme.textSecondary,
+                  color: AppTheme.adaptiveTextSecondary(context),
                   size: 24,
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(
                   post.content,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppTheme.adaptiveText(context),
                     fontSize: 10,
                   ),
                   maxLines: 3,
@@ -897,7 +902,7 @@ class _PostGridCell extends StatelessWidget {
             ),
           ),
           if (isRepost)
-            const Positioned(
+            Positioned(
               bottom: 0,
               right: 0,
               child: Icon(Icons.repeat_rounded, size: 14, color: Colors.green),
@@ -907,21 +912,21 @@ class _PostGridCell extends StatelessWidget {
               bottom: 0,
               left: 0,
               child: Row(children: [
-                const Icon(Icons.favorite_border,
-                    size: 10, color: AppTheme.textSecondary),
-                const SizedBox(width: 3),
+                Icon(Icons.favorite_border,
+                    size: 10, color: AppTheme.adaptiveTextSecondary(context)),
+                SizedBox(width: 3),
                 Text(
                   '${post.likes}',
-                  style: const TextStyle(
-                      color: AppTheme.textSecondary, fontSize: 10),
+                  style: TextStyle(
+                      color: AppTheme.adaptiveTextSecondary(context), fontSize: 10),
                 ),
                 if (post.repostCount > 0) ...[
-                  const SizedBox(width: 8),
-                  const Icon(Icons.repeat_rounded, size: 10, color: Colors.green),
-                  const SizedBox(width: 3),
+                  SizedBox(width: 8),
+                  Icon(Icons.repeat_rounded, size: 10, color: Colors.green),
+                  SizedBox(width: 3),
                   Text(
                     '${post.repostCount}',
-                    style: const TextStyle(color: AppTheme.textSecondary, fontSize: 10),
+                    style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 10),
                   ),
                 ],
               ]),
@@ -936,7 +941,7 @@ class _PostGridCell extends StatelessWidget {
 
 class _ReelsGridTab extends StatelessWidget {
   final String userId;
-  const _ReelsGridTab({required this.userId});
+  _ReelsGridTab({required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -945,7 +950,7 @@ class _ReelsGridTab extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting &&
             !snapshot.hasData) {
-          return const Center(
+          return Center(
               child: CircularProgressIndicator(
                   color: AppTheme.primaryPurple));
         }
@@ -959,18 +964,18 @@ class _ReelsGridTab extends StatelessWidget {
               children: [
                 Icon(Icons.videocam_off_outlined,
                     size: 56, color: Colors.grey[700]),
-                const SizedBox(height: 12),
-                const Text('No reels yet',
+                SizedBox(height: 12),
+                Text('No reels yet',
                     style: TextStyle(
-                        color: AppTheme.textSecondary, fontSize: 15)),
+                        color: AppTheme.adaptiveTextSecondary(context), fontSize: 15)),
               ],
             ),
           );
         }
 
         return GridView.builder(
-          padding: const EdgeInsets.all(1),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          padding: EdgeInsets.all(1),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
             crossAxisSpacing: 1.5,
             mainAxisSpacing: 1.5,
@@ -1000,7 +1005,7 @@ class _ReelsGridTab extends StatelessWidget {
 
 class _ReelDetailSheet extends StatefulWidget {
   final Reel reel;
-  const _ReelDetailSheet({required this.reel});
+  _ReelDetailSheet({required this.reel});
 
   @override
   State<_ReelDetailSheet> createState() => _ReelDetailSheetState();
@@ -1079,11 +1084,11 @@ class _ReelDetailSheetState extends State<_ReelDetailSheet> {
       maxChildSize: 0.95,
       minChildSize: 0.4,
       builder: (_, scrollController) => Container(
-        decoration: const BoxDecoration(
-          color: AppTheme.surfaceDark,
+        decoration: BoxDecoration(
+          color: AppTheme.surface(context),
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20),
         child: SingleChildScrollView(
           controller: scrollController,
           child: Column(
@@ -1094,8 +1099,8 @@ class _ReelDetailSheetState extends State<_ReelDetailSheet> {
                 child: Container(
                   width: 40,
                   height: 4,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)),
+                  margin: EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(color: AppTheme.adaptiveSubtle(context), borderRadius: BorderRadius.circular(2)),
                 ),
               ),
               if (_controller != null && _controller!.value.isInitialized)
@@ -1111,40 +1116,40 @@ class _ReelDetailSheetState extends State<_ReelDetailSheet> {
                   aspectRatio: 9 / 16,
                   child: Container(
                     decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(12)),
-                    child: const Center(child: CircularProgressIndicator(color: AppTheme.primaryPurple)),
+                    child: Center(child: CircularProgressIndicator(color: AppTheme.primaryPurple)),
                   ),
                 ),
-              const SizedBox(height: 16),
-              Text(widget.reel.displayName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-              const SizedBox(height: 4),
-              Text(widget.reel.caption, style: const TextStyle(color: Colors.white70, fontSize: 14)),
-              const SizedBox(height: 12),
+              SizedBox(height: 16),
+              Text(widget.reel.displayName, style: TextStyle(color: AppTheme.adaptiveText(context), fontWeight: FontWeight.bold, fontSize: 16)),
+              SizedBox(height: 4),
+              Text(widget.reel.caption, style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 14)),
+              SizedBox(height: 12),
               Row(
                 children: [
                   GestureDetector(
                     onTap: _toggleLike,
                     child: Row(
                       children: [
-                        Icon(_isLiked ? Icons.favorite : Icons.favorite_border, color: _isLiked ? Colors.red : AppTheme.textSecondary, size: 20),
-                        const SizedBox(width: 4),
-                        Text('$_likesCount', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
+                        Icon(_isLiked ? Icons.favorite : Icons.favorite_border, color: _isLiked ? Colors.red : AppTheme.textSecondaryColor(context), size: 20),
+                        SizedBox(width: 4),
+                        Text('$_likesCount', style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 13)),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Row(
                     children: [
-                      const Icon(Icons.chat_bubble_outline, color: AppTheme.textSecondary, size: 20),
-                      const SizedBox(width: 4),
-                      Text('${widget.reel.comments}', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
+                      Icon(Icons.chat_bubble_outline, color: AppTheme.adaptiveTextSecondary(context), size: 20),
+                      SizedBox(width: 4),
+                      Text('${widget.reel.comments}', style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 13)),
                     ],
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Row(
                     children: [
-                      const Icon(Icons.remove_red_eye_outlined, color: AppTheme.textSecondary, size: 20),
-                      const SizedBox(width: 4),
-                      Text('${widget.reel.views}', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13)),
+                      Icon(Icons.remove_red_eye_outlined, color: AppTheme.adaptiveTextSecondary(context), size: 20),
+                      SizedBox(width: 4),
+                      Text('${widget.reel.views}', style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 13)),
                     ],
                   ),
                 ],
@@ -1160,15 +1165,15 @@ class _ReelDetailSheetState extends State<_ReelDetailSheet> {
 class _ReelStat extends StatelessWidget {
   final IconData icon;
   final String value;
-  const _ReelStat(this.icon, this.value);
+  _ReelStat(this.icon, this.value);
 
   @override
   Widget build(BuildContext context) => Row(children: [
-        Icon(icon, size: 16, color: AppTheme.textSecondary),
-        const SizedBox(width: 4),
+        Icon(icon, size: 16, color: AppTheme.adaptiveTextSecondary(context)),
+        SizedBox(width: 4),
         Text(value,
-            style: const TextStyle(
-                color: AppTheme.textSecondary, fontSize: 13)),
+            style: TextStyle(
+                color: AppTheme.adaptiveTextSecondary(context), fontSize: 13)),
       ]);
 }
 
@@ -1176,7 +1181,7 @@ class _ReelStat extends StatelessWidget {
 
 class _ReelGridCell extends StatelessWidget {
   final Reel reel;
-  const _ReelGridCell({required this.reel});
+  _ReelGridCell({required this.reel});
 
   @override
   Widget build(BuildContext context) {
@@ -1193,22 +1198,22 @@ class _ReelGridCell extends StatelessWidget {
       ),
       child: Stack(fit: StackFit.expand, children: [
         // Play icon in center
-        const Center(
+        Center(
           child: Icon(Icons.play_circle_outline,
-              size: 32, color: Colors.white54),
+              size: 32, color: AppTheme.adaptiveTextSecondary(context)),
         ),
         // Views at bottom left
         Positioned(
           bottom: 6,
           left: 6,
           child: Row(children: [
-            const Icon(Icons.remove_red_eye,
-                size: 11, color: Colors.white70),
-            const SizedBox(width: 3),
+            Icon(Icons.remove_red_eye,
+                size: 11, color: AppTheme.adaptiveTextSecondary(context)),
+            SizedBox(width: 3),
             Text(
               _fmt(reel.views),
-              style: const TextStyle(
-                  color: Colors.white70,
+              style: TextStyle(
+                  color: AppTheme.adaptiveTextSecondary(context),
                   fontSize: 10,
                   fontWeight: FontWeight.w600),
             ),
@@ -1238,7 +1243,7 @@ class _RepostsGridTab extends StatelessWidget {
   final String userId;
   final PostService postService;
 
-  const _RepostsGridTab({required this.userId, required this.postService});
+  _RepostsGridTab({required this.userId, required this.postService});
 
   @override
   Widget build(BuildContext context) {
@@ -1253,12 +1258,12 @@ class _RepostsGridTab extends StatelessWidget {
 
         if (snapshot.hasError) {
           developer.log('REPOSTS TAB ERROR: ${snapshot.error}');
-          return Center(child: Text('Error loading reposts: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+          return Center(child: Text('Error loading reposts: ${snapshot.error}', style: TextStyle(color: Colors.red)));
         }
 
         if (snapshot.connectionState == ConnectionState.waiting &&
             !snapshot.hasData) {
-          return const Center(
+          return Center(
               child: CircularProgressIndicator(
                   color: AppTheme.primaryPurple));
         }
@@ -1273,18 +1278,18 @@ class _RepostsGridTab extends StatelessWidget {
               children: [
                 Icon(Icons.repeat_rounded,
                     size: 56, color: Colors.grey[700]),
-                const SizedBox(height: 12),
-                const Text('No reposts yet',
+                SizedBox(height: 12),
+                Text('No reposts yet',
                     style: TextStyle(
-                        color: AppTheme.textSecondary, fontSize: 15)),
+                        color: AppTheme.adaptiveTextSecondary(context), fontSize: 15)),
               ],
             ),
           );
         }
 
         return GridView.builder(
-          padding: const EdgeInsets.all(1),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          padding: EdgeInsets.all(1),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
             crossAxisSpacing: 1.5,
             mainAxisSpacing: 1.5,
@@ -1317,8 +1322,8 @@ class _RepostsGridTab extends StatelessWidget {
         maxChildSize: 0.95,
         minChildSize: 0.4,
         builder: (_, controller) => Container(
-          decoration: const BoxDecoration(
-            color: AppTheme.backgroundDark,
+          decoration: BoxDecoration(
+            color: AppTheme.background(context),
             borderRadius:
                 BorderRadius.vertical(top: Radius.circular(20)),
           ),
@@ -1328,9 +1333,9 @@ class _RepostsGridTab extends StatelessWidget {
                 child: Container(
                   width: 40,
                   height: 4,
-                  margin: const EdgeInsets.only(top: 12, bottom: 8),
+                  margin: EdgeInsets.only(top: 12, bottom: 8),
                   decoration: BoxDecoration(
-                      color: Colors.white24,
+                      color: AppTheme.adaptiveSubtle(context),
                       borderRadius: BorderRadius.circular(2)),
                 ),
               ),
@@ -1352,7 +1357,7 @@ class _RepostsGridTab extends StatelessWidget {
 
 class _SavedTab extends StatelessWidget {
   final String userId;
-  const _SavedTab({required this.userId});
+  _SavedTab({required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -1364,7 +1369,7 @@ class _SavedTab extends StatelessWidget {
           .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Center(
+          return Center(
             child: CircularProgressIndicator(color: AppTheme.primaryPurple),
           );
         }
@@ -1372,10 +1377,10 @@ class _SavedTab extends StatelessWidget {
         final savedDocs = snapshot.data!.docs;
 
         if (savedDocs.isEmpty) {
-          return const Center(
+          return Center(
             child: Text(
               'No saved content yet',
-              style: TextStyle(color: AppTheme.textSecondary),
+              style: TextStyle(color: AppTheme.adaptiveTextSecondary(context)),
             ),
           );
         }
@@ -1391,8 +1396,8 @@ class _SavedTab extends StatelessWidget {
           });
 
         return GridView.builder(
-          padding: const EdgeInsets.all(2),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          padding: EdgeInsets.all(2),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
             crossAxisSpacing: 2,
             mainAxisSpacing: 2,
@@ -1404,7 +1409,7 @@ class _SavedTab extends StatelessWidget {
             final itemId = type == 'reel' ? saved['reelId'] : saved['postId'];
             final collection = type == 'reel' ? 'reels' : 'posts';
 
-            if (itemId == null) return Container(color: AppTheme.surfaceDark);
+            if (itemId == null) return Container(color: AppTheme.surface(context));
 
             return FutureBuilder<DocumentSnapshot>(
               future: FirebaseFirestore.instance
@@ -1414,9 +1419,9 @@ class _SavedTab extends StatelessWidget {
               builder: (context, itemSnap) {
                 if (!itemSnap.hasData || !itemSnap.data!.exists) {
                   return Container(
-                    color: AppTheme.surfaceDark,
-                    child: const Center(
-                      child: Icon(Icons.bookmark_border_rounded, color: Colors.white54),
+                    color: AppTheme.surface(context),
+                    child: Center(
+                      child: Icon(Icons.bookmark_border_rounded, color: AppTheme.adaptiveTextSecondary(context)),
                     ),
                   );
                 }
@@ -1424,14 +1429,14 @@ class _SavedTab extends StatelessWidget {
                 Widget childWidget;
                 if (type == 'reel') {
                   childWidget = Container(
-                    color: AppTheme.surfaceDark,
+                    color: AppTheme.surface(context),
                     child: Stack(
                       fit: StackFit.expand,
-                      children: const [
-                        Center(child: Icon(Icons.play_circle_outline, color: Colors.white54, size: 30)),
+                      children: [
+                        Center(child: Icon(Icons.play_circle_outline, color: AppTheme.adaptiveTextSecondary(context), size: 30)),
                         Positioned(
                           bottom: 4, right: 4,
-                          child: Icon(Icons.video_library, color: Colors.white, size: 14),
+                          child: Icon(Icons.video_library, color: AppTheme.adaptiveText(context), size: 14),
                         ),
                       ],
                     ),
@@ -1442,11 +1447,11 @@ class _SavedTab extends StatelessWidget {
                     childWidget = Image.network(post.content, fit: BoxFit.cover);
                   } else {
                     childWidget = Container(
-                      color: AppTheme.surfaceDark,
+                      color: AppTheme.surface(context),
                       child: Center(
                         child: Icon(
                           post.type == PostType.text ? Icons.text_snippet : Icons.article,
-                          color: Colors.white54,
+                          color: AppTheme.adaptiveTextSecondary(context),
                         ),
                       ),
                     );
@@ -1471,20 +1476,20 @@ class _SavedTab extends StatelessWidget {
                   onLongPress: () {
                     showModalBottomSheet(
                       context: context,
-                      backgroundColor: AppTheme.surfaceDark,
-                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+                      backgroundColor: AppTheme.surface(context),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
                       builder: (bottomSheetContext) => Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
                             width: 40,
                             height: 4,
-                            margin: const EdgeInsets.symmetric(vertical: 12),
-                            decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)),
+                            margin: EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(color: AppTheme.adaptiveSubtle(context), borderRadius: BorderRadius.circular(2)),
                           ),
                           ListTile(
-                            leading: const Icon(Icons.bookmark_remove_rounded, color: Colors.red),
-                            title: const Text('Remove from saved', style: TextStyle(color: Colors.red)),
+                            leading: Icon(Icons.bookmark_remove_rounded, color: Colors.red),
+                            title: Text('Remove from saved', style: TextStyle(color: Colors.red)),
                             onTap: () async {
                               Navigator.pop(bottomSheetContext);
                               await FirebaseFirestore.instance
@@ -1495,12 +1500,12 @@ class _SavedTab extends StatelessWidget {
                                   .delete();
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Removed from saved')),
+                                  SnackBar(content: Text('Removed from saved')),
                                 );
                               }
                             },
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
                         ],
                       ),
                     );
@@ -1525,8 +1530,8 @@ class _SavedTab extends StatelessWidget {
         maxChildSize: 0.95,
         minChildSize: 0.4,
         builder: (_, controller) => Container(
-          decoration: const BoxDecoration(
-            color: AppTheme.backgroundDark,
+          decoration: BoxDecoration(
+            color: AppTheme.background(context),
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Column(
@@ -1535,8 +1540,8 @@ class _SavedTab extends StatelessWidget {
                 child: Container(
                   width: 40,
                   height: 4,
-                  margin: const EdgeInsets.only(top: 12, bottom: 8),
-                  decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)),
+                  margin: EdgeInsets.only(top: 12, bottom: 8),
+                  decoration: BoxDecoration(color: AppTheme.adaptiveSubtle(context), borderRadius: BorderRadius.circular(2)),
                 ),
               ),
               Expanded(
@@ -1558,7 +1563,7 @@ class _SavedTab extends StatelessWidget {
 class _PrivatePostsTab extends StatefulWidget {
   final String userId;
   final PostService postService;
-  const _PrivatePostsTab({required this.userId, required this.postService});
+  _PrivatePostsTab({required this.userId, required this.postService});
 
   @override
   State<_PrivatePostsTab> createState() => _PrivatePostsTabState();
@@ -1575,8 +1580,8 @@ class _PrivatePostsTabState extends State<_PrivatePostsTab> {
         maxChildSize: 0.95,
         minChildSize: 0.5,
         builder: (_, controller) => Container(
-          decoration: const BoxDecoration(
-            color: AppTheme.backgroundDark,
+          decoration: BoxDecoration(
+            color: AppTheme.background(context),
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           child: Column(
@@ -1585,9 +1590,9 @@ class _PrivatePostsTabState extends State<_PrivatePostsTab> {
                 child: Container(
                   width: 40,
                   height: 4,
-                  margin: const EdgeInsets.only(top: 12, bottom: 8),
+                  margin: EdgeInsets.only(top: 12, bottom: 8),
                   decoration: BoxDecoration(
-                      color: Colors.white24,
+                      color: AppTheme.adaptiveSubtle(context),
                       borderRadius: BorderRadius.circular(2)),
                 ),
               ),
@@ -1610,7 +1615,7 @@ class _PrivatePostsTabState extends State<_PrivatePostsTab> {
       stream: widget.postService.getPrivatePostsStream(widget.userId),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Center(
+          return Center(
             child: CircularProgressIndicator(color: AppTheme.primaryPurple),
           );
         }
@@ -1618,15 +1623,15 @@ class _PrivatePostsTabState extends State<_PrivatePostsTab> {
         final privatePosts = snapshot.data!;
 
         if (privatePosts.isEmpty) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.lock_outline_rounded, color: Colors.white24, size: 60),
+                Icon(Icons.lock_outline_rounded, color: AppTheme.adaptiveSubtle(context), size: 60),
                 SizedBox(height: 16),
                 Text(
                   'No private posts',
-                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 16),
+                  style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 16),
                 ),
               ],
             ),
@@ -1634,8 +1639,8 @@ class _PrivatePostsTabState extends State<_PrivatePostsTab> {
         }
 
         return GridView.builder(
-          padding: const EdgeInsets.all(2),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          padding: EdgeInsets.all(2),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
             crossAxisSpacing: 2,
             mainAxisSpacing: 2,
@@ -1659,31 +1664,30 @@ class _PrivatePostsTabState extends State<_PrivatePostsTab> {
         fit: StackFit.expand,
         children: [
           Image.network(post.content, fit: BoxFit.cover),
-          const Positioned(
+          Positioned(
             top: 4, right: 4,
-            child: Icon(Icons.lock, color: Colors.white, size: 14),
+            child: Icon(Icons.lock, color: AppTheme.adaptiveText(context), size: 14),
           ),
         ],
       );
     }
     return Container(
-      color: AppTheme.surfaceDark,
+      color: AppTheme.surface(context),
       child: Stack(
         fit: StackFit.expand,
         children: [
           Center(
             child: Icon(
               post.type == PostType.text ? Icons.text_snippet : Icons.article,
-              color: Colors.white54,
+              color: AppTheme.adaptiveTextSecondary(context),
             ),
           ),
-          const Positioned(
+          Positioned(
             top: 4, right: 4,
-            child: Icon(Icons.lock, color: Colors.white, size: 14),
+            child: Icon(Icons.lock, color: AppTheme.adaptiveText(context), size: 14),
           ),
         ],
       ),
     );
   }
 }
-

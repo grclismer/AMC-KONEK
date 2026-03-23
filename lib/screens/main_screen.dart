@@ -11,6 +11,7 @@ import '../widgets/create_post_modal.dart';
 import '../widgets/profile_completion_modal.dart';
 import '../services/auth_service.dart';
 import '../widgets/user_photo_widget.dart';
+import '../utils/app_localizations.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -22,19 +23,13 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   final AuthService _authService = AuthService();
-  late final List<Widget> _pages;
   final GlobalKey<ReelsPageState> _reelsKey = GlobalKey<ReelsPageState>();
+  AppLocalizations get _l => AppLocalizations.instance;
 
   @override
   void initState() {
     super.initState();
     _checkProfileCompletion();
-    _pages = [
-      const HomePage(),
-      ReelsPage(key: _reelsKey),
-      const MessagesScreen(),
-      const ProfileMenuScreen(),
-    ];
 
     // Ensure Reels are silenced on app start since Home is the initial tab
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -77,14 +72,21 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  Widget _buildPage(int index) {
+    switch (index) {
+      case 0: return HomePage();
+      case 1: return ReelsPage(key: _reelsKey);
+      case 2: return MessagesScreen();
+      case 3: return ProfileMenuScreen();
+      default: return HomePage();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages,
-      ),
+      body: _buildPage(_selectedIndex),
       bottomNavigationBar: ClipRRect(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         child: BackdropFilter(
@@ -97,10 +99,10 @@ class _MainScreenState extends State<MainScreen> {
               right: 8,
             ),
             decoration: BoxDecoration(
-              color: AppTheme.surfaceDark.withOpacity(0.7),
+              color: AppTheme.surface(context).withOpacity(0.7),
               border: Border(
                 top: BorderSide(
-                  color: Colors.white.withOpacity(0.1),
+                  color: AppTheme.adaptiveSubtle(context),
                   width: 0.5,
                 ),
               ),
@@ -110,20 +112,20 @@ class _MainScreenState extends State<MainScreen> {
               children: [
                 _NavItem(
                   icon: Icons.home_rounded,
-                  label: 'Home',
+                  label: _l.t('nav_home'),
                   isActive: _selectedIndex == 0,
                   onTap: () => _onItemTapped(0),
                 ),
                 _NavItem(
                   icon: Icons.play_circle_fill_rounded,
-                  label: 'Reels',
+                  label: _l.t('nav_reels'),
                   isActive: _selectedIndex == 1,
                   onTap: () => _onItemTapped(1),
                 ),
                 
                 // CENTER CREATE POST BUTTON
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
+                  padding: EdgeInsets.only(bottom: 8),
                   child: GestureDetector(
                     onTap: _showCreatePostModal,
                     child: Container(
@@ -141,9 +143,9 @@ class _MainScreenState extends State<MainScreen> {
                           ),
                         ],
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.add_rounded,
-                        color: Colors.white,
+                        color: AppTheme.adaptiveText(context),
                         size: 32,
                       ),
                     ),
@@ -152,7 +154,7 @@ class _MainScreenState extends State<MainScreen> {
 
                 _NavItem(
                   icon: Icons.chat_bubble_rounded,
-                  label: 'Messages',
+                  label: _l.t('nav_messages'),
                   isActive: _selectedIndex == 2,
                   onTap: () => _onItemTapped(2),
                 ),
@@ -171,7 +173,7 @@ class _MainScreenState extends State<MainScreen> {
 
   Widget _buildProfileNavItem({required bool isActive}) {
     final currentUser = _authService.currentUser;
-    if (currentUser == null) return const SizedBox.shrink();
+    if (currentUser == null) return SizedBox.shrink();
 
     return GestureDetector(
       onTap: () => _onItemTapped(3),
@@ -185,13 +187,13 @@ class _MainScreenState extends State<MainScreen> {
             borderGradient: isActive ? AppTheme.primaryGradient : null,
             borderWidth: 1.5,
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
-            "Me",
+            _l.t('nav_me'),
             style: TextStyle(
               fontSize: 10,
               fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-              color: isActive ? AppTheme.primaryPurple : AppTheme.textSecondary,
+              color: isActive ? AppTheme.primaryPurple : AppTheme.textSecondaryColor(context),
             ),
           ),
         ],
@@ -223,24 +225,24 @@ class _NavItem extends StatelessWidget {
         children: [
           AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: isActive ? AppTheme.primaryPurple.withOpacity(0.15) : Colors.transparent,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               icon,
-              color: isActive ? AppTheme.primaryPurple : AppTheme.textSecondary,
+              color: isActive ? AppTheme.primaryPurple : AppTheme.textSecondaryColor(context),
               size: 26,
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
               fontSize: 10,
               fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
-              color: isActive ? AppTheme.primaryPurple : AppTheme.textSecondary,
+              color: isActive ? AppTheme.primaryPurple : AppTheme.textSecondaryColor(context),
             ),
           ),
         ],

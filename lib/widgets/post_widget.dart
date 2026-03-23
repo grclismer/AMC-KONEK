@@ -12,14 +12,17 @@ import '../theme/app_theme.dart';
 import '../theme/animations.dart';
 import '../screens/profile_screen.dart';
 import 'dart:developer' as developer;
+import '../utils/error_handler.dart';
 import '../widgets/user_photo_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../utils/app_localizations.dart';
+import '../services/translation_service.dart';
 
 class PostWidget extends StatefulWidget {
   final Post post;
 
-  const PostWidget({super.key, required this.post});
+  PostWidget({super.key, required this.post});
 
   @override
   State<PostWidget> createState() => _PostWidgetState();
@@ -33,6 +36,11 @@ class _PostWidgetState extends State<PostWidget> {
   bool _isHidden = false;
   bool _isSaved = false;
   final String? _currentUserId = AuthService().currentUser?.uid;
+  AppLocalizations get _l => AppLocalizations.instance;
+
+  String? _translatedContent;
+  bool _showTranslation = false;
+  bool _isTranslating = false;
 
   @override
   void initState() {
@@ -74,10 +82,10 @@ class _PostWidgetState extends State<PostWidget> {
     setState(() => _isSaved = !_isSaved);
     if (_isSaved) {
       await ref.set({'type': 'post', 'postId': widget.post.id, 'savedAt': FieldValue.serverTimestamp()});
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Post saved!')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_l.t('post_saved'))));
     } else {
       await ref.delete();
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Post unsaved')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_l.t('post_unsaved'))));
     }
   }
 
@@ -90,6 +98,30 @@ class _PostWidgetState extends State<PostWidget> {
       _likeCount = widget.post.likes;
       _repostCount = widget.post.repostCount;
       _isLiked = _currentUserId != null && widget.post.likedBy.contains(_currentUserId);
+    }
+  }
+
+  Future<void> _handleTranslate() async {
+    if (_translatedContent != null) {
+      setState(() => _showTranslation = !_showTranslation);
+      return;
+    }
+    setState(() => _isTranslating = true);
+    try {
+      final contentToTranslate = widget.post.caption?.isNotEmpty == true
+          ? widget.post.caption!
+          : widget.post.content;
+      final translated = await TranslationService.instance
+          .translate(contentToTranslate);
+      if (mounted) {
+        setState(() {
+          _translatedContent = translated;
+          _showTranslation = translated != null;
+          _isTranslating = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) setState(() => _isTranslating = false);
     }
   }
 
@@ -110,14 +142,13 @@ class _PostWidgetState extends State<PostWidget> {
       if (_isLiked) {
         await PostService.instance.likePost(widget.post.id, _currentUserId);
         
-        // Notify post owner
-        final currentUser = FirebaseAuth.instance.currentUser;
-        if (currentUser != null && _currentUserId != widget.post.userId) {
-          await NotificationService.sendNotification(
+        if (_isLiked && _currentUserId != null && _currentUserId != widget.post.userId) {
+          final userDoc = await FirebaseFirestore.instance.collection('users').doc(_currentUserId).get();
+          final name = userDoc.data()?['username'] ?? 'Someone';
+          NotificationService.send(
             recipientId: widget.post.userId,
-            senderId: currentUser.uid,
-            senderName: currentUser.displayName ?? 'User',
-            senderAvatar: currentUser.photoURL ?? '',
+            senderId: _currentUserId!,
+            senderName: name,
             type: 'like',
             message: 'liked your post',
             postId: widget.post.id,
@@ -135,7 +166,7 @@ class _PostWidgetState extends State<PostWidget> {
       developer.log('Error toggling like', error: e);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to update like status. Please try again.')),
+          SnackBar(content: Text('Failed to update like status. Please try again.')),
         );
       }
     }
@@ -156,10 +187,24 @@ class _PostWidgetState extends State<PostWidget> {
     try {
       if (_isReposted) {
         await PostService.instance.repostPost(widget.post);
+        
+        if (_currentUserId != null && _currentUserId != (widget.post.originalUserId ?? widget.post.userId)) {
+          final userDoc = await FirebaseFirestore.instance.collection('users').doc(_currentUserId).get();
+          final name = userDoc.data()?['username'] ?? 'Someone';
+          NotificationService.send(
+            recipientId: widget.post.originalUserId ?? widget.post.userId,
+            senderId: _currentUserId!,
+            senderName: name,
+            type: 'repost',
+            message: 'reposted your post',
+            postId: widget.post.id,
+          );
+        }
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Reposted! 🎉 check your profile'),
+            SnackBar(
+              content: Text(_l.t('post_reposted')),
               backgroundColor: Colors.green,
             ),
           );
@@ -168,7 +213,7 @@ class _PostWidgetState extends State<PostWidget> {
         await PostService.instance.undoRepost(widget.post);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Repost removed')),
+            SnackBar(content: Text(_l.t('post_repost_removed'))),
           );
         }
       }
@@ -179,7 +224,7 @@ class _PostWidgetState extends State<PostWidget> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text(AppErrorHandler.postError(e))),
         );
       }
     }
@@ -193,13 +238,13 @@ class _PostWidgetState extends State<PostWidget> {
     
     String relative;
     if (difference.inSeconds < 60) {
-      relative = 'Just now';
+      relative = _l.t('time_just_now');
     } else if (difference.inMinutes < 60) {
-      relative = '${difference.inMinutes}m ago';
+      relative = '${difference.inMinutes}${_l.t('time_m_ago')}';
     } else if (difference.inHours < 24) {
-      relative = '${difference.inHours}h ago';
+      relative = '${difference.inHours}${_l.t('time_h_ago')}';
     } else if (difference.inDays < 7) {
-      relative = '${difference.inDays}d ago';
+      relative = '${difference.inDays}${_l.t('time_d_ago')}';
     } else {
       relative = '${timestamp.day}/${timestamp.month}/${timestamp.year}';
     }
@@ -225,19 +270,19 @@ class _PostWidgetState extends State<PostWidget> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Delete Post?"),
-          content: const Text("Are you sure you want to delete this post? This action cannot be undone."),
+          title: Text(_l.t('post_delete_confirm')),
+          content: Text(_l.t('post_delete_message')),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel", style: TextStyle(color: Colors.black87)),
+              child: Text(_l.t('cancel'), style: TextStyle(color: Colors.black87)),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pop(context); // Close confirmation dialog
                 _handleDeletePost();
               },
-              child: const Text("Delete", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              child: Text(_l.t('delete'), style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
             ),
           ],
         );
@@ -250,7 +295,7 @@ class _PostWidgetState extends State<PostWidget> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
+      builder: (context) => Center(child: CircularProgressIndicator()),
     );
 
     try {
@@ -258,14 +303,14 @@ class _PostWidgetState extends State<PostWidget> {
       if (mounted) {
         Navigator.pop(context); // Close loading dialog
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Post deleted')),
+          SnackBar(content: Text(_l.t('post_deleted'))),
         );
       }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context); // Close loading dialog
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to delete post: $e')),
+          SnackBar(content: Text(AppErrorHandler.postError(e))),
         );
       }
     }
@@ -278,9 +323,9 @@ class _PostWidgetState extends State<PostWidget> {
   void _showPostOptions() {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) => Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: EdgeInsets.symmetric(vertical: 12),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -288,12 +333,12 @@ class _PostWidgetState extends State<PostWidget> {
               child: Container(
                 width: 40, 
                 height: 4, 
-                margin: const EdgeInsets.only(bottom: 8), 
+                margin: EdgeInsets.only(bottom: 8), 
                 decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))
               )),
             ListTile(
-              leading: const Icon(Icons.info_outline),
-              title: const Text('About this account'),
+              leading: Icon(Icons.info_outline),
+              title: Text(_l.t('post_about_account')),
               onTap: () {
                 Navigator.pop(context);
                 final uId = widget.post.isRepost ? widget.post.originalUserId! : widget.post.userId;
@@ -302,8 +347,8 @@ class _PostWidgetState extends State<PostWidget> {
             ),
             if (_currentUserId == widget.post.userId)
               ListTile(
-                leading: const Icon(Icons.delete_outline, color: Colors.red),
-                title: const Text('Delete Post', style: TextStyle(color: Colors.red)),
+                leading: Icon(Icons.delete_outline, color: Colors.red),
+                title: Text(_l.t('post_delete'), style: TextStyle(color: Colors.red)),
                 onTap: () {
                   Navigator.pop(context);
                   _showDeleteConfirmationDialog();
@@ -311,17 +356,17 @@ class _PostWidgetState extends State<PostWidget> {
               )
             else
               ListTile(
-                leading: const Icon(Icons.hide_source_outlined, color: Colors.orange),
-                title: const Text('Hide Post', style: TextStyle(color: Colors.orange)),
+                leading: Icon(Icons.hide_source_outlined, color: Colors.orange),
+                title: Text(_l.t('post_hide'), style: TextStyle(color: Colors.orange)),
                 onTap: () {
                   Navigator.pop(context);
                   setState(() => _isHidden = true);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Post hidden. You won\'t see this post again.')),
+                    SnackBar(content: Text(_l.t('post_hidden'))),
                   );
                 },
               ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
           ],
         ),
       ),
@@ -330,7 +375,7 @@ class _PostWidgetState extends State<PostWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isHidden) return const SizedBox.shrink();
+    if (_isHidden) return SizedBox.shrink();
     developer.log('=== BUILDING POST ===');
     developer.log('Post ID: ${widget.post.id}');
     developer.log('Type: ${widget.post.type}');
@@ -338,22 +383,22 @@ class _PostWidgetState extends State<PostWidget> {
     developer.log('Content exists: ${widget.post.content.isNotEmpty}');
     developer.log('====================');
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceDark,
+        color: AppTheme.surface(context),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: AppTheme.primaryPurple.withOpacity(0.15),
             blurRadius: 10,
             spreadRadius: 1,
-            offset: const Offset(0, 4),
+            offset: Offset(0, 4),
           ),
           BoxShadow(
             color: AppTheme.primaryPink.withOpacity(0.1),
             blurRadius: 10,
             spreadRadius: -2,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -363,17 +408,17 @@ class _PostWidgetState extends State<PostWidget> {
           // ─── Repost Indicator ──────────────────────────────────────────────
           if (widget.post.isRepost)
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.repeat_rounded,
                     size: 14,
-                    color: AppTheme.textSecondary,
+                    color: AppTheme.adaptiveTextSecondary(context),
                   ),
-                  const SizedBox(width: 6),
+                  SizedBox(width: 6),
                   UserPhotoWidget(userId: widget.post.userId, radius: 9),
-                  const SizedBox(width: 6),
+                  SizedBox(width: 6),
                   GestureDetector(
                     onTap: () => Navigator.push(
                       context,
@@ -383,8 +428,8 @@ class _PostWidgetState extends State<PostWidget> {
                       widget.post.userId == _currentUserId
                           ? 'You reposted'
                           : '@${widget.post.username} reposted',
-                      style: const TextStyle(
-                        color: AppTheme.textSecondary,
+                      style: TextStyle(
+                        color: AppTheme.adaptiveTextSecondary(context),
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -396,7 +441,7 @@ class _PostWidgetState extends State<PostWidget> {
 
           // Header
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(12),
             child: Row(
               children: [
                 GestureDetector(
@@ -407,8 +452,8 @@ class _PostWidgetState extends State<PostWidget> {
                     Navigator.push(context, SlidePageRoute(page: ProfileScreen(userId: targetId)));
                   },
                   child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
+                    padding: EdgeInsets.all(2),
+                    decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       gradient: AppTheme.primaryGradient,
                     ),
@@ -420,7 +465,7 @@ class _PostWidgetState extends State<PostWidget> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
@@ -436,7 +481,7 @@ class _PostWidgetState extends State<PostWidget> {
                           widget.post.isRepost 
                               ? (widget.post.originalUsername ?? "Original User")
                               : (widget.post.username.isNotEmpty ? widget.post.username : "Unknown User"),
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.adaptiveText(context)),
                         ),
                         Text(
                           _getFullTimestamp(widget.post.timestamp),
@@ -447,7 +492,7 @@ class _PostWidgetState extends State<PostWidget> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.more_horiz, size: 20, color: Colors.white),
+                  icon: Icon(Icons.more_horiz, size: 20, color: AppTheme.adaptiveText(context)),
                   onPressed: _showPostOptions,
                 ),
               ],
@@ -457,18 +502,58 @@ class _PostWidgetState extends State<PostWidget> {
           // Caption
           if (widget.post.caption != null && widget.post.caption!.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
               child: Text(
                 widget.post.caption!, 
-                style: const TextStyle(fontSize: 14, color: AppTheme.textPrimary, height: 1.4),
+                style: TextStyle(fontSize: 14, color: AppTheme.adaptiveText(context), height: 1.4),
+              ),
+            ),
+          
+          if (widget.post.type == PostType.text || (widget.post.caption?.isNotEmpty == true))
+            Padding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: _isTranslating
+                  ? Row(children: [
+                      SizedBox(
+                        width: 12, height: 12,
+                        child: CircularProgressIndicator(strokeWidth: 1.5, color: AppTheme.primaryPurple),
+                      ),
+                      SizedBox(width: 8),
+                      Text(_l.t('translating'), style: TextStyle(fontSize: 12, color: AppTheme.adaptiveTextSecondary(context))),
+                    ])
+                  : GestureDetector(
+                      onTap: _handleTranslate,
+                      child: Text(
+                        _showTranslation ? _l.t('post_show_original') : _l.t('post_see_translation'),
+                        style: TextStyle(fontSize: 12, color: AppTheme.primaryPurple, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+            ),
+
+          if (_showTranslation && _translatedContent != null)
+            Padding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _l.t('post_translated'),
+                    style: TextStyle(fontSize: 11, color: AppTheme.adaptiveTextSecondary(context), fontStyle: FontStyle.italic),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    _translatedContent!,
+                    style: TextStyle(fontSize: 15, color: AppTheme.adaptiveText(context), height: 1.4),
+                  ),
+                ],
               ),
             ),
 
           // Mood Indicator Section
           if (widget.post.type == PostType.mood)
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              padding: const EdgeInsets.all(16),
+              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -488,22 +573,22 @@ class _PostWidgetState extends State<PostWidget> {
                 children: [
                   Text(
                     widget.post.moodEmoji ?? '😊',
-                    style: const TextStyle(fontSize: 40),
+                    style: TextStyle(fontSize: 40),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           'Feeling ${widget.post.moodLabel ?? 'Happy'}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.amber,
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        SizedBox(height: 6),
                         Row(
                           children: [
                             Icon(
@@ -511,7 +596,7 @@ class _PostWidgetState extends State<PostWidget> {
                               size: 14,
                               color: Colors.amber.shade700,
                             ),
-                            const SizedBox(width: 6),
+                            SizedBox(width: 6),
                             Text(
                               widget.post.timeRemaining,
                               style: TextStyle(
@@ -530,27 +615,23 @@ class _PostWidgetState extends State<PostWidget> {
             ),
 
           // Content
-          if (widget.post.type == PostType.text || widget.post.type == PostType.mood)
+          if (widget.post.type == PostType.text || widget.post.type == PostType.mood) ...[
             if (widget.post.content.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Text(
-                  widget.post.content, 
-                  style: const TextStyle(
-                    fontSize: 15, 
-                    color: AppTheme.textPrimary,
-                    height: 1.4,
-                  ),
+                  widget.post.content,
+                  style: TextStyle(fontSize: 15, color: AppTheme.adaptiveText(context), height: 1.4),
                 ),
-              )
-          else
+              ),
+          ] else
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: EdgeInsets.symmetric(horizontal: 12),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Container(
-                  color: AppTheme.surfaceLighter,
-                  constraints: const BoxConstraints(minHeight: 200, maxHeight: 500),
+                  color: AppTheme.surfaceColor(context),
+                  constraints: BoxConstraints(minHeight: 200, maxHeight: 500),
                   width: double.infinity,
                   child: _buildContent(),
                 ),
@@ -559,7 +640,7 @@ class _PostWidgetState extends State<PostWidget> {
 
           // Interaction Bar
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
             child: Row(
               children: [
                 _buildAnimatedLikeButton(),
@@ -574,11 +655,11 @@ class _PostWidgetState extends State<PostWidget> {
                   color: _isReposted ? Colors.green : null,
                   onTap: _handleRepost,
                 ),
-                const Spacer(),
+                Spacer(),
                 IconButton(
                   icon: Icon(
                     _isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-                    color: _isSaved ? AppTheme.primaryPurple : AppTheme.textSecondary,
+                    color: _isSaved ? AppTheme.primaryPurple : AppTheme.textSecondaryColor(context),
                     size: 24,
                   ),
                   onPressed: _handleSave,
@@ -592,16 +673,16 @@ class _PostWidgetState extends State<PostWidget> {
             stream: CommentService.instance.getLatestCommentsStream(widget.post.id, limit: 2),
             builder: (context, snapshot) {
               final topComments = snapshot.data ?? [];
-              if (topComments.isEmpty) return const SizedBox.shrink();
+              if (topComments.isEmpty) return SizedBox.shrink();
 
               return Padding(
-                padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
+                padding: EdgeInsets.fromLTRB(12, 0, 12, 16),
                 child: GestureDetector(
                   onTap: _navigateToComments,
                   child: Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: AppTheme.surfaceLighter.withOpacity(0.5),
+                      color: AppTheme.surfaceColor(context).withOpacity(0.5),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
@@ -609,34 +690,34 @@ class _PostWidgetState extends State<PostWidget> {
                       children: [
                         if (widget.post.comments > 2)
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
+                            padding: EdgeInsets.only(bottom: 8),
                             child: Row(
                               children: [
                                 Text(
-                                  "View all ${widget.post.comments} comments",
-                                  style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary, fontWeight: FontWeight.w500),
+                                  "${_l.t('post_view_comments')} ${widget.post.comments}",
+                                  style: TextStyle(fontSize: 13, color: AppTheme.adaptiveTextSecondary(context), fontWeight: FontWeight.w500),
                                 ),
-                                const SizedBox(width: 4),
-                                const Icon(Icons.arrow_forward_ios, size: 10, color: AppTheme.textSecondary),
+                                SizedBox(width: 4),
+                                Icon(Icons.arrow_forward_ios, size: 10, color: AppTheme.adaptiveTextSecondary(context)),
                               ],
                             ),
                           )
                         else
-                          const Padding(
+                          Padding(
                             padding: EdgeInsets.only(bottom: 6),
                             child: Text(
-                              "Top Comments",
-                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.textSecondary),
+                              _l.t('post_top_comments'),
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.adaptiveTextSecondary(context)),
                             ),
                           ),
                         ...topComments.reversed.map<Widget>(
                           (comment) => Padding(
-                            padding: const EdgeInsets.only(top: 6),
+                            padding: EdgeInsets.only(top: 6),
                             child: RichText(
                               text: TextSpan(
-                                style: const TextStyle(color: AppTheme.textPrimary, fontSize: 13, height: 1.3),
+                                style: TextStyle(color: AppTheme.adaptiveText(context), fontSize: 13, height: 1.3),
                                 children: [
-                                  TextSpan(text: "${comment.username}  ", style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  TextSpan(text: "${comment.username}  ", style: TextStyle(fontWeight: FontWeight.bold)),
                                   TextSpan(text: comment.text),
                                 ],
                               ),
@@ -659,33 +740,33 @@ class _PostWidgetState extends State<PostWidget> {
     if (widget.post.type == PostType.video) return YoutubePlayerWidget(videoUrl: widget.post.content);
     if (widget.post.type == PostType.tiktok) return TikTokPlayerPlaceholder(url: widget.post.content);
     if (widget.post.type == PostType.image) return AnimatedBlurImage(imageUrl: widget.post.content, fit: BoxFit.cover);
-    return const SizedBox();
+    return SizedBox();
   }
 
   Widget _buildAnimatedLikeButton() {
     return BounceClick(
       onTap: _handleLike,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Row(
           children: [
             AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
+              duration: Duration(milliseconds: 250),
               transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
               child: _isLiked
                   ? ShaderMask(
-                      key: const ValueKey('liked'),
+                      key: ValueKey('liked'),
                       shaderCallback: (bounds) => AppTheme.primaryGradient.createShader(bounds),
-                      child: const Icon(Icons.favorite_rounded, size: 24, color: Colors.white),
+                      child: Icon(Icons.favorite_rounded, size: 24, color: Colors.white),
                     )
-                  : const Icon(Icons.favorite_border_rounded, size: 24, key: ValueKey('unliked'), color: AppTheme.textSecondary),
+                  : Icon(Icons.favorite_border_rounded, size: 24, key: ValueKey('unliked'), color: AppTheme.adaptiveTextSecondary(context)),
             ),
-            const SizedBox(width: 6),
+            SizedBox(width: 6),
             Text(
               _likeCount.toString(), 
               style: TextStyle(
                 fontSize: 13, 
-                color: _isLiked ? AppTheme.primaryPink : AppTheme.textSecondary, 
+                color: _isLiked ? AppTheme.primaryPink : AppTheme.textSecondaryColor(context), 
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -699,12 +780,12 @@ class _PostWidgetState extends State<PostWidget> {
     return BounceClick(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         child: Row(
           children: [
-            Icon(icon, size: 24, color: color ?? AppTheme.textSecondary),
-            const SizedBox(width: 6),
-            Text(label, style: TextStyle(fontSize: 13, color: color ?? AppTheme.textSecondary, fontWeight: FontWeight.w600)),
+            Icon(icon, size: 24, color: color ?? AppTheme.textSecondaryColor(context)),
+            SizedBox(width: 6),
+            Text(label, style: TextStyle(fontSize: 13, color: color ?? AppTheme.textSecondaryColor(context), fontWeight: FontWeight.w600)),
           ],
         ),
       ),

@@ -41,7 +41,12 @@ class PostService {
             .map((snapshot) {
               final posts = snapshot.docs.map((doc) => Post.fromFirestore(doc)).toList();
               // Filter by isPublic and ignore expired moods
-              final filtered = posts.where((p) => p.isPublic && !p.isExpired).toList();
+              final filtered = posts.where((p) {
+                if (p.isExpired) return false;
+                if (p.userId == currentUser.uid) return true; // always show own posts
+                if (p.privacy == 'private') return false; // never show others' private posts
+                return true; // show public and friends posts
+              }).toList();
               
               developer.log('Fetched ${snapshot.docs.length} docs, ${filtered.length} visible');
               for (var p in filtered.take(5)) {
@@ -58,11 +63,13 @@ class PostService {
             .snapshots()
             .map((snapshot) {
               final allPosts = snapshot.docs.map((doc) => Post.fromFirestore(doc)).toList();
-              final filtered = allPosts.where((post) => 
-                visibleUserIds.contains(post.userId) && 
-                post.isPublic &&
-                !post.isExpired
-              ).toList();
+              final filtered = allPosts.where((post) {
+                if (!visibleUserIds.contains(post.userId)) return false;
+                if (post.isExpired) return false;
+                if (post.userId == currentUser.uid) return true; // always show own posts
+                if (post.privacy == 'private') return false; // never show others' private posts
+                return true; // show public and friends posts
+              }).toList();
 
               developer.log('Large list fetch: ${allPosts.length} docs, ${filtered.length} filtered');
 
@@ -91,10 +98,7 @@ class PostService {
       return _firestore.collection(_collection).limit(100).snapshots().map((snapshot) {
         final posts = snapshot.docs.map((doc) => Post.fromFirestore(doc)).toList();
         final filtered = posts.where((p) =>
-          p.isPublic &&
-          !p.isExpired &&
-          !p.isRepost &&
-          !excludeIds.contains(p.userId)
+          !excludeIds.contains(p.userId) && p.privacy != 'private' && p.privacy != 'friends' && !p.isExpired && !p.isRepost
         ).toList();
         filtered.sort((a, b) => b.timestamp.compareTo(a.timestamp));
         return filtered.take(50).toList();
@@ -115,7 +119,7 @@ class PostService {
             .map((doc) => Post.fromFirestore(doc))
             .where((post) {
               // ✅ Filter original content and non-expired moods locally
-              final keep = !post.isRepost && !post.isExpired;
+              final keep = !post.isRepost && !post.isExpired && post.privacy != 'private';
               if (!keep) developer.log('Filtering out: ${post.id} (isRepost: ${post.isRepost}, isExpired: ${post.isExpired})');
               return keep;
             })
@@ -138,7 +142,7 @@ class PostService {
         .map((snapshot) {
           final posts = snapshot.docs
               .map((doc) => Post.fromFirestore(doc))
-              .where((post) => post.isPublic == false && !post.isRepost && !post.isExpired)
+              .where((post) => (post.privacy == 'private' || (!post.isPublic && post.privacy != 'friends')) && !post.isRepost && !post.isExpired)
               .toList();
           posts.sort((a, b) => b.timestamp.compareTo(a.timestamp));
           return posts;

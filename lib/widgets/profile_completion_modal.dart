@@ -109,14 +109,14 @@ class _ProfileCompletionModalState extends State<ProfileCompletionModal> {
                   ),
                   child: TextField(
                     controller: _usernameController,
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(color: AppTheme.adaptiveText(context)),
                     autofocus: true,
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.alternate_email_rounded, color: AppTheme.textSecondary),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.alternate_email_rounded, color: AppTheme.adaptiveTextSecondary(context)),
                       hintText: 'Username',
-                      hintStyle: TextStyle(color: AppTheme.textSecondary),
+                      hintStyle: TextStyle(color: AppTheme.adaptiveTextSecondary(context)),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(16),
+                      contentPadding: const EdgeInsets.all(16),
                     ),
                   ),
                 ),

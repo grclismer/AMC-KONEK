@@ -16,6 +16,7 @@ import '../models/reel_model.dart';
 import '../services/reel_service.dart';
 import '../services/friends_service.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_localizations.dart';
 import '../utils/video_compressor.dart';
 import '../widgets/create_post_modal.dart';
 
@@ -42,6 +43,7 @@ class ReelsPageState extends State<ReelsPage>
   // Cached reel lists — safe reference for onPageChanged prev-index lookup
   List<Reel> _kakonekReels = [];
   List<Reel> _paraSaImoReels = [];
+  AppLocalizations get _l => AppLocalizations.instance;
 
   void _toggleMute() {
     setState(() => _isMuted = !_isMuted);
@@ -103,11 +105,11 @@ class ReelsPageState extends State<ReelsPage>
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
+        builder: (context) => Center(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            CircularProgressIndicator(color: Colors.white),
-            SizedBox(height: 16),
-            Text('Uploading reel...', style: TextStyle(color: Colors.white)),
+            const CircularProgressIndicator(color: Colors.white),
+            const SizedBox(height: 16),
+            Text(_l.t('reels_uploading'), style: TextStyle(color: Colors.white)),
           ]),
         ),
       );
@@ -121,13 +123,13 @@ class ReelsPageState extends State<ReelsPage>
       if (mounted) {
         if (Navigator.canPop(context)) Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Reel uploaded! 🎉'), backgroundColor: Colors.green));
+          SnackBar(content: Text(_l.t('reels_uploaded')), backgroundColor: Colors.green));
       }
     } catch (e) {
       if (mounted) {
         if (Navigator.canPop(context)) Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Upload failed: $e'), backgroundColor: Colors.red));
+          SnackBar(content: Text('${_l.t('reels_upload_failed')}: $e'), backgroundColor: Colors.red));
       }
     }
   }
@@ -181,7 +183,7 @@ class ReelsPageState extends State<ReelsPage>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white60,
           labelStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          tabs: const [Tab(text: 'Kakonek'), Tab(text: 'Para sa Imo')],
+          tabs: [Tab(text: _l.t('reels_kakonek')), Tab(text: _l.t('reels_para_sa_imo'))],
         ),
         actions: [
           IconButton(
@@ -198,7 +200,7 @@ class ReelsPageState extends State<ReelsPage>
             currentIndex: _kakonekIndex,
             cachedReels: _kakonekReels,
             keys: _kakonekKeys,
-            emptyMessage: 'No reels from your Kakonek yet',
+            emptyMessage: _l.t('reels_empty_kakonek'),
             isMuted: _isMuted,
             onPageChanged: (reels, index) {
               // Pause previous safely
@@ -216,7 +218,7 @@ class ReelsPageState extends State<ReelsPage>
             currentIndex: _paraSaImoIndex,
             cachedReels: _paraSaImoReels,
             keys: _paraSaImoKeys,
-            emptyMessage: 'No public reels available',
+            emptyMessage: _l.t('reels_empty_public'),
             isMuted: _isMuted,
             onPageChanged: (reels, index) {
               // Pause previous safely
@@ -329,6 +331,7 @@ class ReelPlayerState extends State<ReelPlayer>
   late int _likesCount;
   bool _isSaved = false;
   late Stream<bool> _friendStatusStream;
+  AppLocalizations get _l => AppLocalizations.instance;
 
   late AnimationController _heartCtrl;
   late Animation<double> _heartAnim;
@@ -499,7 +502,7 @@ class ReelPlayerState extends State<ReelPlayer>
       } else {
         await FriendsService.instance.sendFriendRequest(userId);
         if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Friend request sent!'), duration: Duration(seconds: 1)));
+          SnackBar(content: Text(_l.t('reels_request_sent')), duration: const Duration(seconds: 1)));
       }
     } catch (e) {
       debugPrint('Error toggling friend: $e');
@@ -526,7 +529,7 @@ class ReelPlayerState extends State<ReelPlayer>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Comments', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                   Text(_l.t('comments_title'), style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                   StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance.collection('reels')
                         .doc(widget.reel.id).collection('comments').snapshots(),
@@ -546,10 +549,10 @@ class ReelPlayerState extends State<ReelPlayer>
                   if (!snapshot.hasData) return const Center(
                     child: CircularProgressIndicator(color: AppTheme.primaryPurple));
                   final comments = snapshot.data!.docs;
-                  if (comments.isEmpty) return const Center(
-                    child: Text('No comments yet\nBe the first to comment!',
+                  if (comments.isEmpty) return Center(
+                    child: Text(_l.t('comments_no_comments'),
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: AppTheme.textSecondary)));
+                      style: const TextStyle(color: AppTheme.textSecondary)));
                   return ListView.builder(
                     controller: scrollController,
                     padding: const EdgeInsets.all(16),
@@ -579,17 +582,17 @@ class ReelPlayerState extends State<ReelPlayer>
           Container(width: 40, height: 4,
             margin: const EdgeInsets.only(top: 12, bottom: 20),
             decoration: BoxDecoration(color: Colors.grey[700], borderRadius: BorderRadius.circular(2))),
-          _MenuOption(icon: Icons.bookmark_outline, title: 'Save',
+          _MenuOption(icon: Icons.bookmark_outline, title: _l.t('reels_save'),
             onTap: () { Navigator.pop(context); _saveReel(widget.reel); setState(() => _isSaved = true); }),
           if (!isOwnReel) ...[
             const Divider(color: Colors.white10),
-            _MenuOption(icon: Icons.not_interested, title: 'Not interested',
-              subtitle: 'Hide this reel',
+            _MenuOption(icon: Icons.not_interested, title: _l.t('reels_not_interested'),
+              subtitle: _l.t('reels_hide_reel'),
               onTap: () { Navigator.pop(context); _hideReel(widget.reel); }),
           ],
           if (isOwnReel) ...[
             const Divider(color: Colors.white10),
-            _MenuOption(icon: Icons.delete_outline, title: 'Delete', isDestructive: true,
+            _MenuOption(icon: Icons.delete_outline, title: _l.t('delete'), isDestructive: true,
               onTap: () { Navigator.pop(context); _deleteReel(widget.reel); }),
           ],
           const SizedBox(height: 20),
@@ -628,14 +631,14 @@ class ReelPlayerState extends State<ReelPlayer>
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppTheme.surfaceDark,
-        title: const Text('Delete Reel?', style: TextStyle(color: Colors.white)),
-        content: const Text('This reel will be permanently deleted.',
-          style: TextStyle(color: AppTheme.textSecondary)),
+        title: Text(_l.t('reels_delete_confirm'), style: const TextStyle(color: Colors.white)),
+        content: Text(_l.t('reels_delete_message'),
+          style: const TextStyle(color: AppTheme.textSecondary)),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(_l.t('cancel'))),
           TextButton(onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete')),
+            child: Text(_l.t('delete'))),
         ],
       ),
     );
@@ -694,7 +697,7 @@ class ReelPlayerState extends State<ReelPlayer>
                   children: [
                     const CircularProgressIndicator(color: AppTheme.primaryPurple),
                     const SizedBox(height: 12),
-                    Text('Loading video...', style: TextStyle(
+                    Text(_l.t('reels_loading'), style: TextStyle(
                       color: Colors.white.withOpacity(0.4), fontSize: 13)),
                   ]))),
 
@@ -769,9 +772,9 @@ class ReelPlayerState extends State<ReelPlayer>
             _ActionBtn(
               icon: _isSaved ? Icons.bookmark : Icons.bookmark_border,
               iconColor: _isSaved ? Colors.yellow : Colors.white,
-              label: 'Save', onTap: () => setState(() => _isSaved = !_isSaved)),
+              label: _l.t('reels_save'), onTap: () => setState(() => _isSaved = !_isSaved)),
             const SizedBox(height: 20),
-            _ActionBtn(icon: Icons.more_horiz, label: 'More', onTap: _showReelOptions),
+            _ActionBtn(icon: Icons.more_horiz, label: _l.t('reels_more'), onTap: _showReelOptions),
           ])),
 
         // Bottom info

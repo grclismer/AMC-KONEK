@@ -13,6 +13,7 @@ import '../theme/app_theme.dart';
 import '../theme/effects.dart';
 import '../theme/animations.dart';
 import '../widgets/user_photo_widget.dart';
+import '../utils/app_localizations.dart';
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({super.key});
@@ -25,6 +26,7 @@ class _AppDrawerState extends State<AppDrawer> {
   final AuthService _authService = AuthService();
   final ImagePicker _picker = ImagePicker();
   bool _saveAccount = false;
+  AppLocalizations get _l => AppLocalizations.instance;
 
   void _confirmLogout(Map<String, dynamic> userData) async {
     final prefs = await SharedPreferences.getInstance();
@@ -48,17 +50,17 @@ class _AppDrawerState extends State<AppDrawer> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          backgroundColor: AppTheme.surfaceDark,
+          backgroundColor: AppTheme.surface(context),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text('Confirm Logout', style: TextStyle(color: Colors.white)),
+          title: Text(_l.t('drawer_confirm_logout_title'), style: TextStyle(color: AppTheme.adaptiveText(context))),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Are you sure you want to log out of your account?'),
-              const SizedBox(height: 16),
+              Text(_l.t('drawer_confirm_logout_msg')),
+              SizedBox(height: 16),
               if (!isAlreadySaved)
                 CheckboxListTile(
-                  title: const Text('Save account on this device', style: TextStyle(fontSize: 14, color: Colors.white)),
+                  title: Text(_l.t('drawer_save_account'), style: TextStyle(fontSize: 14, color: AppTheme.adaptiveText(context))),
                   value: _saveAccount,
                   controlAffinity: ListTileControlAffinity.leading,
                   contentPadding: EdgeInsets.zero,
@@ -69,16 +71,16 @@ class _AppDrawerState extends State<AppDrawer> {
                   },
                 ),
               if (isAlreadySaved)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 8.0),
-                  child: Text('Your account is saved on this device.', style: TextStyle(fontSize: 12, color: Colors.grey, fontStyle: FontStyle.italic)),
+                  child: Text(_l.t('drawer_account_saved_msg'), style: TextStyle(fontSize: 12, color: Colors.grey, fontStyle: FontStyle.italic)),
                 )
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext), 
-              child: const Text('Cancel', style: TextStyle(color: AppTheme.textSecondary))
+              child: Text(_l.t('cancel'), style: TextStyle(color: AppTheme.adaptiveTextSecondary(context)))
             ),
             BounceClick(
               onTap: () {}, 
@@ -135,7 +137,7 @@ class _AppDrawerState extends State<AppDrawer> {
                     debugPrint('Logout error: $e');
                   }
                 },
-                child: const Text('Log Out'),
+                child: Text(_l.t('drawer_logout')),
               ),
             ),
           ],
@@ -157,7 +159,7 @@ class _AppDrawerState extends State<AppDrawer> {
       await _authService.saveUserData({'photoURL': base64Image});
       if (mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile picture updated')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_l.t('drawer_photo_updated'))));
       }
     }
   }
@@ -166,7 +168,7 @@ class _AppDrawerState extends State<AppDrawer> {
     await _authService.saveUserData({'photoURL': ''});
     if (mounted) {
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile picture removed')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_l.t('drawer_photo_removed'))));
     }
   }
 
@@ -175,8 +177,8 @@ class _AppDrawerState extends State<AppDrawer> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: AppTheme.surfaceDark,
+        decoration: BoxDecoration(
+          color: AppTheme.surface(context),
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: SafeArea(
@@ -184,16 +186,16 @@ class _AppDrawerState extends State<AppDrawer> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 40, height: 4, margin: const EdgeInsets.symmetric(vertical: 12),
+                width: 40, height: 4, margin: EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(color: Colors.grey[700], borderRadius: BorderRadius.circular(2)),
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(16),
-                child: Text('Profile Photo', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                child: Text(_l.t('drawer_profile_photo'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.adaptiveText(context))),
               ),
               ListTile(
-                leading: const Icon(Icons.image_outlined, color: Colors.white),
-                title: const Text('Upload from Gallery', style: TextStyle(color: Colors.white)),
+                leading: Icon(Icons.image_outlined, color: AppTheme.adaptiveText(context)),
+                title: Text(_l.t('drawer_upload_gallery'), style: TextStyle(color: AppTheme.adaptiveText(context))),
                 onTap: () {
                   Navigator.pop(context);
                   _uploadImage(userData);
@@ -201,14 +203,14 @@ class _AppDrawerState extends State<AppDrawer> {
               ),
               if (photoURL != null && photoURL.isNotEmpty)
                 ListTile(
-                  leading: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                  title: const Text('Remove Photo', style: TextStyle(color: Colors.redAccent)),
+                  leading: Icon(Icons.delete_outline, color: Colors.redAccent),
+                  title: Text(_l.t('drawer_remove_photo'), style: TextStyle(color: Colors.redAccent)),
                   onTap: () {
                     Navigator.pop(context);
                     _removeImage(userData);
                   },
                 ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
             ],
           ),
         ),
@@ -228,8 +230,8 @@ class _AppDrawerState extends State<AppDrawer> {
       backgroundColor: Colors.transparent,
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) => Container(
-          decoration: const BoxDecoration(
-            color: AppTheme.backgroundDark,
+          decoration: BoxDecoration(
+            color: AppTheme.background(context),
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: EdgeInsets.fromLTRB(24, 12, 24, MediaQuery.of(context).viewInsets.bottom + 32),
@@ -239,23 +241,23 @@ class _AppDrawerState extends State<AppDrawer> {
             children: [
               Center(
                 child: Container(
-                  width: 40, height: 4, margin: const EdgeInsets.only(bottom: 24),
+                  width: 40, height: 4, margin: EdgeInsets.only(bottom: 24),
                   decoration: BoxDecoration(color: Colors.grey[800], borderRadius: BorderRadius.circular(2)),
                 ),
               ),
-              const Text('Edit Profile', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
-              const SizedBox(height: 24),
-              _buildEditField(Icons.person_outline, 'Display Name', nameController),
-              const SizedBox(height: 16),
-              _buildEditField(Icons.alternate_email, 'Username', usernameController),
-              const SizedBox(height: 16),
-              _buildEditField(Icons.info_outline, 'Bio', bioController, maxLines: 3),
-              const SizedBox(height: 32),
+              Text(_l.t('drawer_edit_profile'), style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.adaptiveText(context))),
+              SizedBox(height: 24),
+              _buildEditField(Icons.person_outline, _l.t('drawer_display_name'), nameController),
+              SizedBox(height: 16),
+              _buildEditField(Icons.alternate_email, _l.t('drawer_username'), usernameController),
+              SizedBox(height: 16),
+              _buildEditField(Icons.info_outline, _l.t('drawer_bio'), bioController, maxLines: 3),
+              SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
                 height: 52,
                 child: GlassmorphicEffects.gradientButton(
-                  text: 'Save Changes',
+                  text: _l.t('drawer_save_changes'),
                   isLoading: isLoading,
                   onPressed: () async {
                     setModalState(() => isLoading = true);
@@ -267,12 +269,12 @@ class _AppDrawerState extends State<AppDrawer> {
                       });
                       if (context.mounted) {
                         Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile updated!')));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_l.t('drawer_profile_updated'))));
                       }
                     } catch (e) {
                       if (context.mounted) {
                         setModalState(() => isLoading = false);
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update: $e')));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${_l.t('drawer_profile_update_failed')}: $e')));
                       }
                     }
                   },
@@ -289,15 +291,15 @@ class _AppDrawerState extends State<AppDrawer> {
     return TextField(
       controller: controller,
       maxLines: maxLines,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: AppTheme.adaptiveText(context)),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: AppTheme.textSecondary),
+        labelStyle: TextStyle(color: AppTheme.adaptiveTextSecondary(context)),
         prefixIcon: Icon(icon, color: Colors.orange, size: 20),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Colors.orange, width: 2),
+          borderSide: BorderSide(color: Colors.orange, width: 2),
         ),
       ),
     );
@@ -319,16 +321,16 @@ class _AppDrawerState extends State<AppDrawer> {
         return Theme(
           data: AppTheme.darkTheme(),
           child: Drawer(
-            backgroundColor: AppTheme.backgroundDark,
+            backgroundColor: AppTheme.background(context),
             child: ListView(
             padding: EdgeInsets.zero,
             children: [
               DrawerHeader(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: AppTheme.primaryGradient,
                 ),
                 margin: EdgeInsets.zero,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
                     Stack(
@@ -349,19 +351,19 @@ class _AppDrawerState extends State<AppDrawer> {
                           child: GestureDetector(
                             onTap: () => _showImageOptions(userData, photoURL),
                             child: Container(
-                              padding: const EdgeInsets.all(4),
+                              padding: EdgeInsets.all(4),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: AppTheme.adaptiveText(context),
                                 shape: BoxShape.circle,
                                 border: Border.all(color: Colors.orange, width: 1),
                               ),
-                              child: const Icon(Icons.more_horiz, size: 14, color: Colors.orange),
+                              child: Icon(Icons.more_horiz, size: 14, color: Colors.orange),
                             ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -369,7 +371,7 @@ class _AppDrawerState extends State<AppDrawer> {
                         children: [
                           Text(
                             displayName,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                            style: TextStyle(color: AppTheme.adaptiveText(context), fontWeight: FontWeight.bold, fontSize: 18),
                             overflow: TextOverflow.ellipsis,
                           ),
                           if (username.isNotEmpty)
@@ -378,16 +380,16 @@ class _AppDrawerState extends State<AppDrawer> {
                               style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 13),
                               overflow: TextOverflow.ellipsis,
                             ),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           GestureDetector(
                             onTap: () => _showEditProfileModal(userData),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.white.withOpacity(0.6)),
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: const Text("Edit Profile", style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+                              child: Text(_l.t('drawer_edit_profile'), style: TextStyle(color: AppTheme.adaptiveText(context), fontSize: 11, fontWeight: FontWeight.w600)),
                             ),
                           ),
                         ],
@@ -397,24 +399,24 @@ class _AppDrawerState extends State<AppDrawer> {
                 ),
               ),
               ListTile(
-                leading: const Icon(Icons.person_outline),
-                title: const Text("Profile"),
+                leading: Icon(Icons.person_outline),
+                title: Text(_l.t('drawer_profile')),
                 onTap: () {
                   Navigator.pop(context);
-                  Navigator.push(context, SlidePageRoute(page: const ProfileScreen()));
+                  Navigator.push(context, SlidePageRoute(page: ProfileScreen()));
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.bookmark_outline),
-                title: const Text("Saved Posts"),
+                leading: Icon(Icons.bookmark_outline),
+                title: Text(_l.t('drawer_saved_posts')),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(context, MaterialPageRoute(builder: (_) => const SavedPostsScreen()));
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.group_outlined),
-                title: const Text("Kakonek Center"),
+                leading: Icon(Icons.group_outlined),
+                title: Text(_l.t('drawer_kakonek_center')),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(context, MaterialPageRoute(builder: (_) => const KakonekCenterScreen()));
@@ -422,16 +424,16 @@ class _AppDrawerState extends State<AppDrawer> {
               ),
               const Divider(),
               ListTile(
-                leading: const Icon(Icons.settings_outlined),
-                title: const Text("Settings"),
+                leading: Icon(Icons.settings_outlined),
+                title: Text(_l.t('drawer_settings')),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.bug_report_outlined),
-                title: const Text("Report a Problem"),
+                leading: Icon(Icons.bug_report_outlined),
+                title: Text(_l.t('drawer_report_problem')),
                 onTap: () {
                   Navigator.pop(context);
                   Navigator.push(context, MaterialPageRoute(builder: (_) => const ReportProblemScreen()));
@@ -439,8 +441,8 @@ class _AppDrawerState extends State<AppDrawer> {
               ),
               const Divider(),
               ListTile(
-                leading: const Icon(Icons.logout, color: Colors.red),
-                title: const Text("Logout", style: TextStyle(color: Colors.red)),
+                leading: Icon(Icons.logout, color: Colors.red),
+                title: Text(_l.t('drawer_logout'), style: TextStyle(color: Colors.red)),
                 onTap: () => _confirmLogout(userData),
               ),
             ],

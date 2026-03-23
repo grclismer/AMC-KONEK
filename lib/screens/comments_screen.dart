@@ -6,11 +6,14 @@ import '../services/comment_service.dart';
 import '../services/auth_service.dart';
 import '../widgets/user_photo_widget.dart';
 import '../theme/app_theme.dart';
+import '../services/notification_service.dart';
+import '../utils/error_handler.dart';
+import '../utils/app_localizations.dart';
 
 class CommentsScreen extends StatefulWidget {
   final Post post;
 
-  const CommentsScreen({super.key, required this.post});
+  CommentsScreen({super.key, required this.post});
 
   @override
   State<CommentsScreen> createState() => _CommentsScreenState();
@@ -21,6 +24,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
   bool _isPosting = false;
+  AppLocalizations get _l => AppLocalizations.instance;
   
   // Threading state
   Comment? _replyingTo;
@@ -37,7 +41,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
+        duration: Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
     }
@@ -63,7 +67,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
     final currentUser = AuthService().currentUser;
     if (currentUser == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('You must be logged in to comment.')),
+        SnackBar(content: Text('You must be logged in to comment.')),
       );
       return;
     }
@@ -92,6 +96,17 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
       await CommentService.instance.addComment(newComment);
       
+      if (currentUser.uid != widget.post.userId) {
+        NotificationService.send(
+          recipientId: widget.post.userId, 
+          senderId: currentUser.uid, 
+          senderName: username, 
+          type: 'comment', 
+          message: 'commented on your post', 
+          postId: widget.post.id
+        );
+      }
+      
       // Auto-expand the parent if it was a reply
       if (newComment.replyToId != null) {
         setState(() {
@@ -103,12 +118,12 @@ class _CommentsScreenState extends State<CommentsScreen> {
       _cancelReply();
       
       if (_replyingTo == null) {
-        Future.delayed(const Duration(milliseconds: 100), _scrollToBottom);
+        Future.delayed(Duration(milliseconds: 100), _scrollToBottom);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to post comment: $e')),
+          SnackBar(content: Text(AppErrorHandler.commentError(e))),
         );
       }
     } finally {
@@ -123,17 +138,17 @@ class _CommentsScreenState extends State<CommentsScreen> {
     final currentUserId = AuthService().currentUser?.uid;
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: AppTheme.background(context),
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Thread", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            Text("on ${widget.post.username}'s post", style: TextStyle(fontSize: 12, color: AppTheme.textSecondary)),
+            Text("Thread", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text("${_l.t('post_on')} ${widget.post.username}'s post", style: TextStyle(fontSize: 12, color: AppTheme.adaptiveTextSecondary(context))),
           ],
         ),
         elevation: 0,
-        backgroundColor: AppTheme.surfaceDark.withOpacity(0.8),
+        backgroundColor: AppTheme.surface(context).withOpacity(0.8),
         foregroundColor: Colors.white,
       ),
       body: Column(
@@ -141,10 +156,10 @@ class _CommentsScreenState extends State<CommentsScreen> {
           Expanded(
             child: StreamBuilder<List<Comment>>(
               stream: _commentsStream,
-              initialData: const [],
+              initialData: [],
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting && snapshot.data?.isEmpty == true) {
-                  return const Center(
+                  return Center(
                     child: CircularProgressIndicator(color: AppTheme.primaryPurple),
                   );
                 }
@@ -152,13 +167,13 @@ class _CommentsScreenState extends State<CommentsScreen> {
                 final comments = snapshot.data ?? [];
                 
                 if (comments.isEmpty) {
-                  return const Center(child: Text("No comments yet. Start the conversation!", style: TextStyle(color: AppTheme.textSecondary)));
+                  return Center(child: Text(_l.t('comment_no_comments'), style: TextStyle(color: AppTheme.adaptiveTextSecondary(context))));
                 }
 
                 return ListView.builder(
                   controller: _scrollController,
                   itemCount: comments.length,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding: EdgeInsets.symmetric(vertical: 8),
                   itemBuilder: (context, index) {
                     final comment = comments[index];
                     return CommentTile(
@@ -187,21 +202,21 @@ class _CommentsScreenState extends State<CommentsScreen> {
           // Reply Bar (Visible when replying)
           if (_replyingTo != null)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              color: AppTheme.surfaceLighter.withOpacity(0.3),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              color: AppTheme.surfaceColor(context).withOpacity(0.3),
               child: Row(
                 children: [
-                  const Icon(Icons.reply, size: 16, color: AppTheme.textSecondary),
-                  const SizedBox(width: 8),
+                  Icon(Icons.reply, size: 16, color: AppTheme.adaptiveTextSecondary(context)),
+                  SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      "Replying to @${_replyingTo!.username}",
-                      style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13),
+                      "${_l.t('comment_reply_label')} @${_replyingTo!.username}",
+                      style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 13),
                     ),
                   ),
                   GestureDetector(
                     onTap: _cancelReply,
-                    child: const Icon(Icons.close, size: 18, color: AppTheme.textSecondary),
+                    child: Icon(Icons.close, size: 18, color: AppTheme.adaptiveTextSecondary(context)),
                   ),
                 ],
               ),
@@ -210,12 +225,12 @@ class _CommentsScreenState extends State<CommentsScreen> {
           // Comment Input
           Container(
             decoration: BoxDecoration(
-              color: AppTheme.surfaceDark,
-              border: Border(top: BorderSide(color: Colors.white.withOpacity(0.05))),
+              color: AppTheme.surface(context),
+              border: Border(top: BorderSide(color: AppTheme.borderColor(context))),
             ),
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -223,12 +238,12 @@ class _CommentsScreenState extends State<CommentsScreen> {
                       userId: currentUserId ?? '',
                       radius: 18,
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: EdgeInsets.symmetric(horizontal: 16),
                         decoration: BoxDecoration(
-                          color: AppTheme.backgroundDark,
+                          color: AppTheme.background(context),
                           borderRadius: BorderRadius.circular(24),
                         ),
                         child: TextField(
@@ -236,25 +251,25 @@ class _CommentsScreenState extends State<CommentsScreen> {
                           focusNode: _focusNode,
                           maxLines: 5,
                           minLines: 1,
-                          style: const TextStyle(color: Colors.white),
+                          style: TextStyle(color: AppTheme.adaptiveText(context)),
                           decoration: InputDecoration(
-                            hintText: _replyingTo != null ? "Post your reply..." : "Add a comment...",
-                            hintStyle: const TextStyle(color: AppTheme.textSecondary, fontSize: 14),
+                            hintText: _replyingTo != null ? _l.t('comment_reply') : _l.t('comment_add'),
+                            hintStyle: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 14),
                             border: InputBorder.none,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     TextButton(
                       onPressed: _isPosting ? null : _postComment,
                       style: TextButton.styleFrom(
                         foregroundColor: AppTheme.primaryPurple,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: EdgeInsets.symmetric(horizontal: 16),
                       ),
                       child: _isPosting 
-                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                        : const Text("Post", style: TextStyle(fontWeight: FontWeight.bold)),
+                        ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                        : Text(_l.t('comment_post'), style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -276,7 +291,7 @@ class CommentTile extends StatefulWidget {
   final bool isExpanded;
   final ValueChanged<bool> onExpandedChanged;
 
-  const CommentTile({
+  CommentTile({
     super.key,
     required this.comment,
     required this.postId,
@@ -292,6 +307,8 @@ class CommentTile extends StatefulWidget {
 }
 
 class _CommentTileState extends State<CommentTile> {
+  AppLocalizations get _l => AppLocalizations.instance;
+
   late Stream<List<Comment>> _repliesStream;
 
   @override
@@ -324,13 +341,13 @@ class _CommentTileState extends State<CommentTile> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: AppTheme.surfaceDark,
-          title: const Text("Delete Comment?", style: TextStyle(color: Colors.white)),
-          content: const Text("Are you sure you want to delete this comment?", style: TextStyle(color: AppTheme.textSecondary)),
+          backgroundColor: AppTheme.surface(context),
+          title: Text(_l.t('comment_delete'), style: TextStyle(color: AppTheme.adaptiveText(context))),
+          content: Text(_l.t('comment_delete_message'), style: TextStyle(color: AppTheme.adaptiveTextSecondary(context))),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancel"),
+              child: Text(_l.t('cancel')),
             ),
             TextButton(
               onPressed: () {
@@ -339,11 +356,11 @@ class _CommentTileState extends State<CommentTile> {
                   CommentService.instance.deleteComment(widget.postId, widget.comment.id);
                 } catch(e) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Failed to delete comment: $e')),
+                    SnackBar(content: Text(AppErrorHandler.commentError(e))),
                   );
                 }
               },
-              child: const Text("Delete", style: TextStyle(color: Colors.redAccent)),
+              child: Text(_l.t('delete'), style: TextStyle(color: Colors.redAccent)),
             ),
           ],
         );
@@ -382,7 +399,7 @@ class _CommentTileState extends State<CommentTile> {
                 userId: widget.comment.userId,
                 radius: widget.isReply ? 14 : 18,
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -394,34 +411,34 @@ class _CommentTileState extends State<CommentTile> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold, 
                             fontSize: widget.isReply ? 12 : 14, 
-                            color: Colors.white
+                            color: AppTheme.adaptiveText(context)
                           )
                         ),
-                        const SizedBox(width: 6),
+                        SizedBox(width: 6),
                         Text(
                           "· ${_formatTimestamp(widget.comment.timestamp)}", 
-                          style: TextStyle(color: AppTheme.textSecondary, fontSize: 12)
+                          style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 12)
                         ),
                       ],
                     ),
                     if (widget.comment.replyToUsername != null && !widget.isReply)
                       Padding(
-                        padding: const EdgeInsets.only(top: 2),
+                        padding: EdgeInsets.only(top: 2),
                         child: Text(
-                          "Replying to @${widget.comment.replyToUsername}",
-                          style: const TextStyle(color: AppTheme.primaryPurple, fontSize: 12),
+                          "${_l.t('comment_reply_label')} @${widget.comment.replyToUsername}",
+                          style: TextStyle(color: AppTheme.primaryPurple, fontSize: 12),
                         ),
                       ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       widget.comment.text, 
                       style: TextStyle(
                         fontSize: widget.isReply ? 13 : 15, 
-                        color: Colors.white, 
+                        color: AppTheme.adaptiveText(context), 
                         height: 1.4
                       )
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     Row(
                       children: [
                         // Like
@@ -432,29 +449,29 @@ class _CommentTileState extends State<CommentTile> {
                               Icon(
                                 isLiked ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
                                 size: 16,
-                                color: isLiked ? Colors.redAccent : AppTheme.textSecondary,
+                                color: isLiked ? Colors.redAccent : AppTheme.textSecondaryColor(context),
                               ),
                               if (widget.comment.likes > 0) ...[
-                                const SizedBox(width: 4),
+                                SizedBox(width: 4),
                                 Text(
                                   widget.comment.likes.toString(),
-                                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+                                  style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 12),
                                 ),
                               ],
                             ],
                           ),
                         ),
-                        const SizedBox(width: 20),
+                        SizedBox(width: 20),
                         // Reply
                         GestureDetector(
                           onTap: () => widget.onReply(widget.comment),
-                          child: const Icon(Icons.chat_bubble_outline_rounded, size: 16, color: AppTheme.textSecondary),
+                          child: Icon(Icons.chat_bubble_outline_rounded, size: 16, color: AppTheme.adaptiveTextSecondary(context)),
                         ),
                         if (widget.currentUserId == widget.comment.userId) ...[
-                          const SizedBox(width: 20),
+                          SizedBox(width: 20),
                           GestureDetector(
                             onTap: _handleDeleteComment,
-                            child: const Icon(Icons.delete_outline_rounded, size: 16, color: AppTheme.textSecondary),
+                            child: Icon(Icons.delete_outline_rounded, size: 16, color: AppTheme.adaptiveTextSecondary(context)),
                           ),
                         ],
                       ],
@@ -469,7 +486,7 @@ class _CommentTileState extends State<CommentTile> {
         // Replies Toggle
         if (widget.comment.replyCount > 0 && !widget.isReply)
           Padding(
-            padding: const EdgeInsets.only(left: 62, bottom: 8),
+            padding: EdgeInsets.only(left: 62, bottom: 8),
             child: GestureDetector(
               onTap: _toggleReplies,
               child: Row(
@@ -479,10 +496,10 @@ class _CommentTileState extends State<CommentTile> {
                     height: 1,
                     color: AppTheme.primaryPurple.withOpacity(0.5),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Text(
-                    widget.isExpanded ? "Hide replies" : "View ${widget.comment.replyCount} replies",
-                    style: const TextStyle(color: AppTheme.primaryPurple, fontSize: 12, fontWeight: FontWeight.bold),
+                    widget.isExpanded ? _l.t('comment_hide_replies') : "${_l.t('comment_view_replies')} ${widget.comment.replyCount} ${_l.t('comment_replies')}",
+                    style: TextStyle(color: AppTheme.primaryPurple, fontSize: 12, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -492,12 +509,12 @@ class _CommentTileState extends State<CommentTile> {
         if (widget.isExpanded && !widget.isReply)
           StreamBuilder<List<Comment>>(
             stream: _repliesStream,
-            initialData: const [],
+            initialData: [],
             builder: (context, snapshot) {
               final replies = snapshot.data ?? [];
               
               if (replies.isEmpty && snapshot.connectionState == ConnectionState.waiting) {
-                return const Padding(
+                return Padding(
                   padding: EdgeInsets.only(left: 32, top: 8),
                   child: SizedBox(
                     height: 20,
@@ -507,7 +524,7 @@ class _CommentTileState extends State<CommentTile> {
                 );
               }
 
-              if (replies.isEmpty) return const SizedBox.shrink();
+              if (replies.isEmpty) return SizedBox.shrink();
 
               return Column(
                 children: replies.map((reply) => CommentTile(
@@ -525,7 +542,7 @@ class _CommentTileState extends State<CommentTile> {
           ),
           
         if (!widget.isReply)
-          Divider(height: 1, color: Colors.white.withOpacity(0.05)),
+          Divider(height: 1, color: AppTheme.borderColor(context)),
       ],
     );
   }

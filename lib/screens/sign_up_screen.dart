@@ -3,9 +3,11 @@ import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/effects.dart';
 import '../theme/animations.dart';
+import '../utils/error_handler.dart';
+import '../utils/app_localizations.dart';
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+  SignUpScreen({super.key});
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -19,14 +21,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _authService = AuthService();
   bool _isLoading = false;
   bool _obscurePassword = true;
+  AppLocalizations get _l => AppLocalizations.instance;
 
   void _signUp() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty || _nameController.text.isEmpty) {
-      GlassmorphicEffects.showGlassSnackBar(context, message: 'Please fill in all fields', isError: true);
+      GlassmorphicEffects.showGlassSnackBar(context, message: _l.t('login_fill_fields'), isError: true);
       return;
     }
     if (_passwordController.text != _confirmPasswordController.text) {
-      GlassmorphicEffects.showGlassSnackBar(context, message: 'Passwords do not match', isError: true);
+      GlassmorphicEffects.showGlassSnackBar(context, message: _l.t('signup_password_mismatch'), isError: true);
+      return;
+    }
+    if (_passwordController.text.length < 6) {
+      GlassmorphicEffects.showGlassSnackBar(context, 
+        message: _l.t('signup_password_short'), isError: true);
       return;
     }
 
@@ -35,11 +43,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       await _authService.signUpWithEmail(_emailController.text, _passwordController.text, _nameController.text);
       if (mounted) {
         Navigator.pop(context);
-        GlassmorphicEffects.showGlassSnackBar(context, message: 'Account created successfully! Please log in.', icon: Icons.check_circle_outline);
+        GlassmorphicEffects.showGlassSnackBar(context, message: _l.t('signup_success'), icon: Icons.check_circle_outline);
       }
     } catch (e) {
       if (mounted) {
-        GlassmorphicEffects.showGlassSnackBar(context, message: e.toString(), isError: true);
+        GlassmorphicEffects.showGlassSnackBar(context, message: AppErrorHandler.authError(e), isError: true);
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -49,20 +57,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: AppTheme.background(context),
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: BounceClick(
           onTap: () => Navigator.pop(context),
-          child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+          child: Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.adaptiveText(context)),
         ),
       ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
+            padding: EdgeInsets.symmetric(horizontal: 32),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -70,49 +78,49 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   index: 0,
                   child: ShaderMask(
                     shaderCallback: (bounds) => AppTheme.primaryGradient.createShader(bounds),
-                    child: const Icon(Icons.person_add_rounded, size: 80, color: Colors.white),
+                    child: Icon(Icons.person_add_rounded, size: 80, color: Colors.white),
                   ),
                 ),
-                const SizedBox(height: 24),
-                const FadeInStaggered(
+                SizedBox(height: 24),
+                FadeInStaggered(
                   index: 1,
                   child: Text(
-                    'Create Account',
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 1.2),
+                    _l.t('signup_title'),
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppTheme.adaptiveText(context), letterSpacing: 1.2),
                   ),
                 ),
-                const SizedBox(height: 8),
-                const FadeInStaggered(
+                SizedBox(height: 8),
+                FadeInStaggered(
                   index: 2,
                   child: Text(
-                    'Join the KONEK community',
-                    style: TextStyle(color: AppTheme.textSecondary, fontSize: 16),
+                    _l.t('signup_subtitle'),
+                    style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 16),
                   ),
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: 40),
                 
-                _buildField(index: 3, controller: _nameController, hint: 'Full Name', icon: Icons.person_outline),
-                const SizedBox(height: 16),
-                _buildField(index: 4, controller: _emailController, hint: 'Email Address', icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
-                const SizedBox(height: 16),
-                _buildField(index: 5, controller: _passwordController, hint: 'Password', icon: Icons.lock_outline, obscureText: _obscurePassword, isPassword: true),
-                const SizedBox(height: 16),
-                _buildField(index: 6, controller: _confirmPasswordController, hint: 'Confirm Password', icon: Icons.lock_reset_rounded, obscureText: _obscurePassword),
+                _buildField(index: 3, controller: _nameController, hint: _l.t('signup_name_hint'), icon: Icons.person_outline),
+                SizedBox(height: 16),
+                _buildField(index: 4, controller: _emailController, hint: _l.t('signup_email_hint'), icon: Icons.email_outlined, keyboardType: TextInputType.emailAddress),
+                SizedBox(height: 16),
+                _buildField(index: 5, controller: _passwordController, hint: _l.t('login_password_hint'), icon: Icons.lock_outline, obscureText: _obscurePassword, isPassword: true),
+                SizedBox(height: 16),
+                _buildField(index: 6, controller: _confirmPasswordController, hint: _l.t('signup_confirm_password_hint'), icon: Icons.lock_reset_rounded, obscureText: _obscurePassword),
                 
-                const SizedBox(height: 32),
+                SizedBox(height: 32),
                 FadeInStaggered(
                   index: 7,
                   child: BounceClick(
                     onTap: _signUp,
                     child: GlassmorphicEffects.gradientButton(
-                      text: 'Sign Up',
+                      text: _l.t('signup_button'),
                       height: 52,
                       isLoading: _isLoading,
                       onPressed: _signUp,
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
               ],
             ),
           ),
@@ -134,7 +142,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       index: index,
       child: Container(
         decoration: BoxDecoration(
-          color: AppTheme.surfaceDark,
+          color: AppTheme.surface(context),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: Colors.white.withOpacity(0.05)),
         ),
@@ -142,16 +150,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: AppTheme.adaptiveText(context)),
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, color: AppTheme.textSecondary),
+            prefixIcon: Icon(icon, color: AppTheme.adaptiveTextSecondary(context)),
             hintText: hint,
-            hintStyle: const TextStyle(color: AppTheme.textSecondary),
+            hintStyle: TextStyle(color: AppTheme.adaptiveTextSecondary(context)),
             border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             suffixIcon: isPassword 
               ? IconButton(
-                  icon: Icon(_obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: AppTheme.textSecondary),
+                  icon: Icon(_obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: AppTheme.adaptiveTextSecondary(context)),
                   onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                 )
               : null,

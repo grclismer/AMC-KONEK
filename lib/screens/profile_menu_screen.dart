@@ -10,6 +10,8 @@ import 'kakonek_center_screen.dart';
 import 'settings_screen.dart';
 import 'report_problem_screen.dart';
 import '../widgets/user_photo_widget.dart';
+import '../utils/error_handler.dart';
+import '../utils/app_localizations.dart';
 
 class ProfileMenuScreen extends StatefulWidget {
   const ProfileMenuScreen({super.key});
@@ -19,12 +21,14 @@ class ProfileMenuScreen extends StatefulWidget {
 }
 
 class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
+  AppLocalizations get _l => AppLocalizations.instance;
+
   @override
   Widget build(BuildContext context) {
     final authService = AuthService();
     
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: AppTheme.background(context),
       body: SafeArea(
         child: StreamBuilder<DocumentSnapshot>(
           stream: authService.getUserDataStream(),
@@ -48,27 +52,27 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
                   // Header with user info
                   _buildHeader(context, displayName, username, photoURL, authService),
                   
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   
                   // Menu items
                   _buildMenuSection(context),
                   
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   
                   // Switch Account Button (NEW)
                   _buildSwitchAccountButton(context, authService),
                   
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   
                   // Logout button
                   _buildLogoutButton(context, authService, userData),
                   
-                  const SizedBox(height: 40),
+                  SizedBox(height: 40),
                   
                   // App version
                   _buildAppVersion(),
                   
-                  const SizedBox(height: 100), // Space for bottom nav
+                  SizedBox(height: 100), // Space for bottom nav
                 ],
               ),
             );
@@ -87,8 +91,8 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
   ) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
         gradient: AppTheme.primaryGradient,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(24),
@@ -106,25 +110,25 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
             borderWidth: 3,
           ),
           
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           
           // Display Name
           Text(
             displayName,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),
           
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           
           // Username
           if (username.isNotEmpty)
             Text(
               '@$username',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 color: Colors.white70,
               ),
@@ -139,17 +143,17 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
       children: [
         Text(
           count,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: AppTheme.adaptiveText(context),
           ),
         ),
         Text(
           label,
           style: TextStyle(
             fontSize: 12,
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white70,
           ),
         ),
       ],
@@ -158,32 +162,32 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
 
   Widget _buildMenuSection(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceDark,
+        color: AppTheme.surface(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: AppTheme.borderColor(context)),
       ),
       child: Column(
         children: [
           _buildMenuItem(
             icon: Icons.person_outline,
-            title: 'My Profile',
-            onTap: () => Navigator.push(context, SlidePageRoute(page: const ProfileScreen())),
+            title: _l.t('nav_me'),
+            onTap: () => Navigator.push(context, SlidePageRoute(page: ProfileScreen())),
           ),
           _buildMenuItem(
             icon: Icons.group_outlined,
-            title: 'Kakonek Center',
+            title: _l.t('menu_kakonek_center'),
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const KakonekCenterScreen())),
           ),
           _buildMenuItem(
             icon: Icons.settings_outlined,
-            title: 'Settings',
+            title: _l.t('menu_settings'),
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen())),
           ),
           _buildMenuItem(
             icon: Icons.bug_report_outlined,
-            title: 'Report a Problem',
+            title: _l.t('menu_report_problem'),
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ReportProblemScreen())),
           ),
         ],
@@ -198,15 +202,15 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
     Color? color,
   }) {
     return ListTile(
-      leading: Icon(icon, color: color ?? Colors.white70),
+      leading: Icon(icon, color: color ?? AppTheme.adaptiveText(context)),
       title: Text(
         title,
         style: TextStyle(
-          color: color ?? Colors.white,
+          color: color ?? AppTheme.adaptiveText(context),
           fontWeight: FontWeight.w500,
         ),
       ),
-      trailing: const Icon(Icons.chevron_right, color: Colors.white24, size: 20),
+      trailing: Icon(Icons.chevron_right, color: AppTheme.adaptiveSubtle(context), size: 20),
       onTap: onTap,
     );
   }
@@ -216,7 +220,7 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
     AuthService authService
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16),
       child: SizedBox(
         width: double.infinity,
         height: 52,
@@ -231,12 +235,12 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
           ),
-          icon: const Icon(
+          icon: Icon(
             Icons.swap_horiz,
             color: AppTheme.primaryPurple,
           ),
-          label: const Text(
-            'Switch Account',
+          label: Text(
+            _l.t('menu_switch_account'),
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -248,67 +252,47 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
     );
   }
 
-  Future<void> _showSwitchAccountDialog(
+  void _showSwitchAccountDialog(
     BuildContext context,
     AuthService authService,
-  ) async {
-    final prefs = await SharedPreferences.getInstance();
-    final accountsJson = prefs.getString('saved_accounts');
-    
-    if (accountsJson == null || accountsJson.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No saved accounts found'),
-        ),
-      );
-      return;
-    }
-    
-    final List<dynamic> decoded = jsonDecode(accountsJson);
-    final savedAccounts = decoded.cast<Map<String, dynamic>>();
-    final currentEmail = authService.currentUser?.email;
-    
-    // Remove current account from list
-    final otherAccounts = savedAccounts
-      .where((acc) => acc['email'] != currentEmail)
-      .toList();
-    
-    if (otherAccounts.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No other accounts to switch to'),
-        ),
-      );
-      return;
-    }
-    
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surfaceDark,
-        title: const Text(
-          'Switch Account',
-          style: TextStyle(color: Colors.white),
+        backgroundColor: AppTheme.surface(context),
+        title: Text(
+          _l.t('menu_switch_account'),
+          style: TextStyle(color: AppTheme.adaptiveText(context)),
         ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: otherAccounts.length,
-            itemBuilder: (context, index) {
-              final account = otherAccounts[index];
-              return _buildAccountListItem(
-                context, 
-                account, 
-                authService
+        content: FutureBuilder<List<Map<String, dynamic>>>(
+          future: _loadOtherAccounts(authService.currentUser?.email),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return SizedBox(
+                height: 80,
+                child: Center(child: CircularProgressIndicator()),
               );
-            },
-          ),
+            }
+            final otherAccounts = snapshot.data!;
+            if (otherAccounts.isEmpty) {
+              return Text(_l.t('menu_no_other_accounts'),
+                style: TextStyle(color: AppTheme.adaptiveTextSecondary(context)));
+            }
+            return SizedBox(
+              width: double.maxFinite,
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: otherAccounts.length,
+                itemBuilder: (context, index) =>
+                  _buildAccountListItem(context, otherAccounts[index], authService),
+              ),
+            );
+          },
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(_l.t('cancel')),
           ),
         ],
       ),
@@ -321,17 +305,21 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
     AuthService authService,
   ) {
     return ListTile(
-      leading: UserPhotoWidget(
-        userId: account['uid'] ?? '',
+      leading: CircleAvatar(
         radius: 20,
+        backgroundColor: Colors.grey[800],
+        backgroundImage: _getAccountImage(account['photoURL']),
+        child: _getAccountImage(account['photoURL']) == null
+            ? Icon(Icons.person, size: 20, color: Colors.grey)
+            : null,
       ),
       title: Text(
         account['displayName'] ?? 'User',
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(color: AppTheme.adaptiveText(context)),
       ),
       subtitle: Text(
         account['email'] ?? '',
-        style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+        style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 12),
       ),
       onTap: () {
         Navigator.pop(context); // Close dialog
@@ -345,21 +333,34 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
     Map<String, dynamic> account,
     AuthService authService
   ) async {
-    try {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
+    final email = account['email'];
+    final password = account['password'];
+    final provider = account['provider'];
+
+    // Show inline loading snackbar instead of dialog
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            SizedBox(
+              width: 18, height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+            ),
+            SizedBox(width: 12),
+            Text(_l.t('menu_switching_account')),
+          ],
         ),
-      );
-      
-      final email = account['email'];
-      final password = account['password'];
-      final provider = account['provider'];
-      
+        duration: Duration(seconds: 10),
+        backgroundColor: Colors.black87,
+      ),
+    );
+
+
+    try {
       await authService.signOut();
-      
+      // Let auth state settle before signing in
+      await Future.delayed(const Duration(milliseconds: 400));
+
       if (provider == 'google') {
         final credential = await authService.signInWithGoogle();
         if (credential != null) {
@@ -367,33 +368,58 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
           await prefs.setString('temp_provider', 'google');
           await prefs.remove('temp_password');
         }
-      } else if (password != null) {
+      } else if (password != null && password.toString().isNotEmpty) {
         await authService.signInWithEmail(email, password);
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('temp_password', password);
         await prefs.setString('temp_provider', 'email');
       }
-      
-      if (mounted) {
-        Navigator.pop(context); // Close loading dialog
-        // StreamBuilder in main.dart will automatically switch to MainScreen
-        // when it detects the new auth state. No manual push needed.
-      }
+      // main.dart StreamBuilder handles navigation automatically
+      // No Navigator.pop needed — no dialog was pushed
+
     } catch (e) {
-      if (mounted) {
-        Navigator.pop(context); // Close loading
+      // ScaffoldMessenger may be gone after signOut rebuilds tree, so guard it
+      try {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to switch: $e')),
+          SnackBar(
+            content: Text(AppErrorHandler.switchError(e)),
+            backgroundColor: Colors.red,
+          ),
         );
-      }
+      } catch (_) {}
     }
+  }
+
+  Future<List<Map<String, dynamic>>> _loadOtherAccounts(String? currentEmail) async {
+    final prefs = await SharedPreferences.getInstance();
+    final accountsJson = prefs.getString('saved_accounts');
+    if (accountsJson == null || accountsJson.isEmpty) return [];
+    try {
+      final List<dynamic> decoded = jsonDecode(accountsJson);
+      return decoded
+        .cast<Map<String, dynamic>>()
+        .where((acc) => acc['email'] != currentEmail)
+        .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  ImageProvider? _getAccountImage(String? url) {
+    if (url == null || url.isEmpty) return null;
+    if (url.startsWith('data:image')) {
+      try { return MemoryImage(base64Decode(url.split(',').last)); } catch (_) { return null; }
+    }
+    if (url.startsWith('http')) return NetworkImage(url);
+    return null;
   }
 
   Widget _buildLogoutButton(BuildContext context, AuthService authService, Map<String, dynamic> userData) {
     bool saveAccount = true;
     
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16),
       child: SizedBox(
         width: double.infinity,
         height: 52,
@@ -403,15 +429,15 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
               context: context,
               builder: (dialogContext) => StatefulBuilder(
                 builder: (context, setDialogState) => AlertDialog(
-                  backgroundColor: AppTheme.surfaceDark,
-                  title: const Text('Confirm Logout', style: TextStyle(color: Colors.white)),
+                  backgroundColor: AppTheme.surface(context),
+                  title: Text(_l.t('menu_logout_confirm'), style: TextStyle(color: AppTheme.adaptiveText(context))),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text('Are you sure you want to log out?'),
-                      const SizedBox(height: 16),
+                      Text(_l.t('menu_logout_message')),
+                      SizedBox(height: 16),
                       CheckboxListTile(
-                        title: const Text('Save account on this device', style: TextStyle(fontSize: 14)),
+                        title: Text(_l.t('menu_save_account'), style: TextStyle(fontSize: 14)),
                         value: saveAccount,
                         onChanged: (val) {
                           setDialogState(() => saveAccount = val!);
@@ -422,7 +448,7 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(dialogContext),
-                      child: const Text('Cancel'),
+                      child: Text(_l.t('cancel')),
                     ),
                     TextButton(
                       onPressed: () async {
@@ -461,7 +487,7 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
                           debugPrint('Logout error: $e');
                         }
                       },
-                      child: const Text('Logout', style: TextStyle(color: Colors.redAccent)),
+                      child: Text(_l.t('menu_logout'), style: TextStyle(color: Colors.redAccent)),
                     ),
                   ],
                 ),
@@ -477,8 +503,8 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
               side: BorderSide(color: Colors.red.withOpacity(0.2)),
             ),
           ),
-          icon: const Icon(Icons.logout),
-          label: const Text('Logout', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          icon: Icon(Icons.logout),
+          label: Text(_l.t('menu_logout'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         ),
       ),
     );
@@ -489,7 +515,7 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen> {
       'Konek v1.0.0',
       style: TextStyle(
         fontSize: 12,
-        color: AppTheme.textSecondary.withOpacity(0.3),
+        color: AppTheme.adaptiveTextSecondary(context).withOpacity(0.3),
       ),
     );
   }

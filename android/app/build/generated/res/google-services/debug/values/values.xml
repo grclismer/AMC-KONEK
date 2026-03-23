@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gcm_defaultSenderId" translatable="false">79127168151</string>
+    <string name="google_api_key" translatable="false">AIzaSyB9wJ1lhu_P9kDYREnlAxkOCerXRCfZ7As</string>
+    <string name="google_app_id" translatable="false">1:79127168151:android:4ebc1b9da15367bf8295d2</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyB9wJ1lhu_P9kDYREnlAxkOCerXRCfZ7As</string>
+    <string name="google_storage_bucket" translatable="false">koneksocmed.firebasestorage.app</string>
+    <string name="project_id" translatable="false">koneksocmed</string>
+</resources>

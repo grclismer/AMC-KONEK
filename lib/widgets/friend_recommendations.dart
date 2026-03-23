@@ -15,7 +15,7 @@ class FriendRecommendations extends StatelessWidget {
       future: SearchService.instance.getRecommendations(),
       builder: (context, snapshot) {
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const SizedBox.shrink();
+          return SizedBox.shrink();
         }
         
         final recommendations = snapshot.data!;
@@ -24,19 +24,19 @@ class FriendRecommendations extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(
+              padding: EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 8,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Suggested Kakonek',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AppTheme.adaptiveText(context),
                     ),
                   ),
                   TextButton(
@@ -48,7 +48,7 @@ class FriendRecommendations extends StatelessWidget {
                         ),
                       );
                     },
-                    child: const Text('See All', style: TextStyle(color: AppTheme.primaryPurple)),
+                    child: Text('See All', style: TextStyle(color: AppTheme.primaryPurple)),
                   ),
                 ],
               ),
@@ -57,7 +57,7 @@ class FriendRecommendations extends StatelessWidget {
               height: 180, // Increased height to prevent overflow
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: EdgeInsets.symmetric(horizontal: 12),
                 itemCount: recommendations.length,
                 itemBuilder: (context, index) {
                   return _buildUserCard(
@@ -76,10 +76,10 @@ class FriendRecommendations extends StatelessWidget {
   Widget _buildUserCard(BuildContext context, UserModel user) {
     return Container(
       width: 130, // Slightly narrower for better fit
-      margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-      padding: const EdgeInsets.all(10), // Reduced padding
+      margin: EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+      padding: EdgeInsets.all(10), // Reduced padding
       decoration: BoxDecoration(
-        color: AppTheme.surfaceDark,
+        color: AppTheme.surface(context),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
@@ -94,20 +94,20 @@ class FriendRecommendations extends StatelessWidget {
             borderGradient: AppTheme.primaryGradient,
             borderWidth: 2,
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           // Username
           Text(
             user.username,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: AppTheme.adaptiveText(context),
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           // Add button
           SizedBox(
             width: double.infinity,
@@ -145,7 +145,7 @@ class FriendRecommendations extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 'Add',
                 style: TextStyle(
                   fontSize: 11,

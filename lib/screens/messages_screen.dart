@@ -7,6 +7,7 @@ import '../theme/app_theme.dart';
 import 'chat_screen.dart';
 import 'new_message_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:social_media_app/utils/app_localizations.dart';
 
 class MessagesScreen extends StatefulWidget {
   const MessagesScreen({super.key});
@@ -19,6 +20,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   late Stream<List<Chat>> _chatsStream;
   final Map<String, Map<String, dynamic>> _userDataCache = {};
   List<Chat> _cachedChats = []; // Never goes blank during re-queries
+  AppLocalizations get _l => AppLocalizations.instance;
 
   @override
   void initState() {
@@ -50,13 +52,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
     final diff = now.difference(time);
     
     if (diff.inMinutes < 1) {
-      return 'Just now';
+      return _l.t('time_just_now');
     } else if (diff.inHours < 1) {
-      return '${diff.inMinutes}m';
+      return '${diff.inMinutes}${_l.t('time_m_ago').substring(0, 1)}';
     } else if (diff.inDays < 1) {
-      return '${diff.inHours}h';
+      return '${diff.inHours}${_l.t('time_h_ago').substring(0, 1)}';
     } else if (diff.inDays < 7) {
-      return '${diff.inDays}d';
+      return '${diff.inDays}${_l.t('time_d_ago').substring(0, 1)}';
     } else {
       return '${time.day}/${time.month}';
     }
@@ -76,13 +78,13 @@ class _MessagesScreenState extends State<MessagesScreen> {
     final currentUserId = AuthService().currentUser?.uid;
     
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: AppTheme.background(context),
       appBar: AppBar(
-        title: const Text('Messages'),
-        backgroundColor: AppTheme.backgroundDark,
+        title: Text(_l.t('msg_title')),
+        backgroundColor: AppTheme.background(context),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit_square),
+            icon: Icon(Icons.edit_square),
             onPressed: () {
               Navigator.push(
                 context,
@@ -95,7 +97,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ],
       ),
       body: currentUserId == null 
-        ? const Center(child: Text('Please log in'))
+        ? Center(child: Text(_l.t('msg_please_login')))
         : StreamBuilder<List<Chat>>(
             stream: _chatsStream,
             builder: (context, snapshot) {
@@ -107,7 +109,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               // Show spinner only on very first load before any data arrives
               if (_cachedChats.isEmpty) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
+                  return Center(
                     child: CircularProgressIndicator(
                       color: AppTheme.primaryPurple,
                     ),
@@ -123,21 +125,21 @@ class _MessagesScreenState extends State<MessagesScreen> {
                         size: 80,
                         color: Colors.grey[700],
                       ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'No messages yet',
+                      SizedBox(height: 16),
+                      Text(
+                        _l.t('msg_no_messages'),
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white,
+                          color: AppTheme.adaptiveText(context),
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       Text(
-                        'Start chatting with your Kakonek!',
+                        _l.t('msg_start_chatting'),
                         style: TextStyle(
                           fontSize: 14,
-                          color: AppTheme.textSecondary,
+                          color: AppTheme.adaptiveTextSecondary(context),
                         ),
                       ),
                     ],
@@ -171,9 +173,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       if (userSnapshot.connectionState == ConnectionState.waiting) {
                         return Container(
                           height: 80,
-                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
-                            color: AppTheme.surfaceDark.withOpacity(0.3),
+                            color: AppTheme.surface(context).withOpacity(0.3),
                             borderRadius: BorderRadius.circular(12),
                           ),
                         );
@@ -192,7 +194,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                         );
                       }
                       
-                      return const SizedBox.shrink();
+                      return SizedBox.shrink();
                     },
                   );
                 },
@@ -216,14 +218,14 @@ class _MessagesScreenState extends State<MessagesScreen> {
     
     return ListTile(
       key: ValueKey('chat_${chat.id}'),
-      contentPadding: const EdgeInsets.symmetric(
+      contentPadding: EdgeInsets.symmetric(
         horizontal: 16,
         vertical: 8,
       ),
       leading: Stack(
         children: [
           Container(
-            padding: const EdgeInsets.all(2),
+            padding: EdgeInsets.all(2),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: unreadCount > 0 
@@ -235,7 +237,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               backgroundColor: Colors.grey[800],
               backgroundImage: _getProfileImage(photoURL),
               child: _getProfileImage(photoURL) == null
-                ? const Icon(Icons.person, size: 28, color: Colors.grey)
+                ? Icon(Icons.person, size: 28, color: Colors.grey)
                 : null,
             ),
           ),
@@ -250,7 +252,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   color: Colors.green,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: AppTheme.backgroundDark,
+                    color: AppTheme.background(context),
                     width: 2,
                   ),
                 ),
@@ -265,12 +267,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
           fontWeight: unreadCount > 0 
             ? FontWeight.bold 
             : FontWeight.w600,
-          color: Colors.white,
+          color: AppTheme.adaptiveText(context),
         ),
       ),
       subtitle: isTyping
-        ? const Text(
-            'typing...',
+        ? Text(
+            _l.t('msg_typing'),
             style: TextStyle(
               fontSize: 14,
               color: AppTheme.primaryPurple,
@@ -280,12 +282,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
         : Row(
             children: [
               if (isSentByMe)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(right: 4),
                   child: Icon(
                     Icons.check,
                     size: 14,
-                    color: AppTheme.textSecondary,
+                    color: AppTheme.adaptiveTextSecondary(context),
                   ),
                 ),
               Expanded(
@@ -295,7 +297,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     fontSize: 14,
                     color: unreadCount > 0 
                       ? Colors.white 
-                      : AppTheme.textSecondary,
+                      : AppTheme.textSecondaryColor(context),
                     fontWeight: unreadCount > 0 
                       ? FontWeight.w600 
                       : FontWeight.normal,
@@ -316,16 +318,16 @@ class _MessagesScreenState extends State<MessagesScreen> {
               fontSize: 12,
               color: unreadCount > 0 
                 ? AppTheme.primaryPurple 
-                : AppTheme.textSecondary,
+                : AppTheme.textSecondaryColor(context),
               fontWeight: unreadCount > 0 
                 ? FontWeight.bold 
                 : FontWeight.normal,
             ),
           ),
           if (unreadCount > 0) ...[
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             Container(
-              padding: const EdgeInsets.symmetric(
+              padding: EdgeInsets.symmetric(
                 horizontal: 6,
                 vertical: 2,
               ),
@@ -335,10 +337,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
               ),
               child: Text(
                 unreadCount > 99 ? '99+' : '$unreadCount',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: AppTheme.adaptiveText(context),
                 ),
               ),
             ),

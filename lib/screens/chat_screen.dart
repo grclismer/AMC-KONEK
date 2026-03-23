@@ -185,9 +185,9 @@ class _ChatScreenState extends State<ChatScreen> {
     final currentUserId = AuthService().currentUser?.uid;
     
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: AppTheme.background(context),
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceDark,
+        backgroundColor: AppTheme.surface(context),
         elevation: 1,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -197,7 +197,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             CircleAvatar(
               radius: 18,
-              backgroundColor: Colors.grey[800],
+              backgroundColor: AppTheme.surfaceColor(context),
               backgroundImage: _getProfileImage(widget.otherUserPhotoURL),
               child: _getProfileImage(widget.otherUserPhotoURL) == null
                 ? const Icon(Icons.person, size: 18, color: Colors.grey)
@@ -296,7 +296,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               'No messages yet',
                               style: TextStyle(
                                 fontSize: 16,
-                                color: AppTheme.textSecondary,
+                                color: AppTheme.adaptiveTextSecondary(context),
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -362,7 +362,7 @@ class _ChatScreenState extends State<ChatScreen> {
           if (!isSentByMe && showAvatar)
             CircleAvatar(
               radius: 14,
-              backgroundColor: Colors.grey[800],
+              backgroundColor: AppTheme.surfaceColor(context),
               backgroundImage: _getProfileImage(message.senderPhotoURL),
               child: _getProfileImage(message.senderPhotoURL) == null
                 ? const Icon(Icons.person, size: 14, color: Colors.grey)
@@ -384,7 +384,7 @@ class _ChatScreenState extends State<ChatScreen> {
               decoration: BoxDecoration(
                 color: isSentByMe 
                   ? AppTheme.primaryPurple 
-                  : AppTheme.surfaceDark,
+                  : AppTheme.surface(context),
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(16),
                   topRight: const Radius.circular(16),
@@ -395,9 +395,9 @@ class _ChatScreenState extends State<ChatScreen> {
               child: message.type == MessageType.text
                 ? Text(
                     message.content,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
-                      color: Colors.white,
+                      color: isSentByMe ? Colors.white : AppTheme.adaptiveText(context),
                     ),
                   )
                 : ClipRRect(
@@ -433,7 +433,7 @@ class _ChatScreenState extends State<ChatScreen> {
         vertical: 8,
       ),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceDark,
+        color: AppTheme.surface(context),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -459,19 +459,19 @@ class _ChatScreenState extends State<ChatScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: AppTheme.backgroundDark,
+                  color: AppTheme.background(context),
                   borderRadius: BorderRadius.circular(24),
                 ),
                 child: TextField(
                   controller: _messageController,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: AppTheme.adaptiveText(context),
                     fontSize: 15,
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Message...',
                     hintStyle: TextStyle(
-                      color: AppTheme.textSecondary,
+                      color: AppTheme.adaptiveTextSecondary(context),
                     ),
                     border: InputBorder.none,
                   ),

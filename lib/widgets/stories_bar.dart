@@ -12,14 +12,14 @@ import '../widgets/user_photo_widget.dart';
 
 class StoriesBar extends StatefulWidget {
   const StoriesBar({super.key});
-  
+
   @override
   State<StoriesBar> createState() => _StoriesBarState();
 }
 
 class _StoriesBarState extends State<StoriesBar> {
   final ImagePicker _picker = ImagePicker();
-  
+
   ImageProvider? _getProfileImage(String? url) {
     if (url == null || url.isEmpty) return null;
     if (url.startsWith('data:image')) {
@@ -37,34 +37,38 @@ class _StoriesBarState extends State<StoriesBar> {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
-    if (user == null) return const SizedBox.shrink();
-    
+    if (user == null) return SizedBox.shrink();
+
     return StreamBuilder<DocumentSnapshot>(
       stream: FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .snapshots(),
+          .collection('users')
+          .doc(user.uid)
+          .snapshots(),
       builder: (context, userSnapshot) {
-        final userData = userSnapshot.data?.data() as Map<String, dynamic>? ?? {};
+        final userData =
+            userSnapshot.data?.data() as Map<String, dynamic>? ?? {};
         final photoURL = userData['photoURL'];
         final friendIds = List<String>.from(userData['friends'] ?? []);
-        
+
         return StreamBuilder<List<Story>>(
           stream: StoryService.instance.getUserStoriesStream(user.uid),
           builder: (context, storiesSnapshot) {
             final stories = storiesSnapshot.data ?? [];
             final hasStories = stories.isNotEmpty;
-            
+
             return Container(
               height: 120,
-              padding: const EdgeInsets.only(
+              padding: EdgeInsets.only(
                 top: 8,
                 bottom: 16,
                 left: 12,
                 right: 12,
               ),
               child: StreamBuilder<List<FriendStoryGroup>>(
-                stream: StoryService.instance.getFriendsStoriesStream(friendIds, user.uid),
+                stream: StoryService.instance.getFriendsStoriesStream(
+                  friendIds,
+                  user.uid,
+                ),
                 builder: (context, friendsSnapshot) {
                   final friendGroups = friendsSnapshot.data ?? [];
                   return ListView(
@@ -82,11 +86,16 @@ class _StoriesBarState extends State<StoriesBar> {
       },
     );
   }
-  
-  Widget _buildYourStory(User user, bool hasStories, List<Story> stories, String? photoURL) {
+
+  Widget _buildYourStory(
+    User user,
+    bool hasStories,
+    List<Story> stories,
+    String? photoURL,
+  ) {
     return Container(
       width: 80,
-      margin: const EdgeInsets.only(right: 8),
+      margin: EdgeInsets.only(right: 8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -102,23 +111,25 @@ class _StoriesBarState extends State<StoriesBar> {
                   }
                 },
                 child: Container(
-                  padding: const EdgeInsets.all(2.5),
+                  padding: EdgeInsets.all(2.5),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: hasStories ? AppTheme.primaryGradient : null,
-                    border: !hasStories ? Border.all(color: Colors.grey[700]!, width: 2) : null,
+                    border: !hasStories
+                        ? Border.all(color: Colors.grey[700]!, width: 2)
+                        : null,
                   ),
                   child: CircleAvatar(
                     radius: 30,
                     backgroundColor: Colors.grey[800],
                     backgroundImage: _getProfileImage(photoURL),
                     child: _getProfileImage(photoURL) == null
-                      ? const Icon(Icons.person, size: 30, color: Colors.grey)
-                      : null,
+                        ? Icon(Icons.person, size: 30, color: Colors.grey)
+                        : null,
                   ),
                 ),
               ),
-              
+
               // "+" button - ALWAYS SHOW
               Positioned(
                 bottom: 0,
@@ -126,31 +137,24 @@ class _StoriesBarState extends State<StoriesBar> {
                 child: GestureDetector(
                   onTap: _showAddStoryOptions,
                   child: Container(
-                    padding: const EdgeInsets.all(3),
+                    padding: EdgeInsets.all(3),
                     decoration: BoxDecoration(
                       color: AppTheme.primaryPurple,
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: AppTheme.surfaceDark,
-                        width: 2,
-                      ),
+                      border: Border.all(color: AppTheme.surface(context), width: 2),
                     ),
-                    child: const Icon(
-                      Icons.add,
-                      size: 14,
-                      color: Colors.white,
-                    ),
+                    child: Icon(Icons.add, size: 14, color: AppTheme.adaptiveText(context)),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
           Text(
             hasStories ? '${stories.length} Stories' : 'Your Story',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
-              color: Colors.white,
+              color: AppTheme.adaptiveText(context),
               fontWeight: FontWeight.w500,
             ),
             maxLines: 1,
@@ -160,15 +164,12 @@ class _StoriesBarState extends State<StoriesBar> {
       ),
     );
   }
-  
+
   void _viewStories(List<Story> stories) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => StoryViewerScreen(
-          stories: stories,
-          initialIndex: 0,
-        ),
+        builder: (_) => StoryViewerScreen(stories: stories, initialIndex: 0),
       ),
     );
   }
@@ -178,20 +179,18 @@ class _StoriesBarState extends State<StoriesBar> {
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => StoryViewerScreen(
-            stories: group.stories,
-            initialIndex: 0,
-          ),
+          builder: (_) =>
+              StoryViewerScreen(stories: group.stories, initialIndex: 0),
         ),
       ),
       child: Container(
         width: 80,
-        margin: const EdgeInsets.only(right: 8),
+        margin: EdgeInsets.only(right: 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.all(2.5),
+              padding: EdgeInsets.all(2.5),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: group.hasUnviewed ? AppTheme.primaryGradient : null,
@@ -201,12 +200,12 @@ class _StoriesBarState extends State<StoriesBar> {
               ),
               child: UserPhotoWidget(userId: group.userId, radius: 30),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             Text(
               group.username,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
-                color: Colors.white,
+                color: AppTheme.adaptiveText(context),
                 fontWeight: FontWeight.w500,
               ),
               maxLines: 1,
@@ -218,21 +217,19 @@ class _StoriesBarState extends State<StoriesBar> {
       ),
     );
   }
-  
+
   void _showAddStoryOptions() {
     _showUploadDialog();
   }
-  
+
   void _showUploadDialog() {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: AppTheme.surfaceDark,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(20),
-          ),
+        decoration: BoxDecoration(
+          color: AppTheme.surface(context),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: SafeArea(
           child: Column(
@@ -241,38 +238,35 @@ class _StoriesBarState extends State<StoriesBar> {
               Container(
                 width: 40,
                 height: 4,
-                margin: const EdgeInsets.symmetric(vertical: 12),
+                margin: EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: Colors.grey[700],
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.all(16),
                 child: Text(
                   'Add to Story',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: AppTheme.adaptiveText(context),
                   ),
                 ),
               ),
               ListTile(
                 leading: Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: Colors.blue.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
-                    Icons.image,
-                    color: Colors.blue,
-                  ),
+                  child: Icon(Icons.image, color: Colors.blue),
                 ),
-                title: const Text(
+                title: Text(
                   'Upload Photo',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: AppTheme.adaptiveText(context)),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -281,33 +275,30 @@ class _StoriesBarState extends State<StoriesBar> {
               ),
               ListTile(
                 leading: Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: Colors.red.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
-                    Icons.videocam,
-                    color: Colors.red,
-                  ),
+                  child: Icon(Icons.videocam, color: Colors.red),
                 ),
-                title: const Text(
+                title: Text(
                   'Upload Video (max 15s)',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: AppTheme.adaptiveText(context)),
                 ),
                 onTap: () {
                   Navigator.pop(context);
                   _uploadStoryVideo();
                 },
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
             ],
           ),
         ),
       ),
     );
   }
-  
+
   Future<void> _uploadStoryImage() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
@@ -319,19 +310,18 @@ class _StoriesBarState extends State<StoriesBar> {
         maxWidth: 1080,
         maxHeight: 1920,
       );
-      
+
       if (image == null) return;
-      
+
       if (mounted) {
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (context) => const Center(
-            child: CircularProgressIndicator(),
-          ),
+          builder: (context) =>
+              Center(child: CircularProgressIndicator()),
         );
       }
-      
+
       final imageUrl = await StorageService.instance.uploadImage(
         image.path,
         folder: 'stories',
@@ -341,21 +331,17 @@ class _StoriesBarState extends State<StoriesBar> {
           .collection('users')
           .doc(user.uid)
           .get();
-      
+
       final userData = userDoc.data() ?? {};
-      
+
       await StoryService.instance.createStory(
         userId: user.uid,
-        username: userData['username'] ?? 
-                  user.displayName ?? 
-                  'User',
-        avatarUrl: userData['photoURL'] ?? 
-                   user.photoURL ?? 
-                   '',
+        username: userData['username'] ?? user.displayName ?? 'User',
+        avatarUrl: userData['photoURL'] ?? user.photoURL ?? '',
         mediaUrl: imageUrl,
         mediaType: 'image',
       );
-      
+
       if (mounted) {
         final messenger = ScaffoldMessenger.of(context);
         Navigator.pop(context); // Close loading
@@ -378,16 +364,16 @@ class _StoriesBarState extends State<StoriesBar> {
       }
     }
   }
-  
+
   Future<void> _uploadStoryVideo() async {
     try {
       final XFile? video = await _picker.pickVideo(
         source: ImageSource.gallery,
         maxDuration: const Duration(seconds: 15),
       );
-      
+
       if (video == null) return;
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -399,10 +385,7 @@ class _StoriesBarState extends State<StoriesBar> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
         );
       }
     }

@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../theme/app_theme.dart';
 import '../models/post_model.dart';
+import '../utils/app_localizations.dart';
 
 class SavedPostsScreen extends StatefulWidget {
   const SavedPostsScreen({super.key});
@@ -34,9 +35,9 @@ class _SavedPostsScreenState extends State<SavedPostsScreen>
       appBar: AppBar(
         backgroundColor: AppTheme.backgroundDark,
         elevation: 0,
-        title: const Text(
-          'Saved',
-          style: TextStyle(
+        title: Text(
+          AppLocalizations.instance.t('saved_title'),
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
@@ -46,11 +47,11 @@ class _SavedPostsScreenState extends State<SavedPostsScreen>
           indicatorColor: AppTheme.primaryPurple,
           labelColor: Colors.white,
           unselectedLabelColor: AppTheme.textSecondary,
-          tabs: const [
-            Tab(text: 'Posts'),
-            Tab(text: 'Reels'),
-            Tab(text: 'Reposts'),
-            Tab(text: 'Tagged'),
+          tabs: [
+            Tab(text: AppLocalizations.instance.t('saved_tab_posts')),
+            Tab(text: AppLocalizations.instance.t('saved_tab_reels')),
+            Tab(text: AppLocalizations.instance.t('saved_tab_reposts')),
+            Tab(text: AppLocalizations.instance.t('saved_tab_tagged')),
           ],
         ),
       ),
@@ -92,10 +93,10 @@ class _SavedPostsTab extends StatelessWidget {
         final savedDocs = snapshot.data!.docs;
         
         if (savedDocs.isEmpty) {
-          return const Center(
+          return Center(
             child: Text(
-              'No saved posts',
-              style: TextStyle(color: AppTheme.textSecondary),
+              AppLocalizations.instance.t('saved_no_posts'),
+              style: const TextStyle(color: AppTheme.textSecondary),
             ),
           );
         }
@@ -175,10 +176,10 @@ class _SavedReelsTab extends StatelessWidget {
         final savedDocs = snapshot.data!.docs;
         
         if (savedDocs.isEmpty) {
-          return const Center(
+          return Center(
             child: Text(
-              'No saved reels',
-              style: TextStyle(color: AppTheme.textSecondary),
+              AppLocalizations.instance.t('saved_no_reels'),
+              style: const TextStyle(color: AppTheme.textSecondary),
             ),
           );
         }
@@ -232,10 +233,10 @@ class _SavedReelsTab extends StatelessWidget {
 class _SavedRepostsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Text(
-        'Saved reposts',
-        style: TextStyle(color: AppTheme.textSecondary),
+        AppLocalizations.instance.t('saved_no_reposts'),
+        style: const TextStyle(color: AppTheme.textSecondary),
       ),
     );
   }
@@ -245,10 +246,10 @@ class _SavedRepostsTab extends StatelessWidget {
 class _SavedTaggedTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Text(
-        'Posts where you\'re tagged',
-        style: TextStyle(color: AppTheme.textSecondary),
+        AppLocalizations.instance.t('saved_tagged'),
+        style: const TextStyle(color: AppTheme.textSecondary),
       ),
     );
   }

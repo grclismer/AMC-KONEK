@@ -1,5 +1,8 @@
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
 import '../widgets/stories_bar.dart';
 import '../widgets/post_widget.dart';
 import 'notifications_screen.dart';
@@ -14,17 +17,59 @@ import '../widgets/user_photo_widget.dart';
 import '../widgets/friend_recommendations.dart';
 import '../widgets/animated_search_bar.dart';
 import '../widgets/search_results_view.dart';
+import '../utils/app_localizations.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  int _unreadCount = 2;
+  int _unreadCount = 0;
+  bool _notificationsEnabled = true;
+  StreamSubscription? _notifSub;
+  int _refreshKey = 0;
   final AuthService _authService = AuthService();
+  AppLocalizations get _l => AppLocalizations.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotifPreference();
+    _startNotifListener();
+  }
+
+  Future<void> _loadNotifPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) setState(() => _notificationsEnabled = prefs.getBool('pref_notifications') ?? true);
+  }
+
+  void _startNotifListener() {
+    final uid = _authService.currentUser?.uid;
+    if (uid == null) return;
+    _notifSub = FirebaseFirestore.instance
+      .collection('notifications')
+      .where('recipientId', isEqualTo: uid)
+      .where('isRead', isEqualTo: false)
+      .snapshots()
+      .listen((snap) {
+        if (mounted) setState(() => _unreadCount = snap.docs.length);
+      });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadNotifPreference();
+  }
+
+  @override
+  void dispose() {
+    _notifSub?.cancel();
+    super.dispose();
+  }
 
   bool _isDiscoverMode = false;
   bool _showingSearchResults = false;
@@ -35,16 +80,16 @@ class _HomePageState extends State<HomePage> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const CreatePostModal(),
+      builder: (context) => CreatePostModal(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: AppTheme.background(context),
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(65),
+        preferredSize: Size.fromHeight(65),
         child: ClipRRect(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
@@ -55,10 +100,10 @@ class _HomePageState extends State<HomePage> {
                 right: 16,
               ),
               decoration: BoxDecoration(
-                color: AppTheme.surfaceDark.withOpacity(0.8),
+                color: AppTheme.surface(context).withOpacity(0.8),
                 border: Border(
                   bottom: BorderSide(
-                    color: Colors.white.withOpacity(0.1),
+                    color: AppTheme.adaptiveSubtle(context),
                     width: 0.5,
                   ),
                 ),
@@ -74,19 +119,14 @@ class _HomePageState extends State<HomePage> {
                       ShaderMask(
                         shaderCallback: (bounds) =>
                             AppTheme.primaryGradient.createShader(bounds),
-                        child: const Text(
-                          "KONEK",
-                          style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.5,
-                            color: Colors.white,
-                          ),
+                        child: Text(
+                          "KONEK", 
+                          style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 1.5),
                         ),
                       ),
                     
                     if (_showingSearchResults)
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
 
                     // Icons and Search
                     Expanded(
@@ -94,7 +134,7 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           AnimatedSearchBar(
-                            hintText: 'Search people...',
+                            hintText: _l.t('feed_search_people'),
                             onSearch: (query) {
                               setState(() => _searchQuery = query);
                             },
@@ -109,7 +149,7 @@ class _HomePageState extends State<HomePage> {
                             },
                           ),
                           if (!_showingSearchResults) ...[
-                            const SizedBox(width: 12),
+                            SizedBox(width: 12),
                             Stack(
                               clipBehavior: Clip.none,
                               children: [
@@ -117,10 +157,10 @@ class _HomePageState extends State<HomePage> {
                                   icon: Icons.notifications_none_rounded,
                                   onTap: () => Navigator.push(
                                     context,
-                                    SlidePageRoute(page: const NotificationsScreen()),
+                                    SlidePageRoute(page: NotificationsScreen()),
                                   ),
                                 ),
-                                if (_unreadCount > 0)
+                                if (_unreadCount > 0 && _notificationsEnabled)
                                   Positioned(
                                     right: -4,
                                     top: -4,
@@ -141,8 +181,8 @@ class _HomePageState extends State<HomePage> {
                                       child: Center(
                                         child: Text(
                                           '$_unreadCount',
-                                          style: const TextStyle(
-                                            color: Colors.white,
+                                          style: TextStyle(
+                                            color: AppTheme.adaptiveText(context),
                                             fontSize: 10,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -176,72 +216,73 @@ class _HomePageState extends State<HomePage> {
   Widget _buildFeedView() {
     return Center(
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 600),
+        constraints: BoxConstraints(maxWidth: 600),
         child: RefreshIndicator(
-          backgroundColor: AppTheme.surfaceDark,
+          backgroundColor: AppTheme.surface(context),
           color: AppTheme.primaryPurple,
           onRefresh: () async {
-            setState(() {});
+            setState(() => _refreshKey++);
           },
           child: ListView(
             children: [
-              const SizedBox(height: 8),
-              const StoriesBar(),
-              const SizedBox(height: 12),
-              const FriendRecommendations(),
-              const SizedBox(height: 12),
+              SizedBox(height: 8),
+              StoriesBar(),
+              SizedBox(height: 12),
+              FriendRecommendations(),
+              SizedBox(height: 12),
 
               // Feed Type Toggle
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
-                    _buildFeedToggle('Friends', !_isDiscoverMode),
-                    const SizedBox(width: 12),
-                    _buildFeedToggle('Discover', _isDiscoverMode),
+                    _buildFeedToggle(_l.t('feed_friends'), !_isDiscoverMode),
+                    SizedBox(width: 12),
+                    _buildFeedToggle(_l.t('feed_discover'), _isDiscoverMode),
                   ],
                 ),
               ),
 
               // Create Post Bar
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
                     UserPhotoWidget(
                       userId: _authService.currentUser?.uid ?? '',
                       radius: 20,
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       child: GestureDetector(
                         onTap: _showCreatePostModal,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                           decoration: BoxDecoration(
-                            color: AppTheme.surfaceLighter.withOpacity(0.3),
+                            color: AppTheme.surfaceColor(context).withOpacity(0.3),
                             borderRadius: BorderRadius.circular(24),
-                            border: Border.all(color: Colors.white.withOpacity(0.1)),
+                            border: Border.all(color: AppTheme.borderColor(context)),
                           ),
                           child: Text(
-                            "What's on your mind?",
-                            style: TextStyle(color: AppTheme.textSecondary.withOpacity(0.6)),
+                            _l.t('feed_whats_on_mind'),
+                            style: TextStyle(color: AppTheme.adaptiveTextSecondary(context).withOpacity(0.6)),
                           ),
                         ),
                       ),
                     ),
                     IconButton(
                       onPressed: _showCreatePostModal,
-                      icon: const Icon(Icons.image_outlined, color: Colors.green),
+                      icon: Icon(Icons.image_outlined, color: Colors.green),
                     ),
                   ],
                 ),
               ),
 
-              const Divider(color: Colors.white10),
+              Divider(color: AppTheme.adaptiveSubtle(context)),
 
               // Posts Stream
               StreamBuilder<List<Post>>(
+                key: ValueKey(_refreshKey),
                 stream: _isDiscoverMode 
                     ? PostService.instance.getDiscoverPostsStream()
                     : PostService.instance.getPostsStream(),
@@ -249,29 +290,52 @@ class _HomePageState extends State<HomePage> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return ListView.builder(
                       shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
+                      physics: NeverScrollableScrollPhysics(),
                       itemCount: 3,
                       itemBuilder: (context, index) => _buildPostPlaceholder(),
                     );
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+                    return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.red)));
                   }
 
                   final posts = snapshot.data ?? [];
                   if (posts.isEmpty) {
-                    return const Center(
+                    if (!_isDiscoverMode) {
+                      return Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(40.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.people_outline, size: 60, color: AppTheme.adaptiveSubtle(context)),
+                              SizedBox(height: 16),
+                              Text(_l.t('feed_no_posts'),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 15)),
+                              SizedBox(height: 20),
+                              ElevatedButton(
+                                onPressed: () => setState(() => _isDiscoverMode = true),
+                                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryPurple, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+                                child: Text(_l.t('feed_explore_discover')),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+                    return Center(
                       child: Padding(
                         padding: EdgeInsets.all(40.0),
-                        child: Text("No posts found", style: TextStyle(color: AppTheme.textSecondary)),
+                        child: Text(_l.t('feed_no_discover_posts'), style: TextStyle(color: AppTheme.adaptiveTextSecondary(context))),
                       ),
                     );
                   }
 
                   return ListView.builder(
                     shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
+                    physics: NeverScrollableScrollPhysics(),
                     itemCount: posts.length,
                     itemBuilder: (context, index) {
                       try {
@@ -282,14 +346,14 @@ class _HomePageState extends State<HomePage> {
                       } catch (e, stackTrace) {
                         developer.log('Error rendering post at index $index', error: e, stackTrace: stackTrace);
                         return Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          padding: const EdgeInsets.all(16),
+                          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: Colors.red.withOpacity(0.05),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: Colors.red.withOpacity(0.2)),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Something went wrong displaying this post',
                             style: TextStyle(color: Colors.redAccent, fontSize: 13),
                           ),
@@ -299,7 +363,7 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
-              const SizedBox(height: 100),
+              SizedBox(height: 100),
             ],
           ),
         ),
@@ -309,26 +373,26 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildFeedToggle(String label, bool isActive) {
     return GestureDetector(
-      onTap: () => setState(() => _isDiscoverMode = label == 'Discover'),
+      onTap: () => setState(() => _isDiscoverMode = label == _l.t('feed_discover')),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        duration: Duration(milliseconds: 300),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           gradient: isActive ? AppTheme.primaryGradient : null,
-          color: isActive ? null : AppTheme.surfaceLighter.withOpacity(0.5),
+          color: isActive ? null : AppTheme.surfaceColor(context).withOpacity(0.5),
           borderRadius: BorderRadius.circular(20),
           boxShadow: isActive ? [
             BoxShadow(
               color: AppTheme.primaryPurple.withOpacity(0.3),
               blurRadius: 8,
-              offset: const Offset(0, 2),
+              offset: Offset(0, 2),
             )
           ] : [],
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isActive ? Colors.white : AppTheme.textSecondary,
+            color: isActive ? Colors.white : AppTheme.textSecondaryColor(context),
             fontWeight: FontWeight.bold,
             fontSize: 14,
           ),
@@ -339,17 +403,17 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildPostPlaceholder() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const ShimmerBox(width: 40, height: 40, borderRadius: 20),
-              const SizedBox(width: 12),
+              ShimmerBox(width: 40, height: 40, borderRadius: 20),
+              SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   ShimmerBox(width: 100, height: 12),
                   SizedBox(height: 6),
                   ShimmerBox(width: 60, height: 10),
@@ -357,8 +421,8 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          const ShimmerBox(width: double.infinity, height: 200, borderRadius: 12),
+          SizedBox(height: 16),
+          ShimmerBox(width: double.infinity, height: 200, borderRadius: 12),
         ],
       ),
     );
@@ -369,7 +433,7 @@ class _AnimatedIconBtn extends StatefulWidget {
   final IconData icon;
   final VoidCallback onTap;
 
-  const _AnimatedIconBtn({required this.icon, required this.onTap});
+  _AnimatedIconBtn({required this.icon, required this.onTap});
 
   @override
   State<_AnimatedIconBtn> createState() => _AnimatedIconBtnState();
@@ -385,7 +449,7 @@ class _AnimatedIconBtnState extends State<_AnimatedIconBtn>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 100),
+      duration: Duration(milliseconds: 100),
     );
     _scaleAnimation = Tween<double>(begin: 1.0, end: 0.85).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
@@ -411,15 +475,15 @@ class _AnimatedIconBtnState extends State<_AnimatedIconBtn>
         animation: _scaleAnimation,
         builder: (context, child) => Transform.scale(scale: _scaleAnimation.value, child: child),
         child: Container(
-          padding: const EdgeInsets.all(8),
+          padding: EdgeInsets.all(8),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.white.withOpacity(0.05),
+            color: AppTheme.adaptiveSubtle(context),
           ),
           child: Icon(
             widget.icon,
             size: 24,
-            color: Colors.white.withOpacity(0.9),
+            color: AppTheme.adaptiveText(context).withOpacity(0.9),
           ),
         ),
       ),

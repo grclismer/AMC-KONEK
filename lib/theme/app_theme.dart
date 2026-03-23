@@ -12,6 +12,20 @@ class AppTheme {
   static const Color surfaceDark = Color(0xFF1E293B);
   static const Color surfaceLighter = Color(0xFF334155);
 
+  // Context-aware color helpers
+  static bool isDark(BuildContext context) => Theme.of(context).brightness == Brightness.dark;
+  static Color background(BuildContext context) => isDark(context) ? backgroundDark : const Color(0xFFF8F9FA);
+  static Color surface(BuildContext context) => isDark(context) ? surfaceDark : Colors.white;
+  static Color surfaceColor(BuildContext context) => isDark(context) ? surfaceLighter : const Color(0xFFF1F3F4);
+  static Color textPrimaryColor(BuildContext context) => isDark(context) ? Colors.white : const Color(0xFF1A1A2E);
+  static Color textSecondaryColor(BuildContext context) => isDark(context) ? const Color(0xFF94A3B8) : const Color(0xFF6B7280);
+  static Color borderColor(BuildContext context) => isDark(context) ? Colors.white12 : const Color(0xFFE5E7EB);
+  static Color navBarColor(BuildContext context) => isDark(context) ? surfaceDark : Colors.white;
+
+  static Color adaptiveText(BuildContext context) => isDark(context) ? Colors.white : const Color(0xFF1A1A2E);
+  static Color adaptiveTextSecondary(BuildContext context) => isDark(context) ? const Color(0xFF94A3B8) : const Color(0xFF6B7280);
+  static Color adaptiveSubtle(BuildContext context) => isDark(context) ? Colors.white24 : Colors.black12;
+
   // Text Colors
   static const Color textPrimary = Color(0xFFFFFFFF);
   static const Color textSecondary = Color(0xFF94A3B8);
@@ -46,6 +60,70 @@ class AppTheme {
         ..shader = primaryGradient.createShader(
           const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0),
         ),
+    );
+  }
+
+  static const Color backgroundLight = Color(0xFFF8F9FA);
+  static const Color surfaceLightColor = Color(0xFFFFFFFF);
+  static const Color surfaceLightSecondary = Color(0xFFF1F3F4);
+  static const Color textLight = Color(0xFF1A1A2E);
+  static const Color textLightSecondary = Color(0xFF6B7280);
+
+  static ThemeData lightTheme() {
+    final baseTextTheme = GoogleFonts.interTextTheme(ThemeData.light().textTheme);
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: backgroundLight,
+      colorScheme: ColorScheme.light(
+        primary: primaryPurple,
+        secondary: primaryPink,
+        surface: surfaceLightColor,
+        onPrimary: Colors.white,
+        onSurface: textLight,
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        surfaceTintColor: Colors.transparent,
+        iconTheme: IconThemeData(color: textLight),
+        titleTextStyle: TextStyle(color: textLight, fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+      cardTheme: CardThemeData(
+        color: surfaceLightSecondary,
+        elevation: 2,
+        shadowColor: Color(0x14000000),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryPurple,
+          foregroundColor: Colors.white,
+          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16))),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: surfaceLightSecondary,
+        hintStyle: TextStyle(color: textLightSecondary),
+        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(16)), borderSide: BorderSide.none),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(16)), borderSide: BorderSide(color: primaryPurple, width: 2)),
+        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: Colors.white,
+        selectedItemColor: primaryPurple,
+        unselectedItemColor: textLightSecondary,
+        elevation: 8,
+      ),
+      dividerTheme: const DividerThemeData(color: Color(0xFFE5E7EB)),
+      textTheme: baseTextTheme.copyWith(
+        bodyLarge: baseTextTheme.bodyLarge?.copyWith(color: textLight),
+        bodyMedium: baseTextTheme.bodyMedium?.copyWith(color: textLightSecondary),
+        titleLarge: baseTextTheme.titleLarge?.copyWith(color: textLight, fontWeight: FontWeight.w600),
+      ),
     );
   }
 

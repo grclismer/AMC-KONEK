@@ -67,18 +67,18 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                       _searchQuery = value.toLowerCase();
                     });
                   },
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: AppTheme.adaptiveText(context)),
                   decoration: InputDecoration(
                     hintText: 'Search friends...',
-                    hintStyle: const TextStyle(
-                      color: AppTheme.textSecondary,
+                    hintStyle: TextStyle(
+                      color: AppTheme.adaptiveTextSecondary(context),
                     ),
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.search,
-                      color: AppTheme.textSecondary,
+                      color: AppTheme.adaptiveTextSecondary(context),
                     ),
                     filled: true,
-                    fillColor: AppTheme.surfaceDark,
+                    fillColor: AppTheme.surfaceColor(context),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -101,11 +101,11 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                     }
                     
                     if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(
+                      return Center(
                         child: Text(
                           'No friends yet',
                           style: TextStyle(
-                            color: AppTheme.textSecondary,
+                            color: AppTheme.adaptiveTextSecondary(context),
                           ),
                         ),
                       );
@@ -161,8 +161,8 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                           ),
                           subtitle: Text(
                             '@${friend.username}',
-                            style: const TextStyle(
-                              color: AppTheme.textSecondary,
+                            style: TextStyle(
+                              color: AppTheme.adaptiveTextSecondary(context),
                               fontSize: 13,
                             ),
                           ),

@@ -11,6 +11,8 @@ import '../theme/app_theme.dart';
 import '../theme/effects.dart';
 import 'dart:developer' as developer;
 import '../widgets/user_photo_widget.dart';
+import '../utils/error_handler.dart';
+import 'package:social_media_app/utils/app_localizations.dart';
 
 // ─── Post Type Selector ───────────────────────────────────────────────────────
 
@@ -32,14 +34,15 @@ class _CreatePostModalState extends State<CreatePostModal> {
   final ImagePicker _picker = ImagePicker();
 
   bool _isPosting = false;
-  bool _isPublic = false; // Default: Friends Only (Kakonek)
-  bool _reelIsPublic = true;
+  String _privacy = 'public';
+  String _reelPrivacy = 'public';
 
   _CreateType _createType = _CreateType.text;
   XFile? _selectedImageFile;
   XFile? _selectedVideoFile;
   String? _selectedVideoName;
   String? _selectedMood;
+  AppLocalizations get _l => AppLocalizations.instance;
 
   @override
   void initState() {
@@ -55,7 +58,70 @@ class _CreatePostModalState extends State<CreatePostModal> {
     super.dispose();
   }
 
-  void _togglePrivacy() => setState(() => _isPublic = !_isPublic);
+  String _currentPrivacy() => _createType == _CreateType.video ? _reelPrivacy : _privacy;
+
+  IconData _privacyIcon() {
+    switch (_currentPrivacy()) {
+      case 'public': return Icons.public;
+      case 'friends': return Icons.group_outlined;
+      case 'private': return Icons.lock_outline;
+      default: return Icons.public;
+    }
+  }
+
+  String _privacyLabel() {
+    switch (_currentPrivacy()) {
+      case 'public': return _l.t('post_public');
+      case 'friends': return _l.t('post_kakonek');
+      case 'private': return _l.t('post_private');
+      default: return _l.t('post_public');
+    }
+  }
+
+  void _showPrivacyPicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        decoration: BoxDecoration(
+          color: AppTheme.surface(context),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Container(width: 40, height: 4, margin: EdgeInsets.symmetric(vertical: 12), decoration: BoxDecoration(color: AppTheme.adaptiveSubtle(context), borderRadius: BorderRadius.circular(2))),
+          Padding(
+            padding: EdgeInsets.fromLTRB(20, 0, 20, 8),
+            child: Text(_l.t('post_who_can_see'), style: TextStyle(color: AppTheme.adaptiveText(context), fontSize: 16, fontWeight: FontWeight.bold)),
+          ),
+          _privacyOption(ctx, Icons.public, _l.t('post_public'), _l.t('post_public_desc'), 'public'),
+          _privacyOption(ctx, Icons.group_outlined, _l.t('post_kakonek'), _l.t('post_kakonek_desc'), 'friends'),
+          if (_createType != _CreateType.video)
+            _privacyOption(ctx, Icons.lock_outline, _l.t('post_private'), _l.t('post_private_desc'), 'private'),
+          SizedBox(height: 8),
+        ])),
+      ),
+    );
+  }
+
+  Widget _privacyOption(BuildContext ctx, IconData icon, String label, String subtitle, String value) {
+    final isSelected = _currentPrivacy() == value;
+    return ListTile(
+      leading: Icon(icon, color: isSelected ? AppTheme.primaryPurple : Colors.white70),
+      title: Text(label, style: TextStyle(color: isSelected ? AppTheme.primaryPurple : Colors.white, fontWeight: FontWeight.w600)),
+      subtitle: Text(subtitle, style: TextStyle(color: Colors.white70, fontSize: 12)),
+      trailing: isSelected ? Icon(Icons.check_circle, color: AppTheme.primaryPurple) : null,
+      onTap: () {
+        setState(() {
+          if (_createType == _CreateType.video) {
+            _reelPrivacy = value;
+          } else {
+            _privacy = value;
+          }
+        });
+        Navigator.pop(ctx);
+      },
+    );
+  }
 
   // ─── Media Pickers ──────────────────────────────────────────────────────────
 
@@ -106,7 +172,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
       builder: (context) => Container(
         height: 400,
         decoration: BoxDecoration(
-          color: AppTheme.surfaceDark,
+          color: AppTheme.surface(context),
           borderRadius: const BorderRadius.vertical(
             top: Radius.circular(20),
           ),
@@ -115,33 +181,33 @@ class _CreatePostModalState extends State<CreatePostModal> {
           children: [
             // Header
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'How are you feeling?',
+                  Text(
+                    _l.t('mood_question'),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AppTheme.adaptiveText(context),
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white),
+                    icon: Icon(Icons.close, color: AppTheme.adaptiveText(context)),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
             ),
 
-            const Divider(color: Colors.white10),
+            Divider(color: AppTheme.adaptiveSubtle(context)),
 
             // Emoji Grid
             Expanded(
               child: GridView.count(
                 crossAxisCount: 4,
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(16),
                 children: [
                   _buildMoodOption('😊', 'Happy'),
                   _buildMoodOption('😂', 'Laughing'),
@@ -193,14 +259,14 @@ class _CreatePostModalState extends State<CreatePostModal> {
         children: [
           Text(
             emoji,
-            style: const TextStyle(fontSize: 36),
+            style: TextStyle(fontSize: 36),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
-              color: AppTheme.textSecondary,
+              color: AppTheme.adaptiveTextSecondary(context),
             ),
             textAlign: TextAlign.center,
           ),
@@ -252,7 +318,8 @@ class _CreatePostModalState extends State<CreatePostModal> {
           expiresAt: DateTime.now().add(const Duration(hours: 24)),
           moodEmoji: emoji,
           moodLabel: label,
-          isPublic: _isPublic,
+          privacy: _privacy,
+          isPublic: _privacy == 'public',
           likes: 0,
           comments: 0,
           likedBy: [],
@@ -272,8 +339,8 @@ class _CreatePostModalState extends State<CreatePostModal> {
           final messenger = ScaffoldMessenger.of(context);
           Navigator.pop(context);
           messenger.showSnackBar(
-            const SnackBar(
-              content: Text('Mood shared! ✨ Expires in 24 hours'),
+            SnackBar(
+              content: Text('${_l.t('mood_success')} ✨ ${_l.t('mood_expired_desc')}'),
               backgroundColor: Colors.amber,
             ),
           );
@@ -291,15 +358,15 @@ class _CreatePostModalState extends State<CreatePostModal> {
           videoUrl: videoUrl,
           caption: text.isEmpty ? '📹 New Reel' : text,
           hashtags: _extractHashtags(text),
-          isPublic: _reelIsPublic,
+          isPublic: _reelPrivacy == 'public',
         );
 
         if (mounted) {
           final messenger = ScaffoldMessenger.of(context);
           Navigator.pop(context);
           messenger.showSnackBar(
-            const SnackBar(
-              content: Text('Reel uploaded! 🎉'),
+            SnackBar(
+              content: Text(_l.t('reel_uploaded_success')),
               backgroundColor: Colors.green,
             ),
           );
@@ -325,7 +392,8 @@ class _CreatePostModalState extends State<CreatePostModal> {
         caption: _createType == _CreateType.photo ? text : null,
         type: _createType == _CreateType.photo ? PostType.image : PostType.text,
         timestamp: DateTime.now(),
-        isPublic: _isPublic,
+        privacy: _privacy,
+        isPublic: _privacy == 'public',
         likes: 0,
         comments: 0,
         likedBy: [],
@@ -337,7 +405,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
         final messenger = ScaffoldMessenger.of(context);
         Navigator.pop(context);
         messenger.showSnackBar(
-          const SnackBar(content: Text('Posted successfully!')),
+          SnackBar(content: Text(_l.t('post_success'))),
         );
       }
     } catch (e) {
@@ -352,25 +420,25 @@ class _CreatePostModalState extends State<CreatePostModal> {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              backgroundColor: AppTheme.surfaceDark,
+              backgroundColor: AppTheme.surface(context),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               title: Row(
                 children: [
-                  const Icon(Icons.info_outline, color: Colors.orange),
-                  const SizedBox(width: 10),
-                  const Text('Image Too Large', style: TextStyle(color: Colors.white)),
+                  Icon(Icons.info_outline, color: Colors.orange),
+                  SizedBox(width: 10),
+                  Text(_l.t('post_too_large_title'), style: TextStyle(color: AppTheme.adaptiveText(context))),
                 ],
               ),
               content: Text(
-                'Your image ($size) exceeds the 700KB limit.\n\n'
+                '${_l.t('post_too_large_desc')} ($size)\n\n'
                 'Because Konek stores images directly in the database, files must be small. '
                 'Please choose a smaller image or reduce the quality before uploading.',
-                style: const TextStyle(color: AppTheme.textSecondary),
+                style: TextStyle(color: AppTheme.adaptiveTextSecondary(context)),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('OK', style: TextStyle(color: AppTheme.primaryPurple)),
+                  child: Text(_l.t('ok'), style: TextStyle(color: AppTheme.primaryPurple)),
                 ),
               ],
             ),
@@ -383,31 +451,31 @@ class _CreatePostModalState extends State<CreatePostModal> {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              backgroundColor: AppTheme.surfaceDark,
+              backgroundColor: AppTheme.surface(context),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               title: Row(
                 children: [
-                  const Icon(Icons.info_outline, color: AppTheme.primaryPurple),
-                  const SizedBox(width: 10),
-                  const Text('Video Too Large', style: TextStyle(color: Colors.white)),
+                  Icon(Icons.info_outline, color: AppTheme.primaryPurple),
+                  SizedBox(width: 10),
+                  Text(_l.t('reel_too_large_title'), style: TextStyle(color: AppTheme.adaptiveText(context))),
                 ],
               ),
               content: Text(
-                'Your video is $size but the maximum allowed size is 700KB.\n\n'
+                '${_l.t('reel_too_large_desc')} ($size)\n\n'
                 'This limit exists because Konek stores videos directly in the database without a paid storage service. Please trim your video to under 30 seconds and try again.',
-                style: const TextStyle(color: AppTheme.textSecondary),
+                style: TextStyle(color: AppTheme.adaptiveTextSecondary(context)),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('OK', style: TextStyle(color: AppTheme.primaryPurple)),
+                  child: Text(_l.t('ok'), style: TextStyle(color: AppTheme.primaryPurple)),
                 ),
               ],
             ),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to post: $e')),
+            SnackBar(content: Text(AppErrorHandler.postError(e))),
           );
         }
       }
@@ -427,7 +495,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: AppTheme.surfaceDark,
+          color: AppTheme.surface(context),
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
           boxShadow: [
             BoxShadow(
@@ -453,7 +521,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
                 child: Container(
                   width: 40,
                   height: 4,
-                  margin: const EdgeInsets.only(top: 12, bottom: 12),
+                  margin: EdgeInsets.only(top: 12, bottom: 12),
                   decoration: BoxDecoration(
                     color: Colors.grey[700],
                     borderRadius: BorderRadius.circular(2),
@@ -463,36 +531,36 @@ class _CreatePostModalState extends State<CreatePostModal> {
 
               // ── Header ────────────────────────────────────────────────────
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 8, 0),
+                padding: EdgeInsets.fromLTRB(20, 0, 8, 0),
                 child: Row(
                   children: [
                     Text(
                       _createType == _CreateType.video
-                          ? 'Upload Reel 🎬'
-                          : 'Create Post',
-                      style: const TextStyle(
+                          ? _l.t('reel_upload_title')
+                          : _l.t('post_create_title'),
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: AppTheme.adaptiveText(context),
                       ),
                     ),
                     const Spacer(),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.close_rounded,
-                        color: Colors.white,
+                        color: AppTheme.adaptiveText(context),
                       ),
                     ),
                   ],
                 ),
               ),
 
-              const Divider(color: Colors.white10),
+              Divider(color: AppTheme.adaptiveSubtle(context)),
 
               // ── Author Row ────────────────────────────────────────────────
               Padding(
-                padding: const EdgeInsets.symmetric(
+                padding: EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 12,
                 ),
@@ -505,7 +573,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
                       borderGradient: AppTheme.primaryGradient,
                       borderWidth: 2,
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -520,58 +588,25 @@ class _CreatePostModalState extends State<CreatePostModal> {
                               userData['displayName'] ??
                                   _authService.currentUser?.displayName ??
                                   'User',
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: AppTheme.adaptiveText(context),
                                 fontWeight: FontWeight.bold,
                               ),
                             );
                           },
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         GestureDetector(
-                          onTap: _createType == _CreateType.video
-                              ? () => setState(() => _reelIsPublic = !_reelIsPublic)
-                              : _togglePrivacy,
+                          onTap: () => _showPrivacyPicker(),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.05),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  _createType == _CreateType.video
-                                      ? (_reelIsPublic ? Icons.public : Icons.group_outlined)
-                                      : (_isPublic
-                                            ? Icons.public
-                                            : Icons.group_outlined),
-                                  size: 12,
-                                  color: AppTheme.textSecondary,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  _createType == _CreateType.video
-                                      ? (_reelIsPublic ? 'Para sa Imo (Public)' : 'Kakonek (Friends)')
-                                      : (_isPublic
-                                            ? 'Public'
-                                            : 'Kakonek (Friends)'),
-                                  style: const TextStyle(
-                                    fontSize: 10,
-                                    color: AppTheme.textSecondary,
-                                  ),
-                                ),
-                                const Icon(
-                                  Icons.arrow_drop_down,
-                                  size: 14,
-                                  color: AppTheme.textSecondary,
-                                ),
-                              ],
-                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(color: AppTheme.adaptiveSubtle(context), borderRadius: BorderRadius.circular(6)),
+                            child: Row(mainAxisSize: MainAxisSize.min, children: [
+                              Icon(_privacyIcon(), size: 12, color: AppTheme.adaptiveTextSecondary(context)),
+                              SizedBox(width: 4),
+                              Text(_privacyLabel(), style: TextStyle(fontSize: 11, color: AppTheme.adaptiveTextSecondary(context))),
+                              Icon(Icons.arrow_drop_down, size: 14, color: AppTheme.adaptiveTextSecondary(context)),
+                            ]),
                           ),
                         ),
                       ],
@@ -582,19 +617,19 @@ class _CreatePostModalState extends State<CreatePostModal> {
 
               // ── Text Input ────────────────────────────────────────────────
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(horizontal: 20),
                 child: TextField(
                   controller: _textController,
                   maxLines: _createType == _CreateType.text ? 5 : 3,
                   minLines: 2,
-                  style: const TextStyle(color: Colors.white),
+                  style: TextStyle(color: AppTheme.adaptiveText(context)),
                   decoration: InputDecoration(
                     hintText: _createType == _CreateType.video
-                        ? "Add a caption... #hashtags"
+                        ? _l.t('reel_hint_text')
                         : _createType == _CreateType.mood
-                            ? "Share more about how you're feeling..."
-                            : "What's on your mind?",
-                    hintStyle: const TextStyle(color: AppTheme.textSecondary),
+                            ? _l.t('mood_hint_text')
+                            : _l.t('post_hint_text'),
+                    hintStyle: TextStyle(color: AppTheme.adaptiveTextSecondary(context)),
                     border: InputBorder.none,
                   ),
                 ),
@@ -602,11 +637,11 @@ class _CreatePostModalState extends State<CreatePostModal> {
 
               // ── Mood Preview Indicator ────────────────────────────────────
               if (_selectedMood != null) ...[
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.amber.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
@@ -618,26 +653,26 @@ class _CreatePostModalState extends State<CreatePostModal> {
                       children: [
                         Text(
                           _selectedMood!.split(' ')[0], // Emoji
-                          style: const TextStyle(fontSize: 32),
+                          style: TextStyle(fontSize: 32),
                         ),
-                        const SizedBox(width: 12),
+                        SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 _selectedMood!,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.amber,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              const Text(
-                                'Expires in 24 hours',
+                              SizedBox(height: 4),
+                              Text(
+                                _l.t('mood_expired_desc'),
                                 style: TextStyle(
-                                  color: AppTheme.textSecondary,
+                                  color: AppTheme.adaptiveTextSecondary(context),
                                   fontSize: 11,
                                 ),
                               ),
@@ -645,7 +680,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.close, color: Colors.white54),
+                          icon: Icon(Icons.close, color: AppTheme.adaptiveTextSecondary(context)),
                           onPressed: () {
                             setState(() {
                               _selectedMood = null;
@@ -662,9 +697,9 @@ class _CreatePostModalState extends State<CreatePostModal> {
 
               // ── Media Preview ─────────────────────────────────────────────
               if (_selectedImageFile != null) ...[
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Stack(
                     children: [
                       ClipRRect(
@@ -684,7 +719,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
                               height: 180,
                               width: double.infinity,
                               color: Colors.black26,
-                              child: const Center(child: CircularProgressIndicator()),
+                              child: Center(child: CircularProgressIndicator()),
                             );
                           },
                         ),
@@ -695,14 +730,14 @@ class _CreatePostModalState extends State<CreatePostModal> {
                         child: GestureDetector(
                           onTap: _clearMedia,
                           child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
+                            padding: EdgeInsets.all(4),
+                            decoration: BoxDecoration(
                               color: Colors.black54,
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.close,
-                              color: Colors.white,
+                              color: AppTheme.adaptiveText(context),
                               size: 16,
                             ),
                           ),
@@ -714,9 +749,9 @@ class _CreatePostModalState extends State<CreatePostModal> {
               ],
 
               if (_selectedVideoName != null) ...[
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 20),
                   child: Stack(
                     children: [
                       Container(
@@ -732,24 +767,24 @@ class _CreatePostModalState extends State<CreatePostModal> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.check_circle,
                               color: Colors.green,
                               size: 36,
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: 8),
                             Text(
                               _selectedVideoName!,
-                              style: const TextStyle(
-                                color: Colors.white70,
+                              style: TextStyle(
+                                color: AppTheme.adaptiveTextSecondary(context),
                                 fontSize: 13,
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              'Video ready to upload as Reel',
+                            SizedBox(height: 4),
+                            Text(
+                              _l.t('reel_video_ready'),
                               style: TextStyle(
                                 color: Colors.green,
                                 fontSize: 11,
@@ -765,14 +800,14 @@ class _CreatePostModalState extends State<CreatePostModal> {
                         child: GestureDetector(
                           onTap: _clearMedia,
                           child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
+                            padding: EdgeInsets.all(4),
+                            decoration: BoxDecoration(
                               color: Colors.black54,
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.close,
-                              color: Colors.white,
+                              color: AppTheme.adaptiveText(context),
                               size: 16,
                             ),
                           ),
@@ -783,11 +818,11 @@ class _CreatePostModalState extends State<CreatePostModal> {
                 ),
               ],
 
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
               // ── Media Type Buttons ─────────────────────────────────────────
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: [
                     _MediaTypeBtn(
@@ -797,7 +832,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
                       isSelected: _createType == _CreateType.photo,
                       onTap: _pickImage,
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16),
                     _MediaTypeBtn(
                       icon: Icons.videocam_outlined,
                       label: 'Reel',
@@ -805,7 +840,7 @@ class _CreatePostModalState extends State<CreatePostModal> {
                       isSelected: _createType == _CreateType.video,
                       onTap: _pickVideo,
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16),
                     _MediaTypeBtn(
                       icon: Icons.mood_outlined,
                       label: 'Mood',
@@ -817,11 +852,11 @@ class _CreatePostModalState extends State<CreatePostModal> {
                 ),
               ),
 
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
 
               // ── Post Button ───────────────────────────────────────────────
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                padding: EdgeInsets.fromLTRB(20, 0, 20, 8),
                 child: SizedBox(
                   width: double.infinity,
                   height: 52,
@@ -867,7 +902,7 @@ class _MediaTypeBtn extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
               ? color.withOpacity(0.15)
@@ -882,11 +917,11 @@ class _MediaTypeBtn extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, color: color, size: 20),
-            const SizedBox(width: 6),
+            SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? color : AppTheme.textSecondary,
+                color: isSelected ? color : AppTheme.textSecondaryColor(context),
                 fontSize: 13,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),

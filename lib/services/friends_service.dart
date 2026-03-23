@@ -36,10 +36,10 @@ class FriendsService {
       status: FriendRequestStatus.pending,
     );
     
+    final requestRef = _firestore.collection('friend_requests').doc();
     // Use transaction for atomic operation
     await _firestore.runTransaction((transaction) async {
       // Add request document
-      final requestRef = _firestore.collection('friend_requests').doc();
       transaction.set(requestRef, request.toFirestore());
       
       // Update sender's sentRequests
@@ -55,14 +55,17 @@ class FriendsService {
       });
     });
 
-    if (currentUser.uid != toUserId) {
-      await NotificationService.sendNotification(
+    final currentUserRef = FirebaseAuth.instance.currentUser;
+    if (currentUserRef != null) {
+      final userDoc = await _firestore.collection('users').doc(currentUserRef.uid).get();
+      final name = userDoc.data()?['username'] ?? 'Someone';
+      await NotificationService.send(
         recipientId: toUserId,
-        senderId: currentUser.uid,
-        senderName: userData['displayName'] ?? currentUser.displayName ?? 'User',
-        senderAvatar: userData['photoURL'] ?? currentUser.photoURL ?? '',
+        senderId: currentUserRef.uid,
+        senderName: name,
         type: 'follow',
         message: 'sent you a Kakonek request',
+        requestId: requestRef.id,
       );
     }
   }

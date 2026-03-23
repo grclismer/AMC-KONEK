@@ -88,9 +88,9 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> with SingleTicker
         return Container(
           width: _widthAnimation.value,
           height: 48,
-          padding: const EdgeInsets.symmetric(horizontal: 4),
+          padding: EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
-            color: _isExpanded ? AppTheme.surfaceDark : Colors.white.withOpacity(0.05),
+            color: _isExpanded ? AppTheme.surface(context) : Colors.white.withOpacity(0.05),
             borderRadius: BorderRadius.circular(24),
             border: _isExpanded
               ? Border.all(color: AppTheme.primaryPurple.withOpacity(0.5), width: 1.5)
@@ -126,25 +126,25 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> with SingleTicker
               if (_isExpanded)
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 8),
+                    padding: EdgeInsets.only(left: 8),
                     child: TextField(
                       controller: _searchController,
                       focusNode: _focusNode,
                       autofocus: false, // Managed by _expand()
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: AppTheme.adaptiveText(context),
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                       ),
                       decoration: InputDecoration(
                         hintText: widget.hintText,
                         hintStyle: TextStyle(
-                          color: AppTheme.textSecondary.withOpacity(0.5),
+                          color: AppTheme.adaptiveTextSecondary(context).withOpacity(0.5),
                           fontSize: 15,
                         ),
                         border: InputBorder.none,
                         isCollapsed: true,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                        contentPadding: EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
                   ),
@@ -153,8 +153,8 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> with SingleTicker
               // Clear button
               if (_isExpanded && _searchController.text.isNotEmpty)
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, size: 20),
-                  color: AppTheme.textSecondary,
+                  icon: Icon(Icons.close_rounded, size: 20),
+                  color: AppTheme.adaptiveTextSecondary(context),
                   onPressed: () {
                     _searchController.clear();
                   },

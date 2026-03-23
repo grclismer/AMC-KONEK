@@ -12,10 +12,10 @@
 @import cloud_firestore;
 #endif
 
-#if __has_include(<ffmpeg_kit_flutter/FFmpegKitFlutterPlugin.h>)
-#import <ffmpeg_kit_flutter/FFmpegKitFlutterPlugin.h>
+#if __has_include(<ffmpeg_kit_flutter_new/FFmpegKitFlutterPlugin.h>)
+#import <ffmpeg_kit_flutter_new/FFmpegKitFlutterPlugin.h>
 #else
-@import ffmpeg_kit_flutter;
+@import ffmpeg_kit_flutter_new;
 #endif
 
 #if __has_include(<file_picker/FilePickerPlugin.h>)
@@ -48,10 +48,10 @@
 @import flutter_image_compress_common;
 #endif
 
-#if __has_include(<flutter_inappwebview/InAppWebViewFlutterPlugin.h>)
-#import <flutter_inappwebview/InAppWebViewFlutterPlugin.h>
+#if __has_include(<flutter_inappwebview_ios/InAppWebViewFlutterPlugin.h>)
+#import <flutter_inappwebview_ios/InAppWebViewFlutterPlugin.h>
 #else
-@import flutter_inappwebview;
+@import flutter_inappwebview_ios;
 #endif
 
 #if __has_include(<google_sign_in_ios/FLTGoogleSignInPlugin.h>)

@@ -9,7 +9,7 @@
       "dependencies": [
         "cloud_firestore",
         "cupertino_icons",
-        "ffmpeg_kit_flutter",
+        "ffmpeg_kit_flutter_new",
         "file_picker",
         "firebase_auth",
         "firebase_core",
@@ -18,6 +18,7 @@
         "flutter_image_compress",
         "google_fonts",
         "google_sign_in",
+        "http",
         "image_picker",
         "path_provider",
         "shared_preferences",
@@ -84,9 +85,10 @@
     },
     {
       "name": "file_picker",
-      "version": "8.3.7",
+      "version": "10.3.10",
       "dependencies": [
         "cross_file",
+        "dbus",
         "ffi",
         "flutter",
         "flutter_plugin_android_lifecycle",
@@ -98,8 +100,8 @@
       ]
     },
     {
-      "name": "ffmpeg_kit_flutter",
-      "version": "6.0.3",
+      "name": "ffmpeg_kit_flutter_new",
+      "version": "4.1.0",
       "dependencies": [
         "ffmpeg_kit_flutter_platform_interface",
         "flutter"
@@ -160,7 +162,7 @@
     },
     {
       "name": "firebase_storage",
-      "version": "12.4.10",
+      "version": "13.1.0",
       "dependencies": [
         "firebase_core",
         "firebase_core_platform_interface",
@@ -198,7 +200,7 @@
     },
     {
       "name": "cloud_firestore",
-      "version": "5.6.12",
+      "version": "6.1.3",
       "dependencies": [
         "cloud_firestore_platform_interface",
         "cloud_firestore_web",
@@ -239,6 +241,16 @@
       "dependencies": []
     },
     {
+      "name": "http",
+      "version": "1.6.0",
+      "dependencies": [
+        "async",
+        "http_parser",
+        "meta",
+        "web"
+      ]
+    },
+    {
       "name": "google_sign_in",
       "version": "6.3.0",
       "dependencies": [
@@ -251,7 +263,7 @@
     },
     {
       "name": "firebase_auth",
-      "version": "5.7.0",
+      "version": "6.2.0",
       "dependencies": [
         "firebase_auth_platform_interface",
         "firebase_auth_web",
@@ -263,7 +275,7 @@
     },
     {
       "name": "firebase_core",
-      "version": "3.15.2",
+      "version": "4.5.0",
       "dependencies": [
         "firebase_core_platform_interface",
         "firebase_core_web",
@@ -273,7 +285,7 @@
     },
     {
       "name": "youtube_player_flutter",
-      "version": "8.1.2",
+      "version": "9.1.3",
       "dependencies": [
         "flutter",
         "flutter_inappwebview"
@@ -455,6 +467,16 @@
       ]
     },
     {
+      "name": "dbus",
+      "version": "0.7.12",
+      "dependencies": [
+        "args",
+        "ffi",
+        "meta",
+        "xml"
+      ]
+    },
+    {
       "name": "web",
       "version": "1.1.1",
       "dependencies": []
@@ -610,16 +632,6 @@
       ]
     },
     {
-      "name": "http",
-      "version": "1.6.0",
-      "dependencies": [
-        "async",
-        "http_parser",
-        "meta",
-        "web"
-      ]
-    },
-    {
       "name": "crypto",
       "version": "3.0.7",
       "dependencies": [
@@ -628,7 +640,7 @@
     },
     {
       "name": "firebase_storage_web",
-      "version": "3.10.17",
+      "version": "3.11.3",
       "dependencies": [
         "_flutterfire_internals",
         "async",
@@ -644,7 +656,7 @@
     },
     {
       "name": "firebase_storage_platform_interface",
-      "version": "5.2.10",
+      "version": "5.2.18",
       "dependencies": [
         "_flutterfire_internals",
         "collection",
@@ -793,7 +805,7 @@
     },
     {
       "name": "cloud_firestore_web",
-      "version": "4.4.12",
+      "version": "5.1.3",
       "dependencies": [
         "_flutterfire_internals",
         "cloud_firestore_platform_interface",
@@ -806,7 +818,7 @@
     },
     {
       "name": "cloud_firestore_platform_interface",
-      "version": "6.6.12",
+      "version": "7.0.7",
       "dependencies": [
         "_flutterfire_internals",
         "collection",
@@ -876,7 +888,7 @@
     },
     {
       "name": "webview_flutter_wkwebview",
-      "version": "3.23.7",
+      "version": "3.24.1",
       "dependencies": [
         "flutter",
         "meta",
@@ -895,11 +907,21 @@
     },
     {
       "name": "webview_flutter_android",
-      "version": "4.10.11",
+      "version": "4.10.13",
       "dependencies": [
         "flutter",
         "meta",
         "webview_flutter_platform_interface"
+      ]
+    },
+    {
+      "name": "http_parser",
+      "version": "4.1.2",
+      "dependencies": [
+        "collection",
+        "source_span",
+        "string_scanner",
+        "typed_data"
       ]
     },
     {
@@ -940,7 +962,7 @@
     },
     {
       "name": "firebase_auth_web",
-      "version": "5.15.3",
+      "version": "6.1.3",
       "dependencies": [
         "firebase_auth_platform_interface",
         "firebase_core",
@@ -954,19 +976,20 @@
     },
     {
       "name": "firebase_auth_platform_interface",
-      "version": "7.7.3",
+      "version": "8.1.7",
       "dependencies": [
         "_flutterfire_internals",
         "collection",
         "firebase_core",
         "flutter",
+        "http",
         "meta",
         "plugin_platform_interface"
       ]
     },
     {
       "name": "firebase_core_web",
-      "version": "2.24.1",
+      "version": "3.5.0",
       "dependencies": [
         "firebase_core_platform_interface",
         "flutter",
@@ -977,9 +1000,15 @@
     },
     {
       "name": "flutter_inappwebview",
-      "version": "5.8.0",
+      "version": "6.1.5",
       "dependencies": [
-        "flutter"
+        "flutter",
+        "flutter_inappwebview_android",
+        "flutter_inappwebview_ios",
+        "flutter_inappwebview_macos",
+        "flutter_inappwebview_platform_interface",
+        "flutter_inappwebview_web",
+        "flutter_inappwebview_windows"
       ]
     },
     {
@@ -1074,6 +1103,20 @@
       ]
     },
     {
+      "name": "xml",
+      "version": "6.6.1",
+      "dependencies": [
+        "collection",
+        "meta",
+        "petitparser"
+      ]
+    },
+    {
+      "name": "args",
+      "version": "2.7.0",
+      "dependencies": []
+    },
+    {
       "name": "platform",
       "version": "3.1.6",
       "dependencies": []
@@ -1087,18 +1130,8 @@
       ]
     },
     {
-      "name": "http_parser",
-      "version": "4.1.2",
-      "dependencies": [
-        "collection",
-        "source_span",
-        "string_scanner",
-        "typed_data"
-      ]
-    },
-    {
       "name": "_flutterfire_internals",
-      "version": "1.3.59",
+      "version": "1.3.67",
       "dependencies": [
         "collection",
         "firebase_core",
@@ -1166,8 +1199,72 @@
       ]
     },
     {
+      "name": "flutter_inappwebview_windows",
+      "version": "0.6.0",
+      "dependencies": [
+        "flutter",
+        "flutter_inappwebview_platform_interface"
+      ]
+    },
+    {
+      "name": "flutter_inappwebview_web",
+      "version": "1.1.2",
+      "dependencies": [
+        "flutter",
+        "flutter_inappwebview_platform_interface",
+        "flutter_web_plugins",
+        "web"
+      ]
+    },
+    {
+      "name": "flutter_inappwebview_macos",
+      "version": "1.1.2",
+      "dependencies": [
+        "flutter",
+        "flutter_inappwebview_platform_interface"
+      ]
+    },
+    {
+      "name": "flutter_inappwebview_ios",
+      "version": "1.1.2",
+      "dependencies": [
+        "flutter",
+        "flutter_inappwebview_platform_interface"
+      ]
+    },
+    {
+      "name": "flutter_inappwebview_android",
+      "version": "1.1.3",
+      "dependencies": [
+        "flutter",
+        "flutter_inappwebview_platform_interface"
+      ]
+    },
+    {
+      "name": "flutter_inappwebview_platform_interface",
+      "version": "1.3.0+1",
+      "dependencies": [
+        "flutter",
+        "flutter_inappwebview_internal_annotations",
+        "plugin_platform_interface"
+      ]
+    },
+    {
       "name": "vm_service",
       "version": "15.0.2",
+      "dependencies": []
+    },
+    {
+      "name": "petitparser",
+      "version": "7.0.2",
+      "dependencies": [
+        "collection",
+        "meta"
+      ]
+    },
+    {
+      "name": "flutter_inappwebview_internal_annotations",
+      "version": "1.3.0",
       "dependencies": []
     }
   ],

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'privacy_policy_screen.dart';
 import 'terms_of_service_screen.dart';
 import '../services/auth_service.dart';
@@ -11,6 +12,9 @@ import '../theme/animations.dart';
 import 'package:image_picker/image_picker.dart';
 import '../widgets/user_photo_widget.dart';
 import '../services/storage_service.dart';
+import '../utils/error_handler.dart';
+import '../utils/app_localizations.dart';
+import '../main.dart' show themeNotifier;
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -25,6 +29,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String _selectedLanguage = 'English';
   final AuthService _authService = AuthService();
   final ImagePicker _picker = ImagePicker();
+  AppLocalizations get _l => AppLocalizations.instance;
 
   @override
   void initState() {
@@ -53,13 +58,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: AppTheme.background(context),
       appBar: AppBar(
-        title: const Text('Settings', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.transparent,
+        title: Text(_l.t('settings_title'), style: TextStyle(color: AppTheme.adaptiveText(context), fontWeight: FontWeight.bold)),
+        backgroundColor: AppTheme.surface(context),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: AppTheme.adaptiveText(context)),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -76,11 +81,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               _buildProfilePictureSection(displayName, currentEmail, photoURL),
               
-              _sectionHeader('Preferences'),
+              _sectionHeader(_l.t('settings_section_preferences')),
               _settingsTile(
                 icon: Icons.notifications_none_rounded,
-                title: 'Notifications',
-                subtitle: 'Push notifications & sounds',
+                title: _l.t('settings_notifications'),
+                subtitle: _l.t('settings_notifications_desc'),
                 trailing: Switch(
                   value: _notificationsEnabled,
                   onChanged: (val) {
@@ -92,53 +97,48 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               _settingsTile(
                 icon: Icons.dark_mode_outlined,
-                title: 'Dark Mode',
-                subtitle: 'Dark theme for the app',
+                title: _l.t('settings_dark_mode'),
+                subtitle: _l.t('settings_dark_mode_desc'),
                 trailing: Switch(
                   value: _darkMode,
                   onChanged: (val) {
                     setState(() => _darkMode = val);
                     _updatePreference('pref_dark_mode', val);
+                    themeNotifier.value = val ? ThemeMode.dark : ThemeMode.light;
                   },
                   activeColor: AppTheme.primaryPurple,
                 ),
               ),
               _settingsTile(
                 icon: Icons.language_rounded,
-                title: 'Language',
+                title: _l.t('settings_language'),
                 subtitle: _selectedLanguage,
                 onTap: () => _showLanguageDialog(),
               ),
               
-              _sectionHeader('Account'),
+              _sectionHeader(_l.t('settings_section_account')),
               _settingsTile(
                 icon: Icons.person_outline,
-                title: 'Edit Profile',
+                title: _l.t('settings_edit_profile'),
                 onTap: () => _showEditProfileModal(userData),
               ),
               _settingsTile(
                 icon: Icons.security_outlined,
-                title: 'Security',
+                title: _l.t('settings_security'),
+                subtitle: _l.t('settings_change_password'),
+                onTap: () => _showChangePasswordModal(),
               ),
               
-              _sectionHeader('Legal'),
+              _sectionHeader(_l.t('settings_section_legal')),
               _settingsTile(
                 icon: Icons.description_outlined,
-                title: 'Terms of Service',
+                title: _l.t('settings_terms'),
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TermsOfServiceScreen())),
               ),
               _settingsTile(
                 icon: Icons.privacy_tip_outlined,
-                title: 'Privacy Policy',
+                title: _l.t('settings_privacy'),
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen())),
-              ),
-              
-              _sectionHeader('Account Actions'),
-              _settingsTile(
-                icon: Icons.logout,
-                title: 'Logout',
-                iconColor: Colors.redAccent,
-                onTap: () => _showLogoutConfirm(userData),
               ),
               
               const SizedBox(height: 32),
@@ -146,7 +146,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: TextButton(
                   onPressed: () => _showDeleteAccountConfirm(),
-                  child: const Text('Delete Account', style: TextStyle(color: Colors.redAccent, fontSize: 13)),
+                  child: Text(_l.t('settings_delete_account'), style: const TextStyle(color: Colors.redAccent, fontSize: 13)),
                 ),
               ),
               const SizedBox(height: 40),
@@ -165,7 +165,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
-          color: AppTheme.textSecondary.withOpacity(0.7),
+          color: AppTheme.adaptiveTextSecondary(context).withOpacity(0.7),
           letterSpacing: 1.5,
         ),
       ),
@@ -184,7 +184,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceDark.withOpacity(0.5),
+        color: AppTheme.surface(context),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
@@ -204,14 +204,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           title, 
           style: TextStyle(
             fontWeight: FontWeight.w600, 
-            color: enabled ? Colors.white : Colors.white24,
+            color: enabled ? AppTheme.adaptiveText(context) : AppTheme.adaptiveSubtle(context),
             fontSize: 15,
           )
         ),
         subtitle: subtitle != null 
-          ? Text(subtitle, style: TextStyle(color: AppTheme.textSecondary, fontSize: 12)) 
+          ? Text(subtitle, style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 12)) 
           : null,
-        trailing: trailing ?? Icon(Icons.chevron_right, color: AppTheme.textSecondary.withOpacity(0.5), size: 20),
+        trailing: trailing ?? Icon(Icons.chevron_right, color: AppTheme.adaptiveTextSecondary(context).withOpacity(0.5), size: 20),
         onTap: enabled ? onTap : null,
       ),
     );
@@ -222,7 +222,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceDark,
+        color: AppTheme.surface(context),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Colors.white.withOpacity(0.05)),
       ),
@@ -247,7 +247,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     decoration: BoxDecoration(
                       color: AppTheme.primaryPurple,
                       shape: BoxShape.circle,
-                      border: Border.all(color: AppTheme.surfaceDark, width: 2),
+                      border: Border.all(color: AppTheme.surface(context), width: 2),
                     ),
                     child: const Icon(
                       Icons.camera_alt,
@@ -266,15 +266,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 Text(
                   displayName,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.adaptiveText(context)),
                 ),
                 Text(
                   email,
-                  style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary),
+                  style: TextStyle(fontSize: 13, color: AppTheme.adaptiveTextSecondary(context)),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Tap to update photo',
+                  _l.t('settings_tap_to_update_photo'),
                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.primaryPurple.withOpacity(0.8)),
                 ),
               ],
@@ -290,9 +290,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: AppTheme.surfaceDark,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        decoration: BoxDecoration(
+          color: AppTheme.surface(context),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: SafeArea(
           child: Column(
@@ -302,13 +302,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: 40, height: 4, margin: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(color: Colors.grey[700], borderRadius: BorderRadius.circular(2)),
               ),
-              const Padding(
-                padding: EdgeInsets.all(16),
-                child: Text('Profile Photo', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(_l.t('drawer_profile_photo'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.adaptiveText(context))),
               ),
               ListTile(
-                leading: const Icon(Icons.image_outlined, color: Colors.white),
-                title: const Text('Upload from Gallery', style: TextStyle(color: Colors.white)),
+                leading: Icon(Icons.image_outlined, color: AppTheme.adaptiveText(context)),
+                title: Text(_l.t('drawer_upload_gallery'), style: TextStyle(color: AppTheme.adaptiveText(context))),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImage();
@@ -317,7 +317,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               if (photoURL != null && photoURL.isNotEmpty)
                 ListTile(
                   leading: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                  title: const Text('Remove Photo', style: TextStyle(color: Colors.redAccent)),
+                  title: Text(_l.t('drawer_remove_photo'), style: const TextStyle(color: Colors.redAccent)),
                   onTap: () async {
                     Navigator.pop(context);
                     await _authService.saveUserData({'photoURL': ''});
@@ -351,13 +351,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (mounted) {
         Navigator.pop(context); // Close loading
         GlassmorphicEffects.showGlassSnackBar(context,
-            message: 'Profile picture updated!');
+            message: _l.t('drawer_photo_updated'));
       }
     } catch (e) {
       if (mounted) {
         Navigator.pop(context); // Close loading
         GlassmorphicEffects.showGlassSnackBar(context,
-            message: 'Failed to upload: $e', isError: true);
+            message: AppErrorHandler.profileError(e), isError: true);
       }
     }
   }
@@ -376,9 +376,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       backgroundColor: Colors.transparent,
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) => Container(
-          decoration: const BoxDecoration(
-            color: AppTheme.backgroundDark,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: AppTheme.background(context),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           padding: EdgeInsets.fromLTRB(24, 12, 24, MediaQuery.of(context).viewInsets.bottom + 32),
           child: Column(
@@ -391,23 +391,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   decoration: BoxDecoration(color: Colors.grey[800], borderRadius: BorderRadius.circular(2)),
                 ),
               ),
-              const Text('Edit Profile', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+              Text(_l.t('settings_edit_profile'), style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.adaptiveText(context))),
               const SizedBox(height: 24),
-              _buildEditField(Icons.person_outline, 'Display Name', nameController),
+              _buildEditField(Icons.person_outline, _l.t('drawer_display_name'), nameController),
               const SizedBox(height: 16),
-              _buildEditField(Icons.alternate_email, 'Username', usernameController),
+              _buildEditField(Icons.alternate_email, _l.t('drawer_username'), usernameController),
               const SizedBox(height: 16),
-              _buildEditField(Icons.info_outline, 'Bio', bioController, maxLines: 3),
+              _buildEditField(Icons.info_outline, _l.t('drawer_bio'), bioController, maxLines: 3),
               const SizedBox(height: 16),
-              _buildEditField(Icons.phone_android_outlined, 'Mobile Number', phoneController),
+              _buildEditField(Icons.phone_android_outlined, _l.t('phone_number'), phoneController),
               const SizedBox(height: 16),
-              _buildEditField(Icons.email_outlined, 'Email Address', emailController),
+              _buildEditField(Icons.email_outlined, _l.t('email_label'), emailController),
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
                 height: 52,
                 child: GlassmorphicEffects.gradientButton(
-                  text: 'Save Changes',
+                  text: _l.t('drawer_save_changes'),
                   isLoading: isLoading,
                   onPressed: () async {
                     setModalState(() => isLoading = true);
@@ -421,12 +421,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       });
                       if (context.mounted) {
                         Navigator.pop(context);
-                        GlassmorphicEffects.showGlassSnackBar(context, message: 'Profile updated successfully!');
+                        GlassmorphicEffects.showGlassSnackBar(context, message: _l.t('settings_profile_updated_success'));
                       }
                     } catch (e) {
                       if (context.mounted) {
                         setModalState(() => isLoading = false);
-                        GlassmorphicEffects.showGlassSnackBar(context, message: 'Failed to update: $e', isError: true);
+                        GlassmorphicEffects.showGlassSnackBar(context, message: AppErrorHandler.profileError(e), isError: true);
                       }
                     }
                   },
@@ -443,40 +443,226 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return TextField(
       controller: controller,
       maxLines: maxLines,
-      style: const TextStyle(color: Colors.white, fontSize: 16),
+      style: TextStyle(color: AppTheme.adaptiveText(context), fontSize: 16),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: AppTheme.textSecondary),
+        labelStyle: TextStyle(color: AppTheme.adaptiveTextSecondary(context)),
         prefixIcon: Icon(icon, color: AppTheme.primaryPurple, size: 20),
         filled: true,
-        fillColor: AppTheme.surfaceDark.withOpacity(0.5),
+        fillColor: AppTheme.surfaceColor(context),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
     );
   }
 
-  void _showLanguageDialog() {
-    final languages = ['English', 'Spanish', 'French', 'German', 'Filipino', 'Japanese'];
-    showDialog(
+  void _showChangePasswordModal() {
+    final currentPasswordCtrl = TextEditingController();
+    final newPasswordCtrl = TextEditingController();
+    final confirmPasswordCtrl = TextEditingController();
+    bool isLoading = false;
+    String? errorMessage;
+
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surfaceDark,
-        title: const Text('Select Language', style: TextStyle(color: Colors.white)),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: languages.length,
-            itemBuilder: (context, index) => ListTile(
-              title: Text(languages[index], style: const TextStyle(color: Colors.white)),
-              trailing: _selectedLanguage == languages[index] ? const Icon(Icons.check, color: AppTheme.primaryPurple) : null,
-              onTap: () {
-                setState(() => _selectedLanguage = languages[index]);
-                _updatePreference('pref_language', languages[index]);
-                Navigator.pop(context);
-              },
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppTheme.surface(context),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             ),
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40, height: 4,
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: AppTheme.adaptiveSubtle(context),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                Text(_l.t('settings_change_password_title'),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,
+                        color: AppTheme.adaptiveText(context))),
+                const SizedBox(height: 20),
+                if (errorMessage != null)
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.red.withOpacity(0.3)),
+                    ),
+                    child: Text(errorMessage!,
+                        style: const TextStyle(color: Colors.red, fontSize: 13)),
+                  ),
+                _passwordField(ctx, currentPasswordCtrl, _l.t('settings_current_password'), Icons.lock_outline),
+                const SizedBox(height: 12),
+                _passwordField(ctx, newPasswordCtrl, _l.t('settings_new_password'), Icons.lock_reset_outlined),
+                const SizedBox(height: 12),
+                _passwordField(ctx, confirmPasswordCtrl, _l.t('settings_confirm_new_password'), Icons.lock_outline),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: isLoading ? null : () async {
+                      final current = currentPasswordCtrl.text.trim();
+                      final newPass = newPasswordCtrl.text.trim();
+                      final confirm = confirmPasswordCtrl.text.trim();
+
+                      if (current.isEmpty || newPass.isEmpty || confirm.isEmpty) {
+                        setModalState(() => errorMessage = _l.t('settings_fields_required'));
+                        return;
+                      }
+                      if (newPass.length < 6) {
+                        setModalState(() => errorMessage = _l.t('settings_password_too_short'));
+                        return;
+                      }
+                      if (newPass != confirm) {
+                        setModalState(() => errorMessage = _l.t('settings_passwords_mismatch'));
+                        return;
+                      }
+
+                      setModalState(() { isLoading = true; errorMessage = null; });
+
+                      try {
+                        final user = _authService.currentUser;
+                        if (user == null || user.email == null) throw Exception('Not logged in');
+
+                        // Re-authenticate then update password
+                        final credential = EmailAuthProvider.credential(
+                          email: user.email!,
+                          password: current,
+                        );
+                        await user.reauthenticateWithCredential(credential);
+                        await user.updatePassword(newPass);
+
+                        if (mounted) {
+                          Navigator.pop(ctx);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(_l.t('settings_password_updated')),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        String msg = AppErrorHandler.profileError(e);
+                        setModalState(() { isLoading = false; errorMessage = msg; });
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryPurple,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: isLoading
+                        ? const SizedBox(height: 20, width: 20,
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                        : Text(_l.t('settings_update_password_button'), style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _passwordField(BuildContext ctx, TextEditingController controller, String hint, IconData icon) {
+    return TextField(
+      controller: controller,
+      obscureText: true,
+      style: TextStyle(color: AppTheme.adaptiveText(ctx)),
+      decoration: InputDecoration(
+        prefixIcon: Icon(icon, color: AppTheme.adaptiveTextSecondary(ctx), size: 20),
+        hintText: hint,
+        hintStyle: TextStyle(color: AppTheme.adaptiveTextSecondary(ctx)),
+        filled: true,
+        fillColor: AppTheme.surfaceColor(ctx),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+    );
+  }
+
+  void _showLanguageDialog() {
+    final languages = [
+      {'name': 'English', 'code': 'en'},
+      {'name': 'Filipino', 'code': 'fil'},
+      {'name': 'Spanish', 'code': 'es'},
+      {'name': 'French', 'code': 'fr'},
+      {'name': 'German', 'code': 'de'},
+      {'name': 'Japanese', 'code': 'ja'},
+      {'name': 'Korean', 'code': 'ko'},
+      {'name': 'Chinese', 'code': 'zh'},
+    ];
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        decoration: BoxDecoration(
+          color: AppTheme.surface(context),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40, height: 4,
+                margin: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppTheme.adaptiveSubtle(context),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                child: Text(_l.t('settings_select_language'),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,
+                        color: AppTheme.adaptiveText(context))),
+              ),
+              const Divider(height: 1),
+              ...languages.map((lang) => ListTile(
+                leading: Icon(Icons.language, color: AppTheme.primaryPurple, size: 20),
+                title: Text(lang['name']!,
+                    style: TextStyle(color: AppTheme.adaptiveText(context))),
+                trailing: _selectedLanguage == lang['name']
+                    ? const Icon(Icons.check_circle, color: AppTheme.primaryPurple)
+                    : null,
+                onTap: () {
+                  setState(() => _selectedLanguage = lang['name']!);
+                  _updatePreference('pref_language', lang['name']!);
+                  AppLocalizations.instance.setLanguage(lang['code']!);
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(AppLocalizations.instance.t('settings_language') + 
+                        ': ${lang['name']}'),
+                      backgroundColor: AppTheme.primaryPurple,
+                    ),
+                  );
+                },
+              )),
+              const SizedBox(height: 8),
+            ],
           ),
         ),
       ),
@@ -489,15 +675,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          backgroundColor: AppTheme.surfaceDark,
-          title: const Text('Confirm Logout', style: TextStyle(color: Colors.white)),
+          backgroundColor: AppTheme.surface(context),
+          title: Text(_l.t('drawer_confirm_logout_title'), style: TextStyle(color: AppTheme.adaptiveText(context))),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Are you sure you want to log out?', style: TextStyle(color: AppTheme.textSecondary)),
+              Text(_l.t('drawer_confirm_logout_msg'), style: TextStyle(color: AppTheme.adaptiveTextSecondary(context))),
               const SizedBox(height: 16),
               CheckboxListTile(
-                title: const Text('Save account on this device', style: TextStyle(fontSize: 14, color: Colors.white)),
+                title: Text(_l.t('drawer_save_account'), style: TextStyle(fontSize: 14, color: AppTheme.adaptiveText(context))),
                 value: saveAccount,
                 activeColor: AppTheme.primaryPurple,
                 onChanged: (val) => setDialogState(() => saveAccount = val!),
@@ -505,7 +691,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
+            TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text(_l.t('cancel'))),
             TextButton(
               onPressed: () async {
                 try {
@@ -537,7 +723,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   debugPrint('Logout error: $e');
                 }
               },
-              child: const Text('Logout', style: TextStyle(color: Colors.redAccent)),
+              child: Text(_l.t('drawer_logout'), style: const TextStyle(color: Colors.redAccent)),
             ),
           ],
         ),
@@ -549,11 +735,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surfaceDark,
-        title: const Text('Delete Account?', style: TextStyle(color: Colors.white)),
-        content: const Text('This action is permanent and cannot be undone.', style: TextStyle(color: AppTheme.textSecondary)),
+        backgroundColor: AppTheme.surface(context),
+        title: Text(_l.t('settings_delete_account_title'), style: TextStyle(color: AppTheme.adaptiveText(context))),
+        content: Text(_l.t('settings_delete_account_msg'), style: TextStyle(color: AppTheme.adaptiveTextSecondary(context))),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(_l.t('cancel'))),
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Delete', style: TextStyle(color: Colors.redAccent))),
         ],
       ),

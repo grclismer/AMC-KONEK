@@ -138,11 +138,10 @@ class CommentService {
       if (postData != null) {
         final postOwnerId = postData['userId'];
         if (postOwnerId != null && postOwnerId != comment.userId) {
-          await NotificationService.sendNotification(
+          await NotificationService.send(
             recipientId: postOwnerId,
             senderId: comment.userId,
             senderName: verifiedUsername,
-            senderAvatar: comment.avatarUrl,
             type: 'comment',
             message: 'commented on your post',
             postId: comment.postId,

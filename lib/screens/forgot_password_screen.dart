@@ -3,6 +3,7 @@ import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/effects.dart';
 import '../theme/animations.dart';
+import '../utils/error_handler.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -26,14 +27,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     try {
       await _authService.resetPassword(_emailController.text);
       if (mounted) {
+        // Update the _resetPassword dialog background and text styles
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            backgroundColor: AppTheme.surfaceDark,
-            title: const Text('Email Sent', style: TextStyle(color: Colors.white)),
-            content: const Text(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor, // Use Theme instead of hardcoded
+            title: Text('Email Sent', style: TextStyle(color: AppTheme.adaptiveText(context))),
+            content: Text(
               'Check your inbox for password reset instructions.',
-              style: TextStyle(color: AppTheme.textSecondary),
+              style: TextStyle(color: AppTheme.adaptiveTextSecondary(context)),
             ),
             actions: [
               TextButton(
@@ -49,7 +51,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       }
     } catch (e) {
       if (mounted) {
-        GlassmorphicEffects.showGlassSnackBar(context, message: e.toString(), isError: true);
+        GlassmorphicEffects.showGlassSnackBar(context, message: AppErrorHandler.authError(e), isError: true);
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -83,11 +85,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              const FadeInStaggered(
+              FadeInStaggered(
                 index: 1,
                 child: Text(
                   'Forgot Password?',
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 1.2),
+                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppTheme.adaptiveText(context), letterSpacing: 1.2),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -113,13 +115,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   child: TextField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.email_outlined, color: AppTheme.textSecondary),
+                    style: TextStyle(color: AppTheme.adaptiveText(context)),
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.email_outlined, color: AppTheme.adaptiveTextSecondary(context)),
                       hintText: 'Email Address',
-                      hintStyle: TextStyle(color: AppTheme.textSecondary),
+                      hintStyle: TextStyle(color: AppTheme.adaptiveTextSecondary(context)),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     ),
                   ),
                 ),

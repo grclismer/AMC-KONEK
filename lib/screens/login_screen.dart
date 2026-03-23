@@ -8,9 +8,11 @@ import '../theme/app_theme.dart';
 import '../theme/effects.dart';
 import '../theme/animations.dart';
 import '../widgets/user_photo_widget.dart';
+import '../utils/error_handler.dart';
+import '../utils/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -22,6 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _authService = AuthService();
   bool _obscurePassword = true;
   bool _isLoading = false;
+  AppLocalizations get _l => AppLocalizations.instance;
 
   Future<List<Map<String, dynamic>>> _getSavedAccounts() async {
     final prefs = await SharedPreferences.getInstance();
@@ -49,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      GlassmorphicEffects.showGlassSnackBar(context, message: 'Please fill in all fields', isError: true);
+      GlassmorphicEffects.showGlassSnackBar(context, message: _l.t('login_fill_fields'), isError: true);
       return;
     }
     setState(() => _isLoading = true);
@@ -64,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // when it detects authStateChanges()
     } catch (e) {
       if (mounted) {
-        GlassmorphicEffects.showGlassSnackBar(context, message: 'Login Failed: ${e.toString()}', isError: true);
+        GlassmorphicEffects.showGlassSnackBar(context, message: AppErrorHandler.authError(e), isError: true);
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -84,36 +87,47 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       if (mounted) {
-        GlassmorphicEffects.showGlassSnackBar(context, message: 'Google Sign-In Failed: ${e.toString()}', isError: true);
+        GlassmorphicEffects.showGlassSnackBar(context, message: AppErrorHandler.authError(e), isError: true);
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
+  ImageProvider? _getAccountImage(String? url) {
+    if (url == null || url.isEmpty) return null;
+    if (url.startsWith('data:image')) {
+      try {
+        final base64String = url.split(',').last;
+        return MemoryImage(base64Decode(base64String));
+      } catch (_) {
+        return null;
+      }
+    }
+    if (url.startsWith('http')) {
+      return NetworkImage(url);
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: AppTheme.background(context),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
+            padding: EdgeInsets.symmetric(horizontal: 32),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 GradientUtils.gradientText(
-                  child: const Text(
+                  child: Text(
                     'KONEK',
-                    style: TextStyle(
-                      fontSize: 56,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      letterSpacing: 2.0,
-                    ),
+                    style: const TextStyle(color: Colors.white, letterSpacing: 2.0, fontSize: 32, fontWeight: FontWeight.bold),
                   ),
                 ),
-                const SizedBox(height: 48),
+                SizedBox(height: 48),
 
                 FutureBuilder<List<Map<String, dynamic>>>(
                   future: _getSavedAccounts(),
@@ -124,19 +138,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         .toList();
                     
                     if (savedAccounts.isEmpty) {
-                      return const SizedBox.shrink();
+                      return SizedBox.shrink();
                     }
                     
                     return Column(
                       children: [
-                        const Text(
-                          'Continue as saved account',
+                        Text(
+                          _l.t('login_continue_saved'),
                           style: TextStyle(
-                            color: AppTheme.textSecondary,
+                            color: AppTheme.adaptiveTextSecondary(context),
                             fontSize: 14,
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16),
                         
                         SizedBox(
                           height: 110,
@@ -153,9 +167,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         
-                        const SizedBox(height: 24),
-                        const Text("— or sign in —", style: TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24),
+                        Text("— ${_l.t('login_or_sign_in')} —", style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 14)),
+                        SizedBox(height: 24),
                       ],
                     );
                   },
@@ -165,7 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   index: 1,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: AppTheme.surfaceDark, 
+                      color: AppTheme.surface(context), 
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.white.withOpacity(0.05)),
                     ),
@@ -173,77 +187,77 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       autofocus: true,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: AppTheme.adaptiveText(context)),
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.person_outline, color: AppTheme.textSecondary),
-                        hintText: '@username or email',
-                        hintStyle: const TextStyle(color: AppTheme.textSecondary),
+                        prefixIcon: Icon(Icons.person_outline, color: AppTheme.adaptiveTextSecondary(context)),
+                        hintText: _l.t('login_email_hint'),
+                        hintStyle: TextStyle(color: AppTheme.adaptiveTextSecondary(context)),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 
                 FadeInStaggered(
                   index: 2,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: AppTheme.surfaceDark, 
+                      color: AppTheme.surface(context), 
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.white.withOpacity(0.05)),
                     ),
                     child: TextField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: AppTheme.adaptiveText(context)),
                       decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.textSecondary),
-                        hintText: 'Password',
-                        hintStyle: const TextStyle(color: AppTheme.textSecondary),
+                        prefixIcon: Icon(Icons.lock_outline, color: AppTheme.adaptiveTextSecondary(context)),
+                        hintText: _l.t('login_password_hint'),
+                        hintStyle: TextStyle(color: AppTheme.adaptiveTextSecondary(context)),
                         border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                         suffixIcon: IconButton(
-                          icon: Icon(_obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: AppTheme.textSecondary),
+                          icon: Icon(_obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: AppTheme.adaptiveTextSecondary(context)),
                           onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                         ),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
  
                 FadeInStaggered(
                   index: 3,
                   child: BounceClick(
                     onTap: _login,
                     child: GlassmorphicEffects.gradientButton(
-                      text: 'Log In',
+                      text: _l.t('login_button'),
                       height: 52,
                       isLoading: _isLoading,
                       onPressed: _login,
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     TextButton(
-                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ForgotPasswordScreen())),
-                      child: const Text('Forgot password?', style: TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
+                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ForgotPasswordScreen())),
+                      child: Text(_l.t('login_forgot_password'), style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 14)),
                     ),
-                    const Text(' • ', style: TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
+                    Text(' • ', style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 14)),
                     TextButton(
-                      onPressed: () => Navigator.push(context, SlidePageRoute(page: const SignUpScreen())),
-                      child: const Text('Create account', style: TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
+                      onPressed: () => Navigator.push(context, SlidePageRoute(page: SignUpScreen())),
+                      child: Text(_l.t('login_create_account'), style: TextStyle(color: AppTheme.adaptiveTextSecondary(context), fontSize: 14)),
                     ),
                   ],
                 ),
                 
-                const SizedBox(height: 32),
+                SizedBox(height: 32),
                 FadeInStaggered(
                   index: 4,
                   child: SizedBox(
@@ -253,8 +267,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       onTap: _isLoading ? null : _loginWithGoogle,
                       child: OutlinedButton.icon(
                         onPressed: _isLoading ? null : _loginWithGoogle,
-                        icon: const Icon(Icons.g_mobiledata_rounded, size: 28, color: Colors.white),
-                        label: const Text('Continue with Google', style: TextStyle(color: Colors.white)),
+                        icon: Icon(Icons.g_mobiledata_rounded, size: 28, color: AppTheme.adaptiveText(context)),
+                        label: Text(_l.t('login_google_button'), style: TextStyle(color: AppTheme.adaptiveText(context))),
                         style: OutlinedButton.styleFrom(
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           side: BorderSide(color: Colors.white.withOpacity(0.2)),
@@ -278,17 +292,17 @@ class _LoginScreenState extends State<LoginScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            backgroundColor: AppTheme.surfaceDark,
-            title: const Text('Remove account?', style: TextStyle(color: Colors.white)),
-            content: Text('Remove ${account['email']} from saved accounts?', style: const TextStyle(color: AppTheme.textSecondary)),
+            backgroundColor: AppTheme.surface(context),
+            title: Text(_l.t('login_remove_confirm'), style: TextStyle(color: AppTheme.adaptiveText(context))),
+            content: Text('${_l.t('login_remove_message')} ${account['email']}?', style: TextStyle(color: AppTheme.adaptiveTextSecondary(context))),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+              TextButton(onPressed: () => Navigator.pop(context), child: Text(_l.t('cancel'))),
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                   _removeSavedAccount(account);
                 },
-                child: const Text('Remove', style: TextStyle(color: Colors.redAccent)),
+                child: Text(_l.t('remove'), style: TextStyle(color: Colors.redAccent)),
               ),
             ],
           ),
@@ -296,24 +310,32 @@ class _LoginScreenState extends State<LoginScreen> {
       },
       child: Container(
         width: 80,
-        margin: const EdgeInsets.only(right: 16),
+        margin: EdgeInsets.only(right: 16),
         child: Column(
           children: [
-            UserPhotoWidget(
-              userId: account['uid'] ?? '',
-              radius: 32,
-              showBorder: true,
-              borderGradient: AppTheme.primaryGradient,
-              borderWidth: 2,
+            Container(
+              padding: EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: AppTheme.primaryGradient,
+              ),
+              child: CircleAvatar(
+                radius: 32,
+                backgroundColor: Colors.grey[800],
+                backgroundImage: _getAccountImage(account['photoURL']),
+                child: _getAccountImage(account['photoURL']) == null
+                    ? Icon(Icons.person, size: 32, color: Colors.grey)
+                    : null,
+              ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               account['username'] ?? 
               account['displayName'] ?? 
               account['email']?.split('@')[0] ?? 
               'User',
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: AppTheme.adaptiveText(context),
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
@@ -332,7 +354,7 @@ class _LoginScreenState extends State<LoginScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
+        builder: (context) => Center(
           child: CircularProgressIndicator(),
         ),
       );
@@ -367,7 +389,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       if (mounted) {
         Navigator.pop(context); // Close loading
-        GlassmorphicEffects.showGlassSnackBar(context, message: 'Login failed: $e', isError: true);
+        GlassmorphicEffects.showGlassSnackBar(context, message: AppErrorHandler.authError(e), isError: true);
       }
     }
   }
@@ -378,24 +400,24 @@ class _LoginScreenState extends State<LoginScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppTheme.surfaceDark,
-        title: const Text(
-          'Enter Password',
-          style: TextStyle(color: Colors.white),
+        backgroundColor: AppTheme.surface(context),
+        title: Text(
+          _l.t('login_enter_password'),
+          style: TextStyle(color: AppTheme.adaptiveText(context)),
         ),
         content: TextField(
           controller: passwordController,
           obscureText: true,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            hintText: 'Password',
-            hintStyle: TextStyle(color: AppTheme.textSecondary),
+          style: TextStyle(color: AppTheme.adaptiveText(context)),
+          decoration: InputDecoration(
+            hintText: _l.t('login_password_hint'),
+            hintStyle: TextStyle(color: AppTheme.adaptiveTextSecondary(context)),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(_l.t('cancel')),
           ),
           TextButton(
             onPressed: () async {
@@ -407,7 +429,7 @@ class _LoginScreenState extends State<LoginScreen> {
               showDialog(
                 context: context,
                 barrierDismissible: false,
-                builder: (context) => const Center(child: CircularProgressIndicator()),
+                builder: (context) => Center(child: CircularProgressIndicator()),
               );
               
               try {
@@ -422,11 +444,11 @@ class _LoginScreenState extends State<LoginScreen> {
               } catch (e) {
                 if (mounted) {
                   Navigator.pop(context); // Close loading
-                  GlassmorphicEffects.showGlassSnackBar(context, message: 'Login failed: $e', isError: true);
+                  GlassmorphicEffects.showGlassSnackBar(context, message: AppErrorHandler.authError(e), isError: true);
                 }
               }
             },
-            child: const Text('Log In'),
+            child: Text(_l.t('login_button')),
           ),
         ],
       ),

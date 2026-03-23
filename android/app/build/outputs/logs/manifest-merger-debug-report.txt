@@ -1,0 +1,964 @@
+-- Merging decision tree log ---
+application
+INJECTED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\main\AndroidManifest.xml:2:5-33:19
+INJECTED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\debug\AndroidManifest.xml
+MERGED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:5-46:19
+MERGED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:5-46:19
+MERGED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-32:19
+MERGED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:5-32:19
+MERGED from [:url_launcher_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.28\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-12:19
+MERGED from [:url_launcher_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.28\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-12:19
+MERGED from [:cloud_firestore] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\cloud_firestore-5.6.12\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-13:19
+MERGED from [:cloud_firestore] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\cloud_firestore-5.6.12\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-13:19
+MERGED from [:firebase_auth] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_auth-5.7.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-13:19
+MERGED from [:firebase_auth] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_auth-5.7.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-13:19
+MERGED from [:firebase_storage] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_storage-12.4.10\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-13:19
+MERGED from [:firebase_storage] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_storage-12.4.10\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-13:19
+MERGED from [:firebase_core] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_core-3.15.2\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-13:19
+MERGED from [:firebase_core] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_core-3.15.2\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-13:19
+MERGED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:28:5-73:19
+MERGED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:28:5-73:19
+MERGED from [androidx.window:window:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cd55006f3af01eca13a44d05ded19cc2\transformed\window-1.2.0\AndroidManifest.xml:22:5-29:19
+MERGED from [androidx.window:window:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cd55006f3af01eca13a44d05ded19cc2\transformed\window-1.2.0\AndroidManifest.xml:22:5-29:19
+MERGED from [androidx.emoji2:emoji2:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\939f3ad82514b6f9abcf17b3aad4b42c\transformed\emoji2-1.2.0\AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.emoji2:emoji2:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\939f3ad82514b6f9abcf17b3aad4b42c\transformed\emoji2-1.2.0\AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:23:5-42:19
+MERGED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:23:5-42:19
+MERGED from [com.google.android.gms:play-services-auth:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\bc9dac762807af0faf4b8802a6d21833\transformed\play-services-auth-21.0.0\AndroidManifest.xml:22:5-38:19
+MERGED from [com.google.android.gms:play-services-auth:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\bc9dac762807af0faf4b8802a6d21833\transformed\play-services-auth-21.0.0\AndroidManifest.xml:22:5-38:19
+MERGED from [com.google.firebase:firebase-firestore:25.1.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9bb823874bf863b2f586eca3d3548ed5\transformed\firebase-firestore-25.1.4\AndroidManifest.xml:13:5-24:19
+MERGED from [com.google.firebase:firebase-firestore:25.1.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9bb823874bf863b2f586eca3d3548ed5\transformed\firebase-firestore-25.1.4\AndroidManifest.xml:13:5-24:19
+MERGED from [com.google.firebase:firebase-storage:21.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f0c139bfad30fb5c25db9d31e6a36212\transformed\firebase-storage-21.0.2\AndroidManifest.xml:26:5-37:19
+MERGED from [com.google.firebase:firebase-storage:21.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f0c139bfad30fb5c25db9d31e6a36212\transformed\firebase-storage-21.0.2\AndroidManifest.xml:26:5-37:19
+MERGED from [com.google.firebase:firebase-auth-interop:20.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5adc7445fc4393f8e512b2ff3f317369\transformed\firebase-auth-interop-20.0.0\AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.firebase:firebase-auth-interop:20.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5adc7445fc4393f8e512b2ff3f317369\transformed\firebase-auth-interop-20.0.0\AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\21f22314527288259e21d5daaba52605\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:21:5-32:19
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\21f22314527288259e21d5daaba52605\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:21:5-32:19
+MERGED from [com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5f43f36a6386db306c79b7d03f045305\transformed\firebase-common-ktx-21.0.0\AndroidManifest.xml:8:5-16:19
+MERGED from [com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5f43f36a6386db306c79b7d03f045305\transformed\firebase-common-ktx-21.0.0\AndroidManifest.xml:8:5-16:19
+MERGED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:22:5-39:19
+MERGED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:22:5-39:19
+MERGED from [com.google.android.play:integrity:1.3.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9aa5fa4349d645aecaea1bd24aa4f1f8\transformed\integrity-1.3.0\AndroidManifest.xml:5:5-6:19
+MERGED from [com.google.android.play:integrity:1.3.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9aa5fa4349d645aecaea1bd24aa4f1f8\transformed\integrity-1.3.0\AndroidManifest.xml:5:5-6:19
+MERGED from [com.google.firebase:firebase-appcheck-interop:17.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\d73f21f399d1ad4adebb28da745821e3\transformed\firebase-appcheck-interop-17.1.0\AndroidManifest.xml:21:5-20
+MERGED from [com.google.firebase:firebase-appcheck-interop:17.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\d73f21f399d1ad4adebb28da745821e3\transformed\firebase-appcheck-interop-17.1.0\AndroidManifest.xml:21:5-20
+MERGED from [com.google.android.gms:play-services-fido:20.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ba7f47ed79d4b94f9ef4e3b48a080618\transformed\play-services-fido-20.1.0\AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.android.gms:play-services-fido:20.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ba7f47ed79d4b94f9ef4e3b48a080618\transformed\play-services-fido-20.1.0\AndroidManifest.xml:7:5-8:19
+MERGED from [com.google.android.gms:play-services-base:18.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\87593e21da0fd48c2909f3826fbef62f\transformed\play-services-base-18.1.0\AndroidManifest.xml:19:5-23:19
+MERGED from [com.google.android.gms:play-services-base:18.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\87593e21da0fd48c2909f3826fbef62f\transformed\play-services-base-18.1.0\AndroidManifest.xml:19:5-23:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\20ff5d78d88aff1ec01d8becfbbaf8fe\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\20ff5d78d88aff1ec01d8becfbbaf8fe\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:23:5-33:19
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\c1a2317e3f150f82d4cf0e255a2420f4\transformed\play-services-tasks-18.2.0\AndroidManifest.xml:4:5-20
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\c1a2317e3f150f82d4cf0e255a2420f4\transformed\play-services-tasks-18.2.0\AndroidManifest.xml:4:5-20
+MERGED from [com.google.android.gms:play-services-basement:18.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5c2a01603f7fdbeec8eab9b1873f2aea\transformed\play-services-basement-18.4.0\AndroidManifest.xml:5:5-7:19
+MERGED from [com.google.android.gms:play-services-basement:18.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5c2a01603f7fdbeec8eab9b1873f2aea\transformed\play-services-basement-18.4.0\AndroidManifest.xml:5:5-7:19
+MERGED from [androidx.core:core:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\fe466d01096315eb795ac782eef033af\transformed\core-1.17.0\AndroidManifest.xml:28:5-89
+MERGED from [androidx.core:core:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\fe466d01096315eb795ac782eef033af\transformed\core-1.17.0\AndroidManifest.xml:28:5-89
+MERGED from [com.otaliastudios:transcoder:0.10.5] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\12d03c7b0cc04fc296030296ce78158f\transformed\transcoder-0.10.5\AndroidManifest.xml:9:5-20
+MERGED from [com.otaliastudios:transcoder:0.10.5] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\12d03c7b0cc04fc296030296ce78158f\transformed\transcoder-0.10.5\AndroidManifest.xml:9:5-20
+MERGED from [com.otaliastudios.opengl:egloo:0.6.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\105a34b9847bba8b687c1cddeced92d0\transformed\egloo-0.6.1\AndroidManifest.xml:9:5-20
+MERGED from [com.otaliastudios.opengl:egloo:0.6.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\105a34b9847bba8b687c1cddeced92d0\transformed\egloo-0.6.1\AndroidManifest.xml:9:5-20
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b9eb8a1a496559a57c267953f19a1f5e\transformed\startup-runtime-1.1.1\AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b9eb8a1a496559a57c267953f19a1f5e\transformed\startup-runtime-1.1.1\AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\4f0abb00b4c9e04354c372bd77cc4b34\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\4f0abb00b4c9e04354c372bd77cc4b34\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:24:5-25:19
+MERGED from [com.google.android.play:core-common:2.0.3] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\db0f2498bb07f017d39d5cb2d952b27d\transformed\core-common-2.0.3\AndroidManifest.xml:11:5-19:19
+MERGED from [com.google.android.play:core-common:2.0.3] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\db0f2498bb07f017d39d5cb2d952b27d\transformed\core-common-2.0.3\AndroidManifest.xml:11:5-19:19
+	android:extractNativeLibs
+		INJECTED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\debug\AndroidManifest.xml
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\fe466d01096315eb795ac782eef033af\transformed\core-1.17.0\AndroidManifest.xml:28:18-86
+	android:name
+		INJECTED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\main\AndroidManifest.xml
+manifest
+ADDED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\main\AndroidManifest.xml:1:1-45:12
+MERGED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\main\AndroidManifest.xml:1:1-45:12
+INJECTED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\debug\AndroidManifest.xml:1:1-7:12
+INJECTED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\debug\AndroidManifest.xml:1:1-7:12
+INJECTED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\debug\AndroidManifest.xml:1:1-7:12
+MERGED from [:ffmpeg_kit_flutter_new] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\ffmpeg_kit_flutter_new-4.1.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:flutter_image_compress_common] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_image_compress_common-1.0.6\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-10:12
+MERGED from [:shared_preferences_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\shared_preferences_android-2.4.21\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:video_player_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\video_player_android-2.9.4\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:webview_flutter_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\webview_flutter_android-4.10.11\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-48:12
+MERGED from [androidx.preference:preference:1.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\4b959f7c338d1bf58ad15a77e656e7c1\transformed\preference-1.2.1\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.appcompat:appcompat-resources:1.5.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\14de00ff56cbfe58648d9e22bbb3643a\transformed\appcompat-resources-1.5.1\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.appcompat:appcompat:1.5.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\0330aa36dfb9f03e944336c747a008b1\transformed\appcompat-1.5.1\AndroidManifest.xml:17:1-22:12
+MERGED from [:file_picker] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\file_picker-8.3.7\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-15:12
+MERGED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-34:12
+MERGED from [:url_launcher_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.28\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-14:12
+MERGED from [:cloud_firestore] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\cloud_firestore-5.6.12\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-15:12
+MERGED from [:firebase_auth] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_auth-5.7.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-15:12
+MERGED from [:firebase_storage] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_storage-12.4.10\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-15:12
+MERGED from [:firebase_core] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_core-3.15.2\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-15:12
+MERGED from [:flutter_plugin_android_lifecycle] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_plugin_android_lifecycle-2.0.33\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:google_sign_in_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\google_sign_in_android-6.2.1\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-9:12
+MERGED from [:path_provider_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\path_provider_android-2.2.22\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [:video_compress] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\video_compress-3.1.4\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-9:12
+MERGED from [:video_thumbnail] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\video_thumbnail-0.5.6\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.recyclerview:recyclerview:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cd55c5e7ba4d5725300001734228d92f\transformed\recyclerview-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\8a24049c8bb51166dac8e6cc253a4f57\transformed\legacy-support-core-ui-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\63ea796eb2ff6afb59b9be29ee3bbb39\transformed\swiperefreshlayout-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:17:1-75:12
+MERGED from [androidx.browser:browser:1.9.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\c703595a64646951e3dca5c9e84e54ff\transformed\browser-1.9.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.media3:media3-extractor:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\2d314572bbb1a034ecb899b3e37cba9c\transformed\media3-extractor-1.9.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-container:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\c1bd4d40b797c2d8235b05e860529bfa\transformed\media3-container-1.9.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-datasource:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5c7ba828f455a10544b03fa4c206351b\transformed\media3-datasource-1.9.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-decoder:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9beb8a0230802b28aa963cdf64f4f53f\transformed\media3-decoder-1.9.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-database:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5e5c4213b55bec221fdcf14d13d511d1\transformed\media3-database-1.9.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-common:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\aa1e2108b666a3e84c928320221e8855\transformed\media3-common-1.9.2\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.media3:media3-exoplayer-hls:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\3238a62a36ae02846f583aec0576f29b\transformed\media3-exoplayer-hls-1.9.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-exoplayer-dash:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\917b3eac7c3f740f7d0887321ee6b3d0\transformed\media3-exoplayer-dash-1.9.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-exoplayer-rtsp:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\469a97fbc002655e9119de755212d5cc\transformed\media3-exoplayer-rtsp-1.9.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-exoplayer-smoothstreaming:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\6d2dac66af0573d655fd5fe0e5ee9bd8\transformed\media3-exoplayer-smoothstreaming-1.9.2\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media3:media3-exoplayer:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\de8caec8d708cab68c6370b2330dee5d\transformed\media3-exoplayer-1.9.2\AndroidManifest.xml:17:1-25:12
+MERGED from [androidx.webkit:webkit:1.14.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\55a1cbdf4172e6b1732396fe3e61e5f1\transformed\webkit-1.14.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\e6bada844bb923ab161d79080aaea579\transformed\slidingpanelayout-1.2.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.window:window:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cd55006f3af01eca13a44d05ded19cc2\transformed\window-1.2.0\AndroidManifest.xml:17:1-31:12
+MERGED from [androidx.window:window-java:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\dd469dce54fb235c44e62946145b58cc\transformed\window-java-1.2.0\AndroidManifest.xml:17:1-21:12
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ec7558ac8791ad5a73f9f29a6cb9157e\transformed\drawerlayout-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.emoji2:emoji2-views-helper:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ec896b23ba8094d64d1cb7cbf772926d\transformed\emoji2-views-helper-1.2.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.emoji2:emoji2:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\939f3ad82514b6f9abcf17b3aad4b42c\transformed\emoji2-1.2.0\AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.credentials:credentials:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf5f9f3c8c204f1eaca76876939df185\transformed\credentials-1.2.0-rc01\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:17:1-44:12
+MERGED from [com.google.android.gms:play-services-auth:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\bc9dac762807af0faf4b8802a6d21833\transformed\play-services-auth-21.0.0\AndroidManifest.xml:17:1-40:12
+MERGED from [com.google.firebase:firebase-firestore:25.1.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9bb823874bf863b2f586eca3d3548ed5\transformed\firebase-firestore-25.1.4\AndroidManifest.xml:2:1-26:12
+MERGED from [com.google.firebase:firebase-storage:21.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f0c139bfad30fb5c25db9d31e6a36212\transformed\firebase-storage-21.0.2\AndroidManifest.xml:15:1-39:12
+MERGED from [com.google.firebase:firebase-auth-interop:20.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5adc7445fc4393f8e512b2ff3f317369\transformed\firebase-auth-interop-20.0.0\AndroidManifest.xml:2:1-10:12
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\21f22314527288259e21d5daaba52605\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:15:1-34:12
+MERGED from [com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5f43f36a6386db306c79b7d03f045305\transformed\firebase-common-ktx-21.0.0\AndroidManifest.xml:2:1-18:12
+MERGED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:15:1-41:12
+MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\defa85ad8f9189bab912180a9550672d\transformed\play-services-auth-api-phone-18.0.2\AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.gms:play-services-auth-base:18.0.10] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\569ed18e20f2ff9dc70acafd91b5a2bf\transformed\play-services-auth-base-18.0.10\AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.recaptcha:recaptcha:18.6.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b88730f0f0dfd351a6b3fe00c4e42353\transformed\recaptcha-18.6.1\AndroidManifest.xml:2:1-11:12
+MERGED from [com.google.android.play:integrity:1.3.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9aa5fa4349d645aecaea1bd24aa4f1f8\transformed\integrity-1.3.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.firebase:firebase-database-collection:18.0.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\4d78fc94628b4fdd0af431c60afc036d\transformed\firebase-database-collection-18.0.1\AndroidManifest.xml:2:1-9:12
+MERGED from [com.google.firebase:firebase-appcheck-interop:17.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\d73f21f399d1ad4adebb28da745821e3\transformed\firebase-appcheck-interop-17.1.0\AndroidManifest.xml:15:1-23:12
+MERGED from [com.google.android.gms:play-services-fido:20.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ba7f47ed79d4b94f9ef4e3b48a080618\transformed\play-services-fido-20.1.0\AndroidManifest.xml:2:1-10:12
+MERGED from [com.google.android.gms:play-services-base:18.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\87593e21da0fd48c2909f3826fbef62f\transformed\play-services-base-18.1.0\AndroidManifest.xml:16:1-24:12
+MERGED from [androidx.fragment:fragment-ktx:1.7.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\421fcba44bb06049166b24397e9fbeda\transformed\fragment-ktx-1.7.1\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.activity:activity-ktx:1.12.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\753b0a03e2038e070431acd7fa4feddc\transformed\activity-ktx-1.12.4\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.activity:activity:1.12.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ae97e1c2c118bf8baa0b209ed3307fc2\transformed\activity-1.12.4\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\22511e5f9b9e77c262554e79f2c195f8\transformed\lifecycle-livedata-core-ktx-2.7.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ff060184ca7a288054e53939cb0d8e24\transformed\lifecycle-viewmodel-ktx-2.7.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\44387f56765a00c4e94b2f4f2e23e336\transformed\lifecycle-runtime-ktx-2.7.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\823167ae951b7c75fe0e5d8c28eac5b5\transformed\lifecycle-livedata-core-2.7.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ba7aaf3756592a453859f0577d0ecb1c\transformed\lifecycle-viewmodel-savedstate-2.7.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\75f1269d57da6147491ce24ed6de6ce3\transformed\lifecycle-viewmodel-2.7.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\20ff5d78d88aff1ec01d8becfbbaf8fe\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5857e697016b08f21f82979759acc0be\transformed\lifecycle-runtime-2.7.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.savedstate:savedstate-ktx:1.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\2cfd95419e1401f3c2788985f50cb815\transformed\savedstate-ktx-1.2.1\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.savedstate:savedstate:1.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\68d6d279dc5e82dc6fb54a7721f5cce1\transformed\savedstate-1.2.1\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.datastore:datastore-preferences-core-android:1.1.7] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\3a022b93d40760c862e8e5903bbcac40\transformed\datastore-preferences-core-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.datastore:datastore-core-android:1.1.7] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\26445deb34b112d32a6d0dc4afcd514d\transformed\datastore-core-release\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.datastore:datastore-preferences-android:1.1.7] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\29bb4e3f01d63b44dfd6ed6ca59ba102\transformed\datastore-preferences-release\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.datastore:datastore-android:1.1.7] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ba72eb6bd7c1094d0007a128864e268a\transformed\datastore-release\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.navigationevent:navigationevent-android:1.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\781c2e72e35abd8e9751d7e1b0e1ac93\transformed\navigationevent\AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\c1a2317e3f150f82d4cf0e255a2420f4\transformed\play-services-tasks-18.2.0\AndroidManifest.xml:2:1-5:12
+MERGED from [com.google.android.gms:play-services-basement:18.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5c2a01603f7fdbeec8eab9b1873f2aea\transformed\play-services-basement-18.4.0\AndroidManifest.xml:2:1-9:12
+MERGED from [androidx.fragment:fragment:1.7.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\2942ac14e350bb1c313fcc01fb2f9c67\transformed\fragment-1.7.1\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9466298c30dc500e7f511b0aa886a3b8\transformed\legacy-support-core-utils-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.loader:loader:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\896cab2638203e837f844e40543f9944\transformed\loader-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.core:core-ktx:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\711fdca95ad61da49a56a02280bf58cd\transformed\core-ktx-1.17.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f64ef72f93ead0627d984e1e01929303\transformed\viewpager-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\74bc9965eefc7a89219e2ae95f139d2a\transformed\vectordrawable-animated-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\a7e45bf8782b8b72327689026e2fa1ea\transformed\vectordrawable-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\119dbb29d52d07b663174458ac30186a\transformed\coordinatorlayout-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.customview:customview:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\c71bbc0d43c484033bf2aa574c609026\transformed\customview-1.1.0\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.transition:transition:1.4.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b04ce4975e5ff70e99adf51e4e7e6aee\transformed\transition-1.4.1\AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\6303fb9e42fef7f59254aab803c6ca45\transformed\asynclayoutinflater-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\fe466d01096315eb795ac782eef033af\transformed\core-1.17.0\AndroidManifest.xml:17:1-30:12
+MERGED from [com.antonkarpenko:ffmpeg-kit-full-gpl:2.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\d78b38543d6a58f70e5ec82a11684445\transformed\ffmpeg-kit-full-gpl-2.1.0\AndroidManifest.xml:2:1-7:12
+MERGED from [com.otaliastudios:transcoder:0.10.5] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\12d03c7b0cc04fc296030296ce78158f\transformed\transcoder-0.10.5\AndroidManifest.xml:2:1-11:12
+MERGED from [com.otaliastudios.opengl:egloo:0.6.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\105a34b9847bba8b687c1cddeced92d0\transformed\egloo-0.6.1\AndroidManifest.xml:2:1-11:12
+MERGED from [com.google.android.libraries.identity.googleid:googleid:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\364d01b648c1518e761c57d9b53e8fbf\transformed\googleid-1.1.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.heifwriter:heifwriter:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\4c564ce2d47430966f6ed5f74ae95187\transformed\heifwriter-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.exifinterface:exifinterface:1.4.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\84b142d522b8fd0a2ed078abc3fb9f49\transformed\exifinterface-1.4.2\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:17:1-55:12
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b9eb8a1a496559a57c267953f19a1f5e\transformed\startup-runtime-1.1.1\AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.tracing:tracing:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\207d15e88ec1782e0bbc925f8b1625e0\transformed\tracing-1.2.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5894835d8c80f65725ce6b6b896e151f\transformed\cursoradapter-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\af1fcc3551e96bc368a7e6f4972c6767\transformed\interpolator-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\4f0abb00b4c9e04354c372bd77cc4b34\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\42044262f887e91fee6808b6522ce83c\transformed\localbroadcastmanager-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [com.google.firebase:firebase-components:18.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f3029ba1ce8a9b48f1dca28444e4de32\transformed\firebase-components-18.0.0\AndroidManifest.xml:15:1-20:12
+MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\8fbd0d1a47089307fd01dd35c77ff556\transformed\core-runtime-2.2.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.window.extensions.core:core:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\6f64ce3cc0e3800481a810a9969d0b00\transformed\core-1.0.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\6ae34a157b732732e23a5a2f4955017b\transformed\documentfile-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.print:print:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b148a7f0989c41e99ded8da74d09764a\transformed\print-1.0.0\AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f43755361c24f191f3cfd14bc2a631a7\transformed\annotation-experimental-1.4.1\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.core:core-viewtree:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\a40ad7cdf283fbd25b906097aafd5c6c\transformed\core-viewtree-1.0.0\AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.runtime:runtime-annotation-android:1.9.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\c4dad51c4beedc28cf6a7898dee9059e\transformed\runtime-annotation\AndroidManifest.xml:2:1-7:12
+MERGED from [com.getkeepsafe.relinker:relinker:1.4.5] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\797c5402757c33f61fc858571fa09b39\transformed\relinker-1.4.5\AndroidManifest.xml:2:1-7:12
+MERGED from [io.grpc:grpc-android:1.62.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\70c06075788772e27e59036dd6c344cf\transformed\grpc-android-1.62.2\AndroidManifest.xml:2:1-9:12
+MERGED from [com.google.firebase:protolite-well-known-types:18.0.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\1cb7f6393a1697777edf6ffb48f8e8ce\transformed\protolite-well-known-types-18.0.1\AndroidManifest.xml:2:1-7:12
+MERGED from [com.google.android.play:core-common:2.0.3] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\db0f2498bb07f017d39d5cb2d952b27d\transformed\core-common-2.0.3\AndroidManifest.xml:2:1-21:12
+	package
+		INJECTED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\debug\AndroidManifest.xml
+	android:versionName
+		INJECTED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\debug\AndroidManifest.xml
+	android:versionCode
+		INJECTED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\debug\AndroidManifest.xml
+	xmlns:android
+		ADDED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\main\AndroidManifest.xml:1:11-69
+queries
+ADDED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\main\AndroidManifest.xml:39:5-44:15
+MERGED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-11:15
+MERGED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-11:15
+MERGED from [:file_picker] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\file_picker-8.3.7\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-13:15
+MERGED from [:file_picker] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\file_picker-8.3.7\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-13:15
+intent#action:name:android.intent.action.PROCESS_TEXT+data:mimeType:text/plain
+ADDED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\main\AndroidManifest.xml:40:9-43:18
+action#android.intent.action.PROCESS_TEXT
+ADDED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\main\AndroidManifest.xml:41:13-72
+	android:name
+		ADDED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\main\AndroidManifest.xml:41:21-70
+data
+ADDED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\main\AndroidManifest.xml:42:13-50
+	android:mimeType
+		ADDED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\main\AndroidManifest.xml:42:19-48
+uses-permission#android.permission.INTERNET
+ADDED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\debug\AndroidManifest.xml:6:5-66
+MERGED from [:google_sign_in_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\google_sign_in_android-6.2.1\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-67
+MERGED from [:google_sign_in_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\google_sign_in_android-6.2.1\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-67
+MERGED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:25:5-67
+MERGED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:25:5-67
+MERGED from [com.google.firebase:firebase-firestore:25.1.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9bb823874bf863b2f586eca3d3548ed5\transformed\firebase-firestore-25.1.4\AndroidManifest.xml:11:5-67
+MERGED from [com.google.firebase:firebase-firestore:25.1.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9bb823874bf863b2f586eca3d3548ed5\transformed\firebase-firestore-25.1.4\AndroidManifest.xml:11:5-67
+MERGED from [com.google.firebase:firebase-storage:21.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f0c139bfad30fb5c25db9d31e6a36212\transformed\firebase-storage-21.0.2\AndroidManifest.xml:24:5-67
+MERGED from [com.google.firebase:firebase-storage:21.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f0c139bfad30fb5c25db9d31e6a36212\transformed\firebase-storage-21.0.2\AndroidManifest.xml:24:5-67
+MERGED from [com.google.android.recaptcha:recaptcha:18.6.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b88730f0f0dfd351a6b3fe00c4e42353\transformed\recaptcha-18.6.1\AndroidManifest.xml:7:5-67
+MERGED from [com.google.android.recaptcha:recaptcha:18.6.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b88730f0f0dfd351a6b3fe00c4e42353\transformed\recaptcha-18.6.1\AndroidManifest.xml:7:5-67
+	android:name
+		ADDED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\debug\AndroidManifest.xml:6:22-64
+uses-sdk
+INJECTED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\debug\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\debug\AndroidManifest.xml
+INJECTED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\debug\AndroidManifest.xml
+MERGED from [:ffmpeg_kit_flutter_new] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\ffmpeg_kit_flutter_new-4.1.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:ffmpeg_kit_flutter_new] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\ffmpeg_kit_flutter_new-4.1.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:flutter_image_compress_common] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_image_compress_common-1.0.6\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-8:55
+MERGED from [:flutter_image_compress_common] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_image_compress_common-1.0.6\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-8:55
+MERGED from [:shared_preferences_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\shared_preferences_android-2.4.21\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:shared_preferences_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\shared_preferences_android-2.4.21\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:video_player_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\video_player_android-2.9.4\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:video_player_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\video_player_android-2.9.4\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:webview_flutter_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\webview_flutter_android-4.10.11\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:webview_flutter_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\webview_flutter_android-4.10.11\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [androidx.preference:preference:1.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\4b959f7c338d1bf58ad15a77e656e7c1\transformed\preference-1.2.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.preference:preference:1.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\4b959f7c338d1bf58ad15a77e656e7c1\transformed\preference-1.2.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.appcompat:appcompat-resources:1.5.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\14de00ff56cbfe58648d9e22bbb3643a\transformed\appcompat-resources-1.5.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.appcompat:appcompat-resources:1.5.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\14de00ff56cbfe58648d9e22bbb3643a\transformed\appcompat-resources-1.5.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.appcompat:appcompat:1.5.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\0330aa36dfb9f03e944336c747a008b1\transformed\appcompat-1.5.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.appcompat:appcompat:1.5.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\0330aa36dfb9f03e944336c747a008b1\transformed\appcompat-1.5.1\AndroidManifest.xml:20:5-44
+MERGED from [:file_picker] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\file_picker-8.3.7\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:file_picker] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\file_picker-8.3.7\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-44
+MERGED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:6:5-44
+MERGED from [:url_launcher_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.28\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:url_launcher_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.28\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:cloud_firestore] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\cloud_firestore-5.6.12\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:cloud_firestore] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\cloud_firestore-5.6.12\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:firebase_auth] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_auth-5.7.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:firebase_auth] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_auth-5.7.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:firebase_storage] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_storage-12.4.10\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:firebase_storage] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_storage-12.4.10\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:firebase_core] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_core-3.15.2\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:firebase_core] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_core-3.15.2\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:flutter_plugin_android_lifecycle] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_plugin_android_lifecycle-2.0.33\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:flutter_plugin_android_lifecycle] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_plugin_android_lifecycle-2.0.33\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:google_sign_in_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\google_sign_in_android-6.2.1\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:google_sign_in_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\google_sign_in_android-6.2.1\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:path_provider_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\path_provider_android-2.2.22\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:path_provider_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\path_provider_android-2.2.22\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:video_compress] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\video_compress-3.1.4\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:video_compress] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\video_compress-3.1.4\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:video_thumbnail] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\video_thumbnail-0.5.6\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [:video_thumbnail] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\video_thumbnail-0.5.6\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:5:5-44
+MERGED from [androidx.recyclerview:recyclerview:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cd55c5e7ba4d5725300001734228d92f\transformed\recyclerview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.recyclerview:recyclerview:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cd55c5e7ba4d5725300001734228d92f\transformed\recyclerview-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\8a24049c8bb51166dac8e6cc253a4f57\transformed\legacy-support-core-ui-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\8a24049c8bb51166dac8e6cc253a4f57\transformed\legacy-support-core-ui-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\63ea796eb2ff6afb59b9be29ee3bbb39\transformed\swiperefreshlayout-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\63ea796eb2ff6afb59b9be29ee3bbb39\transformed\swiperefreshlayout-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:21:5-23:151
+MERGED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:21:5-23:151
+MERGED from [androidx.browser:browser:1.9.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\c703595a64646951e3dca5c9e84e54ff\transformed\browser-1.9.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.browser:browser:1.9.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\c703595a64646951e3dca5c9e84e54ff\transformed\browser-1.9.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.media3:media3-extractor:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\2d314572bbb1a034ecb899b3e37cba9c\transformed\media3-extractor-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-extractor:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\2d314572bbb1a034ecb899b3e37cba9c\transformed\media3-extractor-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-container:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\c1bd4d40b797c2d8235b05e860529bfa\transformed\media3-container-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-container:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\c1bd4d40b797c2d8235b05e860529bfa\transformed\media3-container-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-datasource:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5c7ba828f455a10544b03fa4c206351b\transformed\media3-datasource-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-datasource:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5c7ba828f455a10544b03fa4c206351b\transformed\media3-datasource-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-decoder:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9beb8a0230802b28aa963cdf64f4f53f\transformed\media3-decoder-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-decoder:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9beb8a0230802b28aa963cdf64f4f53f\transformed\media3-decoder-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-database:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5e5c4213b55bec221fdcf14d13d511d1\transformed\media3-database-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-database:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5e5c4213b55bec221fdcf14d13d511d1\transformed\media3-database-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-common:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\aa1e2108b666a3e84c928320221e8855\transformed\media3-common-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-common:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\aa1e2108b666a3e84c928320221e8855\transformed\media3-common-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer-hls:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\3238a62a36ae02846f583aec0576f29b\transformed\media3-exoplayer-hls-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer-hls:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\3238a62a36ae02846f583aec0576f29b\transformed\media3-exoplayer-hls-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer-dash:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\917b3eac7c3f740f7d0887321ee6b3d0\transformed\media3-exoplayer-dash-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer-dash:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\917b3eac7c3f740f7d0887321ee6b3d0\transformed\media3-exoplayer-dash-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer-rtsp:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\469a97fbc002655e9119de755212d5cc\transformed\media3-exoplayer-rtsp-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer-rtsp:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\469a97fbc002655e9119de755212d5cc\transformed\media3-exoplayer-rtsp-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer-smoothstreaming:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\6d2dac66af0573d655fd5fe0e5ee9bd8\transformed\media3-exoplayer-smoothstreaming-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer-smoothstreaming:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\6d2dac66af0573d655fd5fe0e5ee9bd8\transformed\media3-exoplayer-smoothstreaming-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\de8caec8d708cab68c6370b2330dee5d\transformed\media3-exoplayer-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.media3:media3-exoplayer:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\de8caec8d708cab68c6370b2330dee5d\transformed\media3-exoplayer-1.9.2\AndroidManifest.xml:20:5-44
+MERGED from [androidx.webkit:webkit:1.14.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\55a1cbdf4172e6b1732396fe3e61e5f1\transformed\webkit-1.14.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.webkit:webkit:1.14.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\55a1cbdf4172e6b1732396fe3e61e5f1\transformed\webkit-1.14.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\e6bada844bb923ab161d79080aaea579\transformed\slidingpanelayout-1.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\e6bada844bb923ab161d79080aaea579\transformed\slidingpanelayout-1.2.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.window:window:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cd55006f3af01eca13a44d05ded19cc2\transformed\window-1.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.window:window:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cd55006f3af01eca13a44d05ded19cc2\transformed\window-1.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.window:window-java:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\dd469dce54fb235c44e62946145b58cc\transformed\window-java-1.2.0\AndroidManifest.xml:19:5-44
+MERGED from [androidx.window:window-java:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\dd469dce54fb235c44e62946145b58cc\transformed\window-java-1.2.0\AndroidManifest.xml:19:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ec7558ac8791ad5a73f9f29a6cb9157e\transformed\drawerlayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ec7558ac8791ad5a73f9f29a6cb9157e\transformed\drawerlayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.emoji2:emoji2-views-helper:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ec896b23ba8094d64d1cb7cbf772926d\transformed\emoji2-views-helper-1.2.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.emoji2:emoji2-views-helper:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ec896b23ba8094d64d1cb7cbf772926d\transformed\emoji2-views-helper-1.2.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.emoji2:emoji2:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\939f3ad82514b6f9abcf17b3aad4b42c\transformed\emoji2-1.2.0\AndroidManifest.xml:21:5-44
+MERGED from [androidx.emoji2:emoji2:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\939f3ad82514b6f9abcf17b3aad4b42c\transformed\emoji2-1.2.0\AndroidManifest.xml:21:5-44
+MERGED from [androidx.credentials:credentials:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf5f9f3c8c204f1eaca76876939df185\transformed\credentials-1.2.0-rc01\AndroidManifest.xml:5:5-44
+MERGED from [androidx.credentials:credentials:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf5f9f3c8c204f1eaca76876939df185\transformed\credentials-1.2.0-rc01\AndroidManifest.xml:5:5-44
+MERGED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:21:5-44
+MERGED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:21:5-44
+MERGED from [com.google.android.gms:play-services-auth:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\bc9dac762807af0faf4b8802a6d21833\transformed\play-services-auth-21.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.google.android.gms:play-services-auth:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\bc9dac762807af0faf4b8802a6d21833\transformed\play-services-auth-21.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.google.firebase:firebase-firestore:25.1.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9bb823874bf863b2f586eca3d3548ed5\transformed\firebase-firestore-25.1.4\AndroidManifest.xml:6:5-44
+MERGED from [com.google.firebase:firebase-firestore:25.1.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9bb823874bf863b2f586eca3d3548ed5\transformed\firebase-firestore-25.1.4\AndroidManifest.xml:6:5-44
+MERGED from [com.google.firebase:firebase-storage:21.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f0c139bfad30fb5c25db9d31e6a36212\transformed\firebase-storage-21.0.2\AndroidManifest.xml:19:5-44
+MERGED from [com.google.firebase:firebase-storage:21.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f0c139bfad30fb5c25db9d31e6a36212\transformed\firebase-storage-21.0.2\AndroidManifest.xml:19:5-44
+MERGED from [com.google.firebase:firebase-auth-interop:20.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5adc7445fc4393f8e512b2ff3f317369\transformed\firebase-auth-interop-20.0.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-auth-interop:20.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5adc7445fc4393f8e512b2ff3f317369\transformed\firebase-auth-interop-20.0.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\21f22314527288259e21d5daaba52605\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:18:5-44
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\21f22314527288259e21d5daaba52605\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:18:5-44
+MERGED from [com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5f43f36a6386db306c79b7d03f045305\transformed\firebase-common-ktx-21.0.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5f43f36a6386db306c79b7d03f045305\transformed\firebase-common-ktx-21.0.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:19:5-44
+MERGED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:19:5-44
+MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\defa85ad8f9189bab912180a9550672d\transformed\play-services-auth-api-phone-18.0.2\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-api-phone:18.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\defa85ad8f9189bab912180a9550672d\transformed\play-services-auth-api-phone-18.0.2\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-base:18.0.10] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\569ed18e20f2ff9dc70acafd91b5a2bf\transformed\play-services-auth-base-18.0.10\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-auth-base:18.0.10] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\569ed18e20f2ff9dc70acafd91b5a2bf\transformed\play-services-auth-base-18.0.10\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.recaptcha:recaptcha:18.6.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b88730f0f0dfd351a6b3fe00c4e42353\transformed\recaptcha-18.6.1\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.recaptcha:recaptcha:18.6.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b88730f0f0dfd351a6b3fe00c4e42353\transformed\recaptcha-18.6.1\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.play:integrity:1.3.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9aa5fa4349d645aecaea1bd24aa4f1f8\transformed\integrity-1.3.0\AndroidManifest.xml:4:5-44
+MERGED from [com.google.android.play:integrity:1.3.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9aa5fa4349d645aecaea1bd24aa4f1f8\transformed\integrity-1.3.0\AndroidManifest.xml:4:5-44
+MERGED from [com.google.firebase:firebase-database-collection:18.0.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\4d78fc94628b4fdd0af431c60afc036d\transformed\firebase-database-collection-18.0.1\AndroidManifest.xml:5:5-7:41
+MERGED from [com.google.firebase:firebase-database-collection:18.0.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\4d78fc94628b4fdd0af431c60afc036d\transformed\firebase-database-collection-18.0.1\AndroidManifest.xml:5:5-7:41
+MERGED from [com.google.firebase:firebase-appcheck-interop:17.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\d73f21f399d1ad4adebb28da745821e3\transformed\firebase-appcheck-interop-17.1.0\AndroidManifest.xml:18:5-44
+MERGED from [com.google.firebase:firebase-appcheck-interop:17.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\d73f21f399d1ad4adebb28da745821e3\transformed\firebase-appcheck-interop-17.1.0\AndroidManifest.xml:18:5-44
+MERGED from [com.google.android.gms:play-services-fido:20.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ba7f47ed79d4b94f9ef4e3b48a080618\transformed\play-services-fido-20.1.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-fido:20.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ba7f47ed79d4b94f9ef4e3b48a080618\transformed\play-services-fido-20.1.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-base:18.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\87593e21da0fd48c2909f3826fbef62f\transformed\play-services-base-18.1.0\AndroidManifest.xml:18:5-43
+MERGED from [com.google.android.gms:play-services-base:18.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\87593e21da0fd48c2909f3826fbef62f\transformed\play-services-base-18.1.0\AndroidManifest.xml:18:5-43
+MERGED from [androidx.fragment:fragment-ktx:1.7.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\421fcba44bb06049166b24397e9fbeda\transformed\fragment-ktx-1.7.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.fragment:fragment-ktx:1.7.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\421fcba44bb06049166b24397e9fbeda\transformed\fragment-ktx-1.7.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity-ktx:1.12.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\753b0a03e2038e070431acd7fa4feddc\transformed\activity-ktx-1.12.4\AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity-ktx:1.12.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\753b0a03e2038e070431acd7fa4feddc\transformed\activity-ktx-1.12.4\AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity:1.12.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ae97e1c2c118bf8baa0b209ed3307fc2\transformed\activity-1.12.4\AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.12.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ae97e1c2c118bf8baa0b209ed3307fc2\transformed\activity-1.12.4\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\22511e5f9b9e77c262554e79f2c195f8\transformed\lifecycle-livedata-core-ktx-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\22511e5f9b9e77c262554e79f2c195f8\transformed\lifecycle-livedata-core-ktx-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ff060184ca7a288054e53939cb0d8e24\transformed\lifecycle-viewmodel-ktx-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ff060184ca7a288054e53939cb0d8e24\transformed\lifecycle-viewmodel-ktx-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\44387f56765a00c4e94b2f4f2e23e336\transformed\lifecycle-runtime-ktx-2.7.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\44387f56765a00c4e94b2f4f2e23e336\transformed\lifecycle-runtime-ktx-2.7.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\823167ae951b7c75fe0e5d8c28eac5b5\transformed\lifecycle-livedata-core-2.7.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\823167ae951b7c75fe0e5d8c28eac5b5\transformed\lifecycle-livedata-core-2.7.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ba7aaf3756592a453859f0577d0ecb1c\transformed\lifecycle-viewmodel-savedstate-2.7.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ba7aaf3756592a453859f0577d0ecb1c\transformed\lifecycle-viewmodel-savedstate-2.7.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\75f1269d57da6147491ce24ed6de6ce3\transformed\lifecycle-viewmodel-2.7.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\75f1269d57da6147491ce24ed6de6ce3\transformed\lifecycle-viewmodel-2.7.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\20ff5d78d88aff1ec01d8becfbbaf8fe\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\20ff5d78d88aff1ec01d8becfbbaf8fe\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5857e697016b08f21f82979759acc0be\transformed\lifecycle-runtime-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5857e697016b08f21f82979759acc0be\transformed\lifecycle-runtime-2.7.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.savedstate:savedstate-ktx:1.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\2cfd95419e1401f3c2788985f50cb815\transformed\savedstate-ktx-1.2.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate-ktx:1.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\2cfd95419e1401f3c2788985f50cb815\transformed\savedstate-ktx-1.2.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\68d6d279dc5e82dc6fb54a7721f5cce1\transformed\savedstate-1.2.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\68d6d279dc5e82dc6fb54a7721f5cce1\transformed\savedstate-1.2.1\AndroidManifest.xml:20:5-44
+MERGED from [androidx.datastore:datastore-preferences-core-android:1.1.7] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\3a022b93d40760c862e8e5903bbcac40\transformed\datastore-preferences-core-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.datastore:datastore-preferences-core-android:1.1.7] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\3a022b93d40760c862e8e5903bbcac40\transformed\datastore-preferences-core-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.datastore:datastore-core-android:1.1.7] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\26445deb34b112d32a6d0dc4afcd514d\transformed\datastore-core-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.datastore:datastore-core-android:1.1.7] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\26445deb34b112d32a6d0dc4afcd514d\transformed\datastore-core-release\AndroidManifest.xml:5:5-44
+MERGED from [androidx.datastore:datastore-preferences-android:1.1.7] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\29bb4e3f01d63b44dfd6ed6ca59ba102\transformed\datastore-preferences-release\AndroidManifest.xml:20:5-44
+MERGED from [androidx.datastore:datastore-preferences-android:1.1.7] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\29bb4e3f01d63b44dfd6ed6ca59ba102\transformed\datastore-preferences-release\AndroidManifest.xml:20:5-44
+MERGED from [androidx.datastore:datastore-android:1.1.7] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ba72eb6bd7c1094d0007a128864e268a\transformed\datastore-release\AndroidManifest.xml:20:5-44
+MERGED from [androidx.datastore:datastore-android:1.1.7] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\ba72eb6bd7c1094d0007a128864e268a\transformed\datastore-release\AndroidManifest.xml:20:5-44
+MERGED from [androidx.navigationevent:navigationevent-android:1.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\781c2e72e35abd8e9751d7e1b0e1ac93\transformed\navigationevent\AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigationevent:navigationevent-android:1.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\781c2e72e35abd8e9751d7e1b0e1ac93\transformed\navigationevent\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\c1a2317e3f150f82d4cf0e255a2420f4\transformed\play-services-tasks-18.2.0\AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-tasks:18.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\c1a2317e3f150f82d4cf0e255a2420f4\transformed\play-services-tasks-18.2.0\AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-basement:18.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5c2a01603f7fdbeec8eab9b1873f2aea\transformed\play-services-basement-18.4.0\AndroidManifest.xml:3:5-44
+MERGED from [com.google.android.gms:play-services-basement:18.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5c2a01603f7fdbeec8eab9b1873f2aea\transformed\play-services-basement-18.4.0\AndroidManifest.xml:3:5-44
+MERGED from [androidx.fragment:fragment:1.7.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\2942ac14e350bb1c313fcc01fb2f9c67\transformed\fragment-1.7.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.fragment:fragment:1.7.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\2942ac14e350bb1c313fcc01fb2f9c67\transformed\fragment-1.7.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9466298c30dc500e7f511b0aa886a3b8\transformed\legacy-support-core-utils-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9466298c30dc500e7f511b0aa886a3b8\transformed\legacy-support-core-utils-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\896cab2638203e837f844e40543f9944\transformed\loader-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.loader:loader:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\896cab2638203e837f844e40543f9944\transformed\loader-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.core:core-ktx:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\711fdca95ad61da49a56a02280bf58cd\transformed\core-ktx-1.17.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-ktx:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\711fdca95ad61da49a56a02280bf58cd\transformed\core-ktx-1.17.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f64ef72f93ead0627d984e1e01929303\transformed\viewpager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f64ef72f93ead0627d984e1e01929303\transformed\viewpager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\74bc9965eefc7a89219e2ae95f139d2a\transformed\vectordrawable-animated-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable-animated:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\74bc9965eefc7a89219e2ae95f139d2a\transformed\vectordrawable-animated-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\a7e45bf8782b8b72327689026e2fa1ea\transformed\vectordrawable-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.vectordrawable:vectordrawable:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\a7e45bf8782b8b72327689026e2fa1ea\transformed\vectordrawable-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\119dbb29d52d07b663174458ac30186a\transformed\coordinatorlayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\119dbb29d52d07b663174458ac30186a\transformed\coordinatorlayout-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\c71bbc0d43c484033bf2aa574c609026\transformed\customview-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.customview:customview:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\c71bbc0d43c484033bf2aa574c609026\transformed\customview-1.1.0\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.transition:transition:1.4.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b04ce4975e5ff70e99adf51e4e7e6aee\transformed\transition-1.4.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.transition:transition:1.4.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b04ce4975e5ff70e99adf51e4e7e6aee\transformed\transition-1.4.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\6303fb9e42fef7f59254aab803c6ca45\transformed\asynclayoutinflater-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\6303fb9e42fef7f59254aab803c6ca45\transformed\asynclayoutinflater-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\fe466d01096315eb795ac782eef033af\transformed\core-1.17.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\fe466d01096315eb795ac782eef033af\transformed\core-1.17.0\AndroidManifest.xml:20:5-44
+MERGED from [com.antonkarpenko:ffmpeg-kit-full-gpl:2.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\d78b38543d6a58f70e5ec82a11684445\transformed\ffmpeg-kit-full-gpl-2.1.0\AndroidManifest.xml:5:5-44
+MERGED from [com.antonkarpenko:ffmpeg-kit-full-gpl:2.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\d78b38543d6a58f70e5ec82a11684445\transformed\ffmpeg-kit-full-gpl-2.1.0\AndroidManifest.xml:5:5-44
+MERGED from [com.otaliastudios:transcoder:0.10.5] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\12d03c7b0cc04fc296030296ce78158f\transformed\transcoder-0.10.5\AndroidManifest.xml:5:5-7:41
+MERGED from [com.otaliastudios:transcoder:0.10.5] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\12d03c7b0cc04fc296030296ce78158f\transformed\transcoder-0.10.5\AndroidManifest.xml:5:5-7:41
+MERGED from [com.otaliastudios.opengl:egloo:0.6.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\105a34b9847bba8b687c1cddeced92d0\transformed\egloo-0.6.1\AndroidManifest.xml:5:5-7:41
+MERGED from [com.otaliastudios.opengl:egloo:0.6.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\105a34b9847bba8b687c1cddeced92d0\transformed\egloo-0.6.1\AndroidManifest.xml:5:5-7:41
+MERGED from [com.google.android.libraries.identity.googleid:googleid:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\364d01b648c1518e761c57d9b53e8fbf\transformed\googleid-1.1.0\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.libraries.identity.googleid:googleid:1.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\364d01b648c1518e761c57d9b53e8fbf\transformed\googleid-1.1.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.heifwriter:heifwriter:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\4c564ce2d47430966f6ed5f74ae95187\transformed\heifwriter-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.heifwriter:heifwriter:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\4c564ce2d47430966f6ed5f74ae95187\transformed\heifwriter-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.exifinterface:exifinterface:1.4.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\84b142d522b8fd0a2ed078abc3fb9f49\transformed\exifinterface-1.4.2\AndroidManifest.xml:5:5-44
+MERGED from [androidx.exifinterface:exifinterface:1.4.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\84b142d522b8fd0a2ed078abc3fb9f49\transformed\exifinterface-1.4.2\AndroidManifest.xml:5:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:21:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:21:5-44
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b9eb8a1a496559a57c267953f19a1f5e\transformed\startup-runtime-1.1.1\AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b9eb8a1a496559a57c267953f19a1f5e\transformed\startup-runtime-1.1.1\AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.tracing:tracing:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\207d15e88ec1782e0bbc925f8b1625e0\transformed\tracing-1.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.tracing:tracing:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\207d15e88ec1782e0bbc925f8b1625e0\transformed\tracing-1.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5894835d8c80f65725ce6b6b896e151f\transformed\cursoradapter-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5894835d8c80f65725ce6b6b896e151f\transformed\cursoradapter-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\af1fcc3551e96bc368a7e6f4972c6767\transformed\interpolator-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\af1fcc3551e96bc368a7e6f4972c6767\transformed\interpolator-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\4f0abb00b4c9e04354c372bd77cc4b34\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\4f0abb00b4c9e04354c372bd77cc4b34\transformed\versionedparcelable-1.1.1\AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\42044262f887e91fee6808b6522ce83c\transformed\localbroadcastmanager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\42044262f887e91fee6808b6522ce83c\transformed\localbroadcastmanager-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [com.google.firebase:firebase-components:18.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f3029ba1ce8a9b48f1dca28444e4de32\transformed\firebase-components-18.0.0\AndroidManifest.xml:18:5-44
+MERGED from [com.google.firebase:firebase-components:18.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f3029ba1ce8a9b48f1dca28444e4de32\transformed\firebase-components-18.0.0\AndroidManifest.xml:18:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\8fbd0d1a47089307fd01dd35c77ff556\transformed\core-runtime-2.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\8fbd0d1a47089307fd01dd35c77ff556\transformed\core-runtime-2.2.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.window.extensions.core:core:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\6f64ce3cc0e3800481a810a9969d0b00\transformed\core-1.0.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.window.extensions.core:core:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\6f64ce3cc0e3800481a810a9969d0b00\transformed\core-1.0.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\6ae34a157b732732e23a5a2f4955017b\transformed\documentfile-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\6ae34a157b732732e23a5a2f4955017b\transformed\documentfile-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b148a7f0989c41e99ded8da74d09764a\transformed\print-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b148a7f0989c41e99ded8da74d09764a\transformed\print-1.0.0\AndroidManifest.xml:20:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f43755361c24f191f3cfd14bc2a631a7\transformed\annotation-experimental-1.4.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f43755361c24f191f3cfd14bc2a631a7\transformed\annotation-experimental-1.4.1\AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-viewtree:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\a40ad7cdf283fbd25b906097aafd5c6c\transformed\core-viewtree-1.0.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-viewtree:1.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\a40ad7cdf283fbd25b906097aafd5c6c\transformed\core-viewtree-1.0.0\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-annotation-android:1.9.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\c4dad51c4beedc28cf6a7898dee9059e\transformed\runtime-annotation\AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-annotation-android:1.9.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\c4dad51c4beedc28cf6a7898dee9059e\transformed\runtime-annotation\AndroidManifest.xml:5:5-44
+MERGED from [com.getkeepsafe.relinker:relinker:1.4.5] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\797c5402757c33f61fc858571fa09b39\transformed\relinker-1.4.5\AndroidManifest.xml:5:5-43
+MERGED from [com.getkeepsafe.relinker:relinker:1.4.5] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\797c5402757c33f61fc858571fa09b39\transformed\relinker-1.4.5\AndroidManifest.xml:5:5-43
+MERGED from [io.grpc:grpc-android:1.62.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\70c06075788772e27e59036dd6c344cf\transformed\grpc-android-1.62.2\AndroidManifest.xml:5:5-44
+MERGED from [io.grpc:grpc-android:1.62.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\70c06075788772e27e59036dd6c344cf\transformed\grpc-android-1.62.2\AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:protolite-well-known-types:18.0.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\1cb7f6393a1697777edf6ffb48f8e8ce\transformed\protolite-well-known-types-18.0.1\AndroidManifest.xml:5:5-44
+MERGED from [com.google.firebase:protolite-well-known-types:18.0.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\1cb7f6393a1697777edf6ffb48f8e8ce\transformed\protolite-well-known-types-18.0.1\AndroidManifest.xml:5:5-44
+MERGED from [com.google.android.play:core-common:2.0.3] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\db0f2498bb07f017d39d5cb2d952b27d\transformed\core-common-2.0.3\AndroidManifest.xml:7:5-9:41
+MERGED from [com.google.android.play:core-common:2.0.3] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\db0f2498bb07f017d39d5cb2d952b27d\transformed\core-common-2.0.3\AndroidManifest.xml:7:5-9:41
+	tools:overrideLibrary
+		ADDED from [:flutter_image_compress_common] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_image_compress_common-1.0.6\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-52
+	android:targetSdkVersion
+		INJECTED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\debug\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\debug\AndroidManifest.xml
+intent#action:name:android.support.customtabs.action.CustomTabsService
+ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-10:18
+action#android.support.customtabs.action.CustomTabsService
+ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-90
+	android:name
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:21-87
+activity#com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserActivity
+ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:9-18:47
+	android:exported
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:17:13-37
+	android:configChanges
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:13-137
+	android:theme
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:18:13-44
+	android:name
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:13-104
+activity#com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs.ChromeCustomTabsActivity
+ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:9-22:55
+	android:exported
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:13-37
+	android:theme
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:22:13-52
+	android:name
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:13-112
+activity#com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs.TrustedWebActivity
+ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:23:9-26:55
+	android:exported
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:13-37
+	android:theme
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:26:13-52
+	android:name
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:24:13-106
+activity#com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs.ChromeCustomTabsActivitySingleInstance
+ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:27:9-31:55
+	android:launchMode
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:30:13-48
+	android:exported
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:29:13-37
+	android:theme
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:31:13-52
+	android:name
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:28:13-126
+activity#com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs.TrustedWebActivitySingleInstance
+ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:32:9-36:55
+	android:launchMode
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:35:13-48
+	android:exported
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:34:13-37
+	android:theme
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:36:13-52
+	android:name
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:33:13-120
+receiver#com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs.ActionBroadcastReceiver
+ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:38:9-41:40
+	android:enabled
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:40:13-35
+	android:exported
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:41:13-37
+	android:name
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:39:13-111
+meta-data#io.flutter.embedded_views_preview
+ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:43:9-45:36
+	android:value
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:45:13-33
+	android:name
+		ADDED from [:flutter_inappwebview] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\flutter_inappwebview-5.8.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:44:13-61
+intent#action:name:android.intent.action.GET_CONTENT+data:mimeType:*/*
+ADDED from [:file_picker] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\file_picker-8.3.7\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-12:18
+action#android.intent.action.GET_CONTENT
+ADDED from [:file_picker] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\file_picker-8.3.7\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-72
+	android:name
+		ADDED from [:file_picker] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\file_picker-8.3.7\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:21-69
+provider#io.flutter.plugins.imagepicker.ImagePickerFileProvider
+ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:9-17:20
+	android:grantUriPermissions
+		ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:13:13-47
+	android:authorities
+		ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-74
+	android:exported
+		ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:12:13-37
+	android:name
+		ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-82
+meta-data#android.support.FILE_PROVIDER_PATHS
+ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:14:13-16:75
+	android:resource
+		ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:16:17-72
+	android:name
+		ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:15:17-67
+service#com.google.android.gms.metadata.ModuleDependencies
+ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:19:9-31:19
+	android:enabled
+		ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:21:13-36
+	android:exported
+		ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:22:13-37
+	tools:ignore
+		ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:23:13-40
+	android:name
+		ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:20:13-78
+intent-filter#action:name:com.google.android.gms.metadata.MODULE_DEPENDENCIES
+ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:24:13-26:29
+action#com.google.android.gms.metadata.MODULE_DEPENDENCIES
+ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:17-94
+	android:name
+		ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:25:25-91
+meta-data#photopicker_activity:0:required
+ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:28:13-30:36
+	android:value
+		ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:30:17-33
+	android:name
+		ADDED from [:image_picker_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\image_picker_android-0.8.13+14\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:29:17-63
+activity#io.flutter.plugins.urllauncher.WebViewActivity
+ADDED from [:url_launcher_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.28\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-11:74
+	android:exported
+		ADDED from [:url_launcher_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.28\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:13-37
+	android:theme
+		ADDED from [:url_launcher_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.28\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:13-71
+	android:name
+		ADDED from [:url_launcher_android] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\url_launcher_android-6.3.28\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-74
+service#com.google.firebase.components.ComponentDiscoveryService
+ADDED from [:cloud_firestore] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\cloud_firestore-5.6.12\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-12:19
+MERGED from [:firebase_auth] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_auth-5.7.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-12:19
+MERGED from [:firebase_auth] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_auth-5.7.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-12:19
+MERGED from [:firebase_storage] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_storage-12.4.10\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-12:19
+MERGED from [:firebase_storage] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_storage-12.4.10\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-12:19
+MERGED from [:firebase_core] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_core-3.15.2\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-12:19
+MERGED from [:firebase_core] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_core-3.15.2\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:9-12:19
+MERGED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:66:9-72:19
+MERGED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:66:9-72:19
+MERGED from [com.google.firebase:firebase-firestore:25.1.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9bb823874bf863b2f586eca3d3548ed5\transformed\firebase-firestore-25.1.4\AndroidManifest.xml:14:9-23:19
+MERGED from [com.google.firebase:firebase-firestore:25.1.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9bb823874bf863b2f586eca3d3548ed5\transformed\firebase-firestore-25.1.4\AndroidManifest.xml:14:9-23:19
+MERGED from [com.google.firebase:firebase-storage:21.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f0c139bfad30fb5c25db9d31e6a36212\transformed\firebase-storage-21.0.2\AndroidManifest.xml:27:9-36:19
+MERGED from [com.google.firebase:firebase-storage:21.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f0c139bfad30fb5c25db9d31e6a36212\transformed\firebase-storage-21.0.2\AndroidManifest.xml:27:9-36:19
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\21f22314527288259e21d5daaba52605\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:22:9-31:19
+MERGED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\21f22314527288259e21d5daaba52605\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:22:9-31:19
+MERGED from [com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5f43f36a6386db306c79b7d03f045305\transformed\firebase-common-ktx-21.0.0\AndroidManifest.xml:9:9-15:19
+MERGED from [com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5f43f36a6386db306c79b7d03f045305\transformed\firebase-common-ktx-21.0.0\AndroidManifest.xml:9:9-15:19
+MERGED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:30:9-38:19
+MERGED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:30:9-38:19
+	android:exported
+		ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:68:13-37
+	tools:targetApi
+		ADDED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:34:13-32
+	android:directBootAware
+		ADDED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:32:13-43
+	android:name
+		ADDED from [:cloud_firestore] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\cloud_firestore-5.6.12\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:8:18-89
+meta-data#com.google.firebase.components:io.flutter.plugins.firebase.firestore.FlutterFirebaseFirestoreRegistrar
+ADDED from [:cloud_firestore] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\cloud_firestore-5.6.12\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-11:85
+	android:value
+		ADDED from [:cloud_firestore] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\cloud_firestore-5.6.12\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:17-82
+	android:name
+		ADDED from [:cloud_firestore] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\cloud_firestore-5.6.12\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:17-134
+meta-data#com.google.firebase.components:io.flutter.plugins.firebase.auth.FlutterFirebaseAuthRegistrar
+ADDED from [:firebase_auth] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_auth-5.7.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-11:85
+	android:value
+		ADDED from [:firebase_auth] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_auth-5.7.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:17-82
+	android:name
+		ADDED from [:firebase_auth] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_auth-5.7.0\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:17-124
+meta-data#com.google.firebase.components:io.flutter.plugins.firebase.storage.FlutterFirebaseAppRegistrar
+ADDED from [:firebase_storage] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_storage-12.4.10\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-11:85
+	android:value
+		ADDED from [:firebase_storage] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_storage-12.4.10\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:17-82
+	android:name
+		ADDED from [:firebase_storage] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_storage-12.4.10\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:17-126
+meta-data#com.google.firebase.components:io.flutter.plugins.firebase.core.FlutterFirebaseCoreRegistrar
+ADDED from [:firebase_core] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_core-3.15.2\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:9:13-11:85
+	android:value
+		ADDED from [:firebase_core] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_core-3.15.2\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:11:17-82
+	android:name
+		ADDED from [:firebase_core] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\firebase_core-3.15.2\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:10:17-124
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from [:video_compress] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\video_compress-3.1.4\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:5-81
+	android:name
+		ADDED from [:video_compress] C:\Users\Lismer Palce\AppData\Local\Pub\Cache\hosted\pub.dev\video_compress-3.1.4\android\build\intermediates\merged_manifest\debug\processDebugManifest\AndroidManifest.xml:7:22-78
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+IMPLIED from C:\Users\Lismer Palce\Downloads\AMC-SocialMedia\socialmediaappui-v2\social_media_aap\android\app\src\debug\AndroidManifest.xml:1:1-7:12 reason: com.example.video_compress requested WRITE_EXTERNAL_STORAGE
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:26:5-79
+MERGED from [androidx.media3:media3-common:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\aa1e2108b666a3e84c928320221e8855\transformed\media3-common-1.9.2\AndroidManifest.xml:22:5-79
+MERGED from [androidx.media3:media3-common:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\aa1e2108b666a3e84c928320221e8855\transformed\media3-common-1.9.2\AndroidManifest.xml:22:5-79
+MERGED from [androidx.media3:media3-exoplayer:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\de8caec8d708cab68c6370b2330dee5d\transformed\media3-exoplayer-1.9.2\AndroidManifest.xml:22:5-79
+MERGED from [androidx.media3:media3-exoplayer:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\de8caec8d708cab68c6370b2330dee5d\transformed\media3-exoplayer-1.9.2\AndroidManifest.xml:22:5-79
+MERGED from [com.google.firebase:firebase-firestore:25.1.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9bb823874bf863b2f586eca3d3548ed5\transformed\firebase-firestore-25.1.4\AndroidManifest.xml:10:5-79
+MERGED from [com.google.firebase:firebase-firestore:25.1.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9bb823874bf863b2f586eca3d3548ed5\transformed\firebase-firestore-25.1.4\AndroidManifest.xml:10:5-79
+MERGED from [com.google.firebase:firebase-storage:21.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f0c139bfad30fb5c25db9d31e6a36212\transformed\firebase-storage-21.0.2\AndroidManifest.xml:23:5-79
+MERGED from [com.google.firebase:firebase-storage:21.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f0c139bfad30fb5c25db9d31e6a36212\transformed\firebase-storage-21.0.2\AndroidManifest.xml:23:5-79
+MERGED from [com.google.android.recaptcha:recaptcha:18.6.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b88730f0f0dfd351a6b3fe00c4e42353\transformed\recaptcha-18.6.1\AndroidManifest.xml:8:5-79
+MERGED from [com.google.android.recaptcha:recaptcha:18.6.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b88730f0f0dfd351a6b3fe00c4e42353\transformed\recaptcha-18.6.1\AndroidManifest.xml:8:5-79
+MERGED from [io.grpc:grpc-android:1.62.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\70c06075788772e27e59036dd6c344cf\transformed\grpc-android-1.62.2\AndroidManifest.xml:7:5-79
+MERGED from [io.grpc:grpc-android:1.62.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\70c06075788772e27e59036dd6c344cf\transformed\grpc-android-1.62.2\AndroidManifest.xml:7:5-79
+	android:name
+		ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:26:22-76
+activity#com.google.firebase.auth.internal.GenericIdpActivity
+ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:29:9-46:20
+	android:excludeFromRecents
+		ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:31:13-46
+	android:launchMode
+		ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:33:13-44
+	android:exported
+		ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:32:13-36
+	android:theme
+		ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:34:13-72
+	android:name
+		ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:30:13-80
+intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:host:firebase.auth+data:path:/+data:scheme:genericidp
+ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:35:13-45:29
+action#android.intent.action.VIEW
+ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:36:17-69
+	android:name
+		ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:36:25-66
+category#android.intent.category.DEFAULT
+ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:38:17-76
+	android:name
+		ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:38:27-73
+category#android.intent.category.BROWSABLE
+ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:39:17-78
+	android:name
+		ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:39:27-75
+activity#com.google.firebase.auth.internal.RecaptchaActivity
+ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:47:9-64:20
+	android:excludeFromRecents
+		ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:49:13-46
+	android:launchMode
+		ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:51:13-44
+	android:exported
+		ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:50:13-36
+	android:theme
+		ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:52:13-72
+	android:name
+		ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:48:13-79
+intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:host:firebase.auth+data:path:/+data:scheme:recaptcha
+ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:53:13-63:29
+meta-data#com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar
+ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:69:13-71:85
+	android:value
+		ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:71:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-auth:23.2.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cf81ca527e983d87c0b6de65514234da\transformed\firebase-auth-23.2.1\AndroidManifest.xml:70:17-109
+uses-permission#android.permission.WAKE_LOCK
+ADDED from [androidx.media3:media3-exoplayer:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\de8caec8d708cab68c6370b2330dee5d\transformed\media3-exoplayer-1.9.2\AndroidManifest.xml:23:5-68
+	android:name
+		ADDED from [androidx.media3:media3-exoplayer:1.9.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\de8caec8d708cab68c6370b2330dee5d\transformed\media3-exoplayer-1.9.2\AndroidManifest.xml:23:22-65
+uses-library#androidx.window.extensions
+ADDED from [androidx.window:window:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cd55006f3af01eca13a44d05ded19cc2\transformed\window-1.2.0\AndroidManifest.xml:23:9-25:40
+	android:required
+		ADDED from [androidx.window:window:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cd55006f3af01eca13a44d05ded19cc2\transformed\window-1.2.0\AndroidManifest.xml:25:13-37
+	android:name
+		ADDED from [androidx.window:window:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cd55006f3af01eca13a44d05ded19cc2\transformed\window-1.2.0\AndroidManifest.xml:24:13-54
+uses-library#androidx.window.sidecar
+ADDED from [androidx.window:window:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cd55006f3af01eca13a44d05ded19cc2\transformed\window-1.2.0\AndroidManifest.xml:26:9-28:40
+	android:required
+		ADDED from [androidx.window:window:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cd55006f3af01eca13a44d05ded19cc2\transformed\window-1.2.0\AndroidManifest.xml:28:13-37
+	android:name
+		ADDED from [androidx.window:window:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\cd55006f3af01eca13a44d05ded19cc2\transformed\window-1.2.0\AndroidManifest.xml:27:13-51
+provider#androidx.startup.InitializationProvider
+ADDED from [androidx.emoji2:emoji2:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\939f3ad82514b6f9abcf17b3aad4b42c\transformed\emoji2-1.2.0\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\20ff5d78d88aff1ec01d8becfbbaf8fe\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\20ff5d78d88aff1ec01d8becfbbaf8fe\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b9eb8a1a496559a57c267953f19a1f5e\transformed\startup-runtime-1.1.1\AndroidManifest.xml:26:9-30:34
+MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b9eb8a1a496559a57c267953f19a1f5e\transformed\startup-runtime-1.1.1\AndroidManifest.xml:26:9-30:34
+	tools:node
+		ADDED from [androidx.emoji2:emoji2:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\939f3ad82514b6f9abcf17b3aad4b42c\transformed\emoji2-1.2.0\AndroidManifest.xml:28:13-31
+	android:authorities
+		ADDED from [androidx.emoji2:emoji2:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\939f3ad82514b6f9abcf17b3aad4b42c\transformed\emoji2-1.2.0\AndroidManifest.xml:26:13-68
+	android:exported
+		ADDED from [androidx.emoji2:emoji2:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\939f3ad82514b6f9abcf17b3aad4b42c\transformed\emoji2-1.2.0\AndroidManifest.xml:27:13-37
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\939f3ad82514b6f9abcf17b3aad4b42c\transformed\emoji2-1.2.0\AndroidManifest.xml:25:13-67
+meta-data#androidx.emoji2.text.EmojiCompatInitializer
+ADDED from [androidx.emoji2:emoji2:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\939f3ad82514b6f9abcf17b3aad4b42c\transformed\emoji2-1.2.0\AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.emoji2:emoji2:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\939f3ad82514b6f9abcf17b3aad4b42c\transformed\emoji2-1.2.0\AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.2.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\939f3ad82514b6f9abcf17b3aad4b42c\transformed\emoji2-1.2.0\AndroidManifest.xml:30:17-75
+service#androidx.credentials.playservices.CredentialProviderMetadataHolder
+ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:24:9-32:19
+	android:enabled
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:26:13-35
+	android:exported
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:27:13-37
+	tools:ignore
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:28:13-60
+	android:name
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:25:13-94
+meta-data#androidx.credentials.CREDENTIAL_PROVIDER_KEY
+ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:29:13-31:104
+	android:value
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:31:17-101
+	android:name
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:30:17-76
+activity#androidx.credentials.playservices.HiddenActivity
+ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:34:9-41:20
+	android:fitsSystemWindows
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:39:13-45
+	android:enabled
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:38:13-37
+	android:configChanges
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:36:13-87
+	android:theme
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:40:13-48
+	android:name
+		ADDED from [androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5cf9286c4fc58abf2981a511e7bece1f\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:35:13-76
+activity#com.google.android.gms.auth.api.signin.internal.SignInHubActivity
+ADDED from [com.google.android.gms:play-services-auth:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\bc9dac762807af0faf4b8802a6d21833\transformed\play-services-auth-21.0.0\AndroidManifest.xml:23:9-27:75
+	android:excludeFromRecents
+		ADDED from [com.google.android.gms:play-services-auth:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\bc9dac762807af0faf4b8802a6d21833\transformed\play-services-auth-21.0.0\AndroidManifest.xml:25:13-46
+	android:exported
+		ADDED from [com.google.android.gms:play-services-auth:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\bc9dac762807af0faf4b8802a6d21833\transformed\play-services-auth-21.0.0\AndroidManifest.xml:26:13-37
+	android:theme
+		ADDED from [com.google.android.gms:play-services-auth:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\bc9dac762807af0faf4b8802a6d21833\transformed\play-services-auth-21.0.0\AndroidManifest.xml:27:13-72
+	android:name
+		ADDED from [com.google.android.gms:play-services-auth:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\bc9dac762807af0faf4b8802a6d21833\transformed\play-services-auth-21.0.0\AndroidManifest.xml:24:13-93
+service#com.google.android.gms.auth.api.signin.RevocationBoundService
+ADDED from [com.google.android.gms:play-services-auth:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\bc9dac762807af0faf4b8802a6d21833\transformed\play-services-auth-21.0.0\AndroidManifest.xml:33:9-37:51
+	android:exported
+		ADDED from [com.google.android.gms:play-services-auth:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\bc9dac762807af0faf4b8802a6d21833\transformed\play-services-auth-21.0.0\AndroidManifest.xml:35:13-36
+	android:visibleToInstantApps
+		ADDED from [com.google.android.gms:play-services-auth:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\bc9dac762807af0faf4b8802a6d21833\transformed\play-services-auth-21.0.0\AndroidManifest.xml:37:13-48
+	android:permission
+		ADDED from [com.google.android.gms:play-services-auth:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\bc9dac762807af0faf4b8802a6d21833\transformed\play-services-auth-21.0.0\AndroidManifest.xml:36:13-107
+	android:name
+		ADDED from [com.google.android.gms:play-services-auth:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\bc9dac762807af0faf4b8802a6d21833\transformed\play-services-auth-21.0.0\AndroidManifest.xml:34:13-89
+meta-data#com.google.firebase.components:com.google.firebase.firestore.FirebaseFirestoreKtxRegistrar
+ADDED from [com.google.firebase:firebase-firestore:25.1.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9bb823874bf863b2f586eca3d3548ed5\transformed\firebase-firestore-25.1.4\AndroidManifest.xml:17:13-19:85
+	android:value
+		ADDED from [com.google.firebase:firebase-firestore:25.1.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9bb823874bf863b2f586eca3d3548ed5\transformed\firebase-firestore-25.1.4\AndroidManifest.xml:19:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-firestore:25.1.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9bb823874bf863b2f586eca3d3548ed5\transformed\firebase-firestore-25.1.4\AndroidManifest.xml:18:17-122
+meta-data#com.google.firebase.components:com.google.firebase.firestore.FirestoreRegistrar
+ADDED from [com.google.firebase:firebase-firestore:25.1.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9bb823874bf863b2f586eca3d3548ed5\transformed\firebase-firestore-25.1.4\AndroidManifest.xml:20:13-22:85
+	android:value
+		ADDED from [com.google.firebase:firebase-firestore:25.1.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9bb823874bf863b2f586eca3d3548ed5\transformed\firebase-firestore-25.1.4\AndroidManifest.xml:22:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-firestore:25.1.4] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\9bb823874bf863b2f586eca3d3548ed5\transformed\firebase-firestore-25.1.4\AndroidManifest.xml:21:17-111
+meta-data#com.google.firebase.components:com.google.firebase.storage.FirebaseStorageKtxRegistrar
+ADDED from [com.google.firebase:firebase-storage:21.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f0c139bfad30fb5c25db9d31e6a36212\transformed\firebase-storage-21.0.2\AndroidManifest.xml:30:13-32:85
+	android:value
+		ADDED from [com.google.firebase:firebase-storage:21.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f0c139bfad30fb5c25db9d31e6a36212\transformed\firebase-storage-21.0.2\AndroidManifest.xml:32:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-storage:21.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f0c139bfad30fb5c25db9d31e6a36212\transformed\firebase-storage-21.0.2\AndroidManifest.xml:31:17-118
+meta-data#com.google.firebase.components:com.google.firebase.storage.StorageRegistrar
+ADDED from [com.google.firebase:firebase-storage:21.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f0c139bfad30fb5c25db9d31e6a36212\transformed\firebase-storage-21.0.2\AndroidManifest.xml:33:13-35:85
+	android:value
+		ADDED from [com.google.firebase:firebase-storage:21.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f0c139bfad30fb5c25db9d31e6a36212\transformed\firebase-storage-21.0.2\AndroidManifest.xml:35:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-storage:21.0.2] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\f0c139bfad30fb5c25db9d31e6a36212\transformed\firebase-storage-21.0.2\AndroidManifest.xml:34:17-107
+meta-data#com.google.firebase.components:com.google.firebase.appcheck.FirebaseAppCheckKtxRegistrar
+ADDED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\21f22314527288259e21d5daaba52605\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:25:13-27:85
+	android:value
+		ADDED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\21f22314527288259e21d5daaba52605\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:27:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\21f22314527288259e21d5daaba52605\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:26:17-120
+meta-data#com.google.firebase.components:com.google.firebase.appcheck.FirebaseAppCheckRegistrar
+ADDED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\21f22314527288259e21d5daaba52605\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:28:13-30:85
+	android:value
+		ADDED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\21f22314527288259e21d5daaba52605\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:30:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-appcheck:18.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\21f22314527288259e21d5daaba52605\transformed\firebase-appcheck-18.0.0\AndroidManifest.xml:29:17-117
+meta-data#com.google.firebase.components:com.google.firebase.ktx.FirebaseCommonLegacyRegistrar
+ADDED from [com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5f43f36a6386db306c79b7d03f045305\transformed\firebase-common-ktx-21.0.0\AndroidManifest.xml:12:13-14:85
+	android:value
+		ADDED from [com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5f43f36a6386db306c79b7d03f045305\transformed\firebase-common-ktx-21.0.0\AndroidManifest.xml:14:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-common-ktx:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5f43f36a6386db306c79b7d03f045305\transformed\firebase-common-ktx-21.0.0\AndroidManifest.xml:13:17-116
+provider#com.google.firebase.provider.FirebaseInitProvider
+ADDED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:23:9-28:39
+	android:authorities
+		ADDED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:25:13-72
+	android:exported
+		ADDED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:27:13-37
+	android:directBootAware
+		ADDED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:26:13-43
+	android:initOrder
+		ADDED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:28:13-36
+	android:name
+		ADDED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:24:13-77
+meta-data#com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar
+ADDED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:35:13-37:85
+	android:value
+		ADDED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:37:17-82
+	android:name
+		ADDED from [com.google.firebase:firebase-common:21.0.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\534106fc977aa1677926b44ba10f268d\transformed\firebase-common-21.0.0\AndroidManifest.xml:36:17-109
+uses-permission#com.google.android.providers.gsf.permission.READ_GSERVICES
+ADDED from [com.google.android.recaptcha:recaptcha:18.6.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b88730f0f0dfd351a6b3fe00c4e42353\transformed\recaptcha-18.6.1\AndroidManifest.xml:9:5-98
+	android:name
+		ADDED from [com.google.android.recaptcha:recaptcha:18.6.1] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\b88730f0f0dfd351a6b3fe00c4e42353\transformed\recaptcha-18.6.1\AndroidManifest.xml:9:22-95
+activity#com.google.android.gms.common.api.GoogleApiActivity
+ADDED from [com.google.android.gms:play-services-base:18.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\87593e21da0fd48c2909f3826fbef62f\transformed\play-services-base-18.1.0\AndroidManifest.xml:20:9-22:45
+	android:exported
+		ADDED from [com.google.android.gms:play-services-base:18.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\87593e21da0fd48c2909f3826fbef62f\transformed\play-services-base-18.1.0\AndroidManifest.xml:22:19-43
+	android:theme
+		ADDED from [com.google.android.gms:play-services-base:18.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\87593e21da0fd48c2909f3826fbef62f\transformed\play-services-base-18.1.0\AndroidManifest.xml:21:19-78
+	android:name
+		ADDED from [com.google.android.gms:play-services-base:18.1.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\87593e21da0fd48c2909f3826fbef62f\transformed\play-services-base-18.1.0\AndroidManifest.xml:20:19-85
+meta-data#androidx.lifecycle.ProcessLifecycleInitializer
+ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\20ff5d78d88aff1ec01d8becfbbaf8fe\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\20ff5d78d88aff1ec01d8becfbbaf8fe\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\20ff5d78d88aff1ec01d8becfbbaf8fe\transformed\lifecycle-process-2.7.0\AndroidManifest.xml:30:17-78
+meta-data#com.google.android.gms.version
+ADDED from [com.google.android.gms:play-services-basement:18.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5c2a01603f7fdbeec8eab9b1873f2aea\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:9-122
+	android:value
+		ADDED from [com.google.android.gms:play-services-basement:18.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5c2a01603f7fdbeec8eab9b1873f2aea\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:66-119
+	android:name
+		ADDED from [com.google.android.gms:play-services-basement:18.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\5c2a01603f7fdbeec8eab9b1873f2aea\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:20-65
+permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\fe466d01096315eb795ac782eef033af\transformed\core-1.17.0\AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\fe466d01096315eb795ac782eef033af\transformed\core-1.17.0\AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\fe466d01096315eb795ac782eef033af\transformed\core-1.17.0\AndroidManifest.xml:23:9-81
+permission#com.example.social_media_app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\fe466d01096315eb795ac782eef033af\transformed\core-1.17.0\AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\fe466d01096315eb795ac782eef033af\transformed\core-1.17.0\AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\fe466d01096315eb795ac782eef033af\transformed\core-1.17.0\AndroidManifest.xml:23:9-81
+uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\fe466d01096315eb795ac782eef033af\transformed\core-1.17.0\AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\fe466d01096315eb795ac782eef033af\transformed\core-1.17.0\AndroidManifest.xml:26:22-94
+uses-permission#com.example.social_media_app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\fe466d01096315eb795ac782eef033af\transformed\core-1.17.0\AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.17.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\fe466d01096315eb795ac782eef033af\transformed\core-1.17.0\AndroidManifest.xml:26:22-94
+meta-data#androidx.profileinstaller.ProfileInstallerInitializer
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
+receiver#androidx.profileinstaller.ProfileInstallReceiver
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
+	android:enabled
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
+	android:permission
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
+	android:directBootAware
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
+intent-filter#action:name:androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
+action#androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
+intent-filter#action:name:androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
+action#androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
+intent-filter#action:name:androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
+action#androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
+intent-filter#action:name:androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
+action#androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\357e2e087b3927d21b1f506526112270\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:25-92
+activity#com.google.android.play.core.common.PlayCoreDialogWrapperActivity
+ADDED from [com.google.android.play:core-common:2.0.3] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\db0f2498bb07f017d39d5cb2d952b27d\transformed\core-common-2.0.3\AndroidManifest.xml:14:9-18:65
+	android:stateNotNeeded
+		ADDED from [com.google.android.play:core-common:2.0.3] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\db0f2498bb07f017d39d5cb2d952b27d\transformed\core-common-2.0.3\AndroidManifest.xml:17:13-42
+	android:exported
+		ADDED from [com.google.android.play:core-common:2.0.3] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\db0f2498bb07f017d39d5cb2d952b27d\transformed\core-common-2.0.3\AndroidManifest.xml:16:13-37
+	android:theme
+		ADDED from [com.google.android.play:core-common:2.0.3] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\db0f2498bb07f017d39d5cb2d952b27d\transformed\core-common-2.0.3\AndroidManifest.xml:18:13-62
+	android:name
+		ADDED from [com.google.android.play:core-common:2.0.3] C:\Users\Lismer Palce\.gradle\caches\8.11.1\transforms\db0f2498bb07f017d39d5cb2d952b27d\transformed\core-common-2.0.3\AndroidManifest.xml:15:13-93
